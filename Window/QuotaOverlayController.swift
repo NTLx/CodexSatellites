@@ -444,6 +444,7 @@ final class QuotaOverlayController {
     }
 
     private func reviewLoginItems() {
+        hideSettingsBar(animated: true)
         SMAppService.openSystemSettingsLoginItems()
     }
 

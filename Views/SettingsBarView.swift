@@ -36,7 +36,6 @@ struct SettingsBarView: View {
             RoundedRectangle(cornerRadius: 13, style: .continuous)
                 .stroke(Color.primary.opacity(0.12), lineWidth: 0.5)
         }
-        .shadow(color: .black.opacity(0.12), radius: 8, y: 3)
     }
 
     @ViewBuilder

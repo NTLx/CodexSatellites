@@ -25,25 +25,12 @@
 
 ## 3. 文档结构
 
-- `01_PRODUCT_UX_SPEC.md`：产品边界、交互、视觉、状态与非目标。
-- `02_TECHNICAL_ARCHITECTURE.md`：代码结构、数据流、Codex usage 解析、窗口与刘海几何。
-- `03_IMPLEMENTATION_PLAN.md`：面向实施 AI Agent 的逐阶段开发计划、每阶段完成条件。
-- `04_TEST_ACCEPTANCE.md`：单元、集成、人工 UI 验收、异常路径及 v0.1 Release Gate。
-- `05_AGENT_EXECUTION_GUIDE.md`：AI Agent 执行约束、修改纪律、验证命令、禁止事项。
-- `06_RESEARCH_REFERENCES.md`：竞品逆向结论、官方 API、外部接口风险及未来迁移路径。
-- `CodexSatellites_Settings_LaunchAtLogin_Implementation.md`：本次紧凑设置条、开机启动和退出功能的实施约束。
-- `CodexSatellites-v0.1-COMBINED.md`：上述全部正文的单文件合集，方便一次性提供给 Agent。
+- `01_PRODUCT_UX_SPEC.md`：当前产品边界、交互、视觉、状态与非目标。
+- `02_TECHNICAL_ARCHITECTURE.md`：当前真实架构、数据流、Codex usage 解析、窗口与刘海几何。
+- `04_TEST_ACCEPTANCE.md`：当前单元、集成、人工 UI 验收与 v0.1 Release Gate。
+- `06_RESEARCH_REFERENCES.md`：外部 API、竞品与历史研究背景。
 
-## 4. 建议给实施 Agent 的使用方式
-
-最优顺序：
-
-1. 先读 `01_PRODUCT_UX_SPEC.md`，理解“不做什么”。
-2. 再读 `02_TECHNICAL_ARCHITECTURE.md`，确认实现边界。
-3. 严格按 `03_IMPLEMENTATION_PLAN.md` 的垂直切片执行。
-4. 每完成一阶段，立即跑 `04_TEST_ACCEPTANCE.md` 对应验证。
-5. 全程遵守 `05_AGENT_EXECUTION_GUIDE.md`。
-6. 遇到 undocumented endpoint、刘海几何或竞品实现疑问时再看 `06_RESEARCH_REFERENCES.md`。
+开发或修改功能前，先读取 Product SPEC 与 Technical Architecture；完成修改后按 Test & Acceptance 执行验证。
 
 ## 5. 成功定义
 
