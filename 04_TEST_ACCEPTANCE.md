@@ -161,7 +161,33 @@ HTTP integration 使用：
 - [ ] 点击 Quit 只终止当前实例，不 unregister Login Item。
 - [ ] Reduce Motion 开启时无 slide/bounce。
 
-### 4.4 数字
+### 4.4 Launch at Login end-to-end
+
+必须使用稳定 `.app` 路径验证，不能只依赖单元测试或 `SMAppService.status`。
+
+#### ON
+
+- [ ] 将 CodexSatellites.app 放到稳定路径，例如 `/Applications/CodexSatellites.app` 或 `~/Applications/CodexSatellites.app`
+- [ ] Launch at Login = ON
+- [ ] logout/login 或 reboot
+- [ ] 登录后 CodexSatellites 自动运行
+- [ ] 左右 satellite 自动出现
+
+#### OFF
+
+- [ ] Launch at Login = OFF
+- [ ] 当前正在运行的 App 不因此退出
+- [ ] logout/login 或 reboot
+- [ ] 登录后 CodexSatellites 不自动运行
+
+#### Quit semantics
+
+- [ ] Launch at Login = ON
+- [ ] 点击 Quit，当前进程退出
+- [ ] Login Item 不被 unregister
+- [ ] 下一次登录仍自动启动
+
+### 4.5 数字
 
 人工注入 mock 或真实数据验证：
 
@@ -174,7 +200,7 @@ HTTP integration 使用：
 
 三位数不得改变 notch 内侧 anchor。
 
-### 4.5 Fresh/Stale
+### 4.6 Fresh/Stale
 
 - [ ] fresh 正常显示。
 - [ ] 断网后保留原百分比。
@@ -299,6 +325,7 @@ v0.1 只有在以下全部为 PASS 时才可标记完成：
 [PASS] Display-change behavior
 [PASS] Compact settings bar behavior
 [PASS] Launch at Login state mapping
+[PASS] Launch at Login end-to-end
 [PASS] Scope-creep audit
 ```
 
@@ -320,7 +347,10 @@ v0.1 只有在以下全部为 PASS 时才可标记完成：
 - Fresh/stale network behavior: PASS / FAIL
 - Display-change behavior: PASS / FAIL / NOT TESTED
 - Compact settings bar: PASS / FAIL / NOT TESTED
-- Launch at Login: PASS / FAIL / NOT TESTED
+- Launch at Login state mapping: PASS / FAIL / NOT TESTED
+- Launch at Login ON after login/reboot: PASS / FAIL / NOT TESTED
+- Launch at Login OFF after login/reboot: PASS / FAIL / NOT TESTED
+- Quit preserves login-item registration: PASS / FAIL / NOT TESTED
 - Scope audit: PASS / FAIL
 
 ### Changed files
