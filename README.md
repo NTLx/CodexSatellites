@@ -75,5 +75,3 @@ The release script reads signing and notarization identity from the local enviro
 ## License
 
 CodexSatellites is released under the [MIT License](LICENSE).
-
-The public release is distributed under the MIT License.

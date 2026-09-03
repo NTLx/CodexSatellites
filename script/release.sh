@@ -282,6 +282,7 @@ tell application "Finder"
         set text size of viewOptions to 13
         set position of item "CodexSatellites.app" of container window to {170, 220}
         set position of item "Applications" of container window to {490, 220}
+        set position of item "LICENSE.txt" of container window to {330, 340}
         set background picture of viewOptions to file ".background:dmg-background.png"
         update without registering applications
         delay 2
@@ -313,6 +314,7 @@ create_styled_dmg() {
 
     [[ -d "$source_app" ]] || die "source app missing: $source_app"
     [[ -f "$DMG_BACKGROUND" ]] || die "DMG background missing: $DMG_BACKGROUND"
+    [[ -f "$ROOT_DIR/LICENSE" ]] || die "LICENSE missing: $ROOT_DIR/LICENSE"
     rm -rf "$DMG_ROOT"
     rm -f "$rw_dmg" "$final_dmg"
     mkdir -p "$DMG_ROOT"
@@ -325,6 +327,7 @@ create_styled_dmg() {
     fi
     ditto "$source_app" "$DMG_ROOT/$APP_NAME.app"
     ln -s /Applications "$DMG_ROOT/Applications"
+    cp "$ROOT_DIR/LICENSE" "$DMG_ROOT/LICENSE.txt"
     hdiutil create -volname "$APP_NAME" -srcfolder "$DMG_ROOT" -ov -format UDRW "$rw_dmg"
 
     cleanup_mount() {
