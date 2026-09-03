@@ -16,6 +16,7 @@ struct QuotaOrbView: View {
     let freshness: OrbFreshness
     let expanded: Bool
     let side: QuotaOrbSide
+    let onActivate: () -> Void
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
@@ -23,26 +24,30 @@ struct QuotaOrbView: View {
     private let lineWidth: CGFloat = 2.25
 
     var body: some View {
-        HStack(spacing: 4) {
-            if side == .left {
-                orb
-                if expanded {
-                    percentageText
+        Button(action: onActivate) {
+            HStack(spacing: 4) {
+                if side == .left {
+                    orb
+                    if expanded {
+                        percentageText
+                    }
+                } else {
+                    if expanded {
+                        percentageText
+                    }
+                    orb
                 }
-            } else {
-                if expanded {
-                    percentageText
-                }
-                orb
             }
+            .padding(.horizontal, lineWidth / 2)
+            .frame(width: expanded ? 60 : 24, height: 24, alignment: side == .left ? .trailing : .leading)
+            .contentShape(Rectangle())
         }
-        .padding(.horizontal, lineWidth / 2)
-        .frame(width: expanded ? 60 : diameter + lineWidth, height: 24, alignment: .leading)
+        .buttonStyle(.plain)
         .opacity(opacity)
         .animation(reduceMotion ? .linear(duration: 0.01) : .easeInOut(duration: 0.2), value: expanded)
-        .accessibilityElement(children: .ignore)
         .accessibilityLabel(side == .left ? "Codex five hour remaining" : "Codex weekly remaining")
         .accessibilityValue(displayValue)
+        .accessibilityHint("Click to open settings")
     }
 
     private var orb: some View {

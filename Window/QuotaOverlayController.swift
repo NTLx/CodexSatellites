@@ -1,6 +1,7 @@
 import AppKit
 import OSLog
 import QuartzCore
+import ServiceManagement
 import SwiftUI
 
 @MainActor
@@ -9,24 +10,34 @@ final class QuotaOverlayController {
         static let orbDiameter: CGFloat = 14
         static let orbLineWidth: CGFloat = 2.25
         static let panelHeight: CGFloat = 24
-        static let collapsedWidth: CGFloat = orbDiameter + orbLineWidth
+        static let collapsedWidth: CGFloat = 24
         static let expandedWidth: CGFloat = 60
         static let horizontalGap: CGFloat = 10
         static let hoverPadding: CGFloat = 10
+        static let settingsWidth: CGFloat = 240
+        static let settingsHeight: CGFloat = 44
+        static let settingsNotchGap: CGFloat = 6
         static let collapseDelay: Duration = .seconds(3)
         static let expandAnimationDuration: TimeInterval = 0.2
         static let collapseAnimationDuration: TimeInterval = 0.18
+        static let settingsShowDuration: TimeInterval = 0.18
+        static let settingsHideDuration: TimeInterval = 0.15
+        static let settingsAnimationOffset: CGFloat = 6
     }
 
     private let logger = Logger(subsystem: "com.codexsatellites.app", category: "window")
     private let usageClient = CodexUsageClient()
+    private let launchAtLoginService: LaunchAtLoginService
     private let leftPanel: NSPanel
     private let rightPanel: NSPanel
+    private let settingsPanel: NSPanel
     private let leftHostingView: NSHostingView<QuotaOrbView>
     private let rightHostingView: NSHostingView<QuotaOrbView>
+    private var settingsHostingView: NSHostingView<SettingsBarView>
 
     private var state = SnapshotStateMachine()
     private var expanded = false
+    private var settingsVisible = false
     private var currentGeometry: NotchGeometry?
     private var refreshTask: Task<Void, Never>?
     private var collapseTask: Task<Void, Never>?
@@ -34,23 +45,36 @@ final class QuotaOverlayController {
     private var wakeObserver: NSObjectProtocol?
     private var globalMouseMonitor: Any?
     private var localMouseMonitor: Any?
+    private var globalClickMonitor: Any?
+    private var localClickMonitor: Any?
     private var started = false
 
     init() {
+        launchAtLoginService = LaunchAtLoginService()
         leftHostingView = NSHostingView(rootView: QuotaOrbView(
             remainingPercent: nil,
             freshness: .unavailable,
             expanded: false,
-            side: .left
+            side: .left,
+            onActivate: {}
         ))
         rightHostingView = NSHostingView(rootView: QuotaOrbView(
             remainingPercent: nil,
             freshness: .unavailable,
             expanded: false,
-            side: .right
+            side: .right,
+            onActivate: {}
+        ))
+        settingsHostingView = NSHostingView(rootView: SettingsBarView(
+            launchAtLoginState: .unavailable,
+            onSetLaunchAtLogin: { _ in },
+            onReviewLoginItems: {},
+            onQuit: {}
         ))
         leftPanel = Self.makePanel(contentView: leftHostingView)
         rightPanel = Self.makePanel(contentView: rightHostingView)
+        settingsPanel = Self.makeSettingsPanel(contentView: settingsHostingView)
+        settingsHostingView.rootView = makeSettingsBarView()
     }
 
     func start() {
@@ -73,6 +97,9 @@ final class QuotaOverlayController {
         collapseTask?.cancel()
         collapseTask = nil
         removeObservers()
+        settingsVisible = false
+        settingsPanel.alphaValue = 1
+        settingsPanel.orderOut(nil)
         leftPanel.orderOut(nil)
         rightPanel.orderOut(nil)
     }
@@ -93,7 +120,28 @@ final class QuotaOverlayController {
         panel.level = .statusBar
         panel.collectionBehavior = [.canJoinAllSpaces, .stationary]
         panel.isExcludedFromWindowsMenu = true
-        panel.ignoresMouseEvents = true
+        panel.ignoresMouseEvents = false
+        panel.becomesKeyOnlyIfNeeded = false
+        return panel
+    }
+
+    private static func makeSettingsPanel(contentView: NSView) -> NSPanel {
+        let panel = NSPanel(
+            contentRect: CGRect(x: 0, y: 0, width: OverlayMetrics.settingsWidth, height: OverlayMetrics.settingsHeight),
+            styleMask: [.borderless, .nonactivatingPanel],
+            backing: .buffered,
+            defer: false
+        )
+        panel.contentView = contentView
+        panel.isOpaque = false
+        panel.backgroundColor = .clear
+        panel.hasShadow = false
+        panel.hidesOnDeactivate = false
+        panel.isFloatingPanel = true
+        panel.level = .statusBar
+        panel.collectionBehavior = [.canJoinAllSpaces, .stationary]
+        panel.isExcludedFromWindowsMenu = true
+        panel.ignoresMouseEvents = false
         panel.becomesKeyOnlyIfNeeded = false
         return panel
     }
@@ -135,6 +183,19 @@ final class QuotaOverlayController {
             }
             return event
         }
+        globalClickMonitor = NSEvent.addGlobalMonitorForEvents(matching: .leftMouseDown) { [weak self] _ in
+            let location = NSEvent.mouseLocation
+            Task { @MainActor [weak self] in
+                self?.handleClick(at: location)
+            }
+        }
+        localClickMonitor = NSEvent.addLocalMonitorForEvents(matching: .leftMouseDown) { [weak self] event in
+            let location = NSEvent.mouseLocation
+            Task { @MainActor [weak self] in
+                self?.handleClick(at: location)
+            }
+            return event
+        }
     }
 
     private func removeObservers() {
@@ -150,15 +211,24 @@ final class QuotaOverlayController {
         if let localMouseMonitor {
             NSEvent.removeMonitor(localMouseMonitor)
         }
+        if let globalClickMonitor {
+            NSEvent.removeMonitor(globalClickMonitor)
+        }
+        if let localClickMonitor {
+            NSEvent.removeMonitor(localClickMonitor)
+        }
         screenChangeObserver = nil
         wakeObserver = nil
         globalMouseMonitor = nil
         localMouseMonitor = nil
+        globalClickMonitor = nil
+        localClickMonitor = nil
     }
 
     private func updateGeometry() {
         currentGeometry = Self.targetGeometry()
-        guard currentGeometry != nil else {
+        guard let geometry = currentGeometry else {
+            hideSettingsBar(animated: false)
             leftPanel.orderOut(nil)
             rightPanel.orderOut(nil)
             logger.info("geometry screen=none visible=false")
@@ -166,6 +236,9 @@ final class QuotaOverlayController {
         }
         logger.info("geometry screen=builtIn valid=true")
         updatePanelFrames(animated: false)
+        if settingsVisible {
+            settingsPanel.setFrame(settingsFrame(for: geometry), display: true, animate: false)
+        }
         leftPanel.orderFrontRegardless()
         rightPanel.orderFrontRegardless()
     }
@@ -196,7 +269,7 @@ final class QuotaOverlayController {
 
     private func updatePanelFrames(animated: Bool) {
         guard let geometry = currentGeometry else { return }
-        let width = expanded ? OverlayMetrics.expandedWidth : OverlayMetrics.collapsedWidth
+        let width = effectiveExpanded ? OverlayMetrics.expandedWidth : OverlayMetrics.collapsedWidth
         let height = OverlayMetrics.panelHeight
         let y = geometry.verticalCenter - height / 2
         let leftX = geometry.leftAnchor(gap: OverlayMetrics.horizontalGap) - width
@@ -211,7 +284,7 @@ final class QuotaOverlayController {
         }
 
         NSAnimationContext.runAnimationGroup { context in
-            context.duration = expanded
+            context.duration = effectiveExpanded
                 ? OverlayMetrics.expandAnimationDuration
                 : OverlayMetrics.collapseAnimationDuration
             context.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
@@ -226,9 +299,13 @@ final class QuotaOverlayController {
             collapseTask?.cancel()
             collapseTask = nil
             setExpanded(true)
-        } else if expanded {
+        } else if expanded && !settingsVisible {
             scheduleCollapse()
         }
+    }
+
+    private var effectiveExpanded: Bool {
+        expanded || settingsVisible
     }
 
     private var interactionRegion: CGRect {
@@ -259,6 +336,121 @@ final class QuotaOverlayController {
         logger.info("window expanded=\(value)")
     }
 
+    func toggleSettingsBar() {
+        guard started else { return }
+        if settingsVisible {
+            hideSettingsBar(animated: true)
+        } else {
+            showSettingsBar()
+        }
+    }
+
+    private func showSettingsBar() {
+        guard let geometry = currentGeometry else {
+            logger.info("settings visible=false reason=geometryUnavailable")
+            return
+        }
+
+        if launchAtLoginService.state() == .unavailable {
+            logger.info("launchAtLogin state=unavailable")
+        }
+        settingsVisible = true
+        render()
+        updatePanelFrames(animated: true)
+
+        let finalFrame = settingsFrame(for: geometry)
+        let initialFrame = finalFrame.offsetBy(dx: 0, dy: OverlayMetrics.settingsAnimationOffset)
+        settingsPanel.alphaValue = 0
+        settingsPanel.setFrame(initialFrame, display: false, animate: false)
+        settingsPanel.orderFrontRegardless()
+
+        let reduceMotion = NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
+        if reduceMotion {
+            settingsPanel.alphaValue = 1
+            settingsPanel.setFrame(finalFrame, display: true, animate: false)
+        } else {
+            NSAnimationContext.runAnimationGroup { context in
+                context.duration = OverlayMetrics.settingsShowDuration
+                context.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+                settingsPanel.animator().alphaValue = 1
+                settingsPanel.animator().setFrame(finalFrame, display: true)
+            }
+        }
+        logger.info("settings visible=true")
+    }
+
+    private func hideSettingsBar(animated: Bool) {
+        guard settingsVisible else {
+            settingsPanel.orderOut(nil)
+            return
+        }
+
+        settingsVisible = false
+        render()
+        updatePanelFrames(animated: true)
+        updateHoverState(at: NSEvent.mouseLocation)
+
+        guard animated, let geometry = currentGeometry else {
+            settingsPanel.alphaValue = 1
+            settingsPanel.orderOut(nil)
+            logger.info("settings visible=false")
+            return
+        }
+
+        let finalFrame = settingsFrame(for: geometry)
+        let hiddenFrame = finalFrame.offsetBy(dx: 0, dy: OverlayMetrics.settingsAnimationOffset)
+        let reduceMotion = NSWorkspace.shared.accessibilityDisplayShouldReduceMotion
+        NSAnimationContext.runAnimationGroup({ context in
+            context.duration = reduceMotion ? 0.01 : OverlayMetrics.settingsHideDuration
+            context.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
+            settingsPanel.animator().alphaValue = 0
+            settingsPanel.animator().setFrame(hiddenFrame, display: true)
+        }, completionHandler: { [weak self] in
+            Task { @MainActor [weak self] in
+                guard let self, !self.settingsVisible else { return }
+                self.settingsPanel.alphaValue = 1
+                self.settingsPanel.orderOut(nil)
+                self.logger.info("settings visible=false")
+            }
+        })
+    }
+
+    private func settingsFrame(for geometry: NotchGeometry) -> CGRect {
+        CGRect(
+            x: geometry.notchCenterX - OverlayMetrics.settingsWidth / 2,
+            y: geometry.notchBottomEdge - OverlayMetrics.settingsNotchGap - OverlayMetrics.settingsHeight,
+            width: OverlayMetrics.settingsWidth,
+            height: OverlayMetrics.settingsHeight
+        )
+    }
+
+    private func handleClick(at location: NSPoint) {
+        guard settingsVisible else { return }
+        let isInside = leftPanel.frame.contains(location)
+            || rightPanel.frame.contains(location)
+            || settingsPanel.frame.contains(location)
+        if !isInside {
+            hideSettingsBar(animated: true)
+        }
+    }
+
+    private func setLaunchAtLogin(_ enabled: Bool) {
+        do {
+            try launchAtLoginService.setEnabled(enabled)
+        } catch {
+            logger.error("login item update failed error=\(String(describing: error), privacy: .public)")
+        }
+        render()
+    }
+
+    private func reviewLoginItems() {
+        SMAppService.openSystemSettingsLoginItems()
+    }
+
+    private func quit() {
+        NSApp.terminate(nil)
+    }
+
     private func render() {
         let snapshot = state.freshness.snapshot
         let overallFreshness: OrbFreshness
@@ -278,14 +470,36 @@ final class QuotaOverlayController {
         leftHostingView.rootView = QuotaOrbView(
             remainingPercent: snapshot?.fiveHour?.remainingPercent,
             freshness: freshness(for: snapshot?.fiveHour),
-            expanded: expanded,
-            side: .left
+            expanded: effectiveExpanded,
+            side: .left,
+            onActivate: { [weak self] in
+                self?.toggleSettingsBar()
+            }
         )
         rightHostingView.rootView = QuotaOrbView(
             remainingPercent: snapshot?.weekly?.remainingPercent,
             freshness: freshness(for: snapshot?.weekly),
-            expanded: expanded,
-            side: .right
+            expanded: effectiveExpanded,
+            side: .right,
+            onActivate: { [weak self] in
+                self?.toggleSettingsBar()
+            }
+        )
+        settingsHostingView.rootView = makeSettingsBarView()
+    }
+
+    private func makeSettingsBarView() -> SettingsBarView {
+        SettingsBarView(
+            launchAtLoginState: launchAtLoginService.state(),
+            onSetLaunchAtLogin: { [weak self] enabled in
+                self?.setLaunchAtLogin(enabled)
+            },
+            onReviewLoginItems: { [weak self] in
+                self?.reviewLoginItems()
+            },
+            onQuit: { [weak self] in
+                self?.quit()
+            }
         )
     }
 

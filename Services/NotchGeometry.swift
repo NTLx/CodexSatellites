@@ -5,7 +5,12 @@ struct NotchGeometry: Equatable, Sendable {
     let screenFrame: CGRect
     let notchLeftEdge: CGFloat
     let notchRightEdge: CGFloat
+    let notchBottomEdge: CGFloat
     let verticalCenter: CGFloat
+
+    var notchCenterX: CGFloat {
+        (notchLeftEdge + notchRightEdge) / 2
+    }
 
     static func from(
         screenFrame: CGRect,
@@ -35,6 +40,7 @@ struct NotchGeometry: Equatable, Sendable {
             screenFrame: screenFrame,
             notchLeftEdge: leftEdge,
             notchRightEdge: rightEdge,
+            notchBottomEdge: topBand.minY,
             verticalCenter: topBand.midY
         )
     }
@@ -57,4 +63,3 @@ struct NotchGeometry: Equatable, Sendable {
         notchRightEdge + gap
     }
 }
-

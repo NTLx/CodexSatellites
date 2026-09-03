@@ -14,6 +14,8 @@ final class NotchGeometryTests: XCTestCase {
 
         XCTAssertEqual(geometry?.notchLeftEdge, 1410)
         XCTAssertEqual(geometry?.notchRightEdge, 1614)
+        XCTAssertEqual(geometry?.notchCenterX, 1512)
+        XCTAssertEqual(geometry?.notchBottomEdge, 1890)
         XCTAssertEqual(geometry?.verticalCenter, 1927)
         XCTAssertEqual(geometry?.leftAnchor(gap: 10), 1400)
         XCTAssertEqual(geometry?.rightAnchor(gap: 10), 1624)

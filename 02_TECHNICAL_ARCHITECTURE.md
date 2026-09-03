@@ -58,6 +58,8 @@ QuotaOverlayController
 - 无 MenuBarExtra；
 - overlay 由 AppDelegate / app-level controller 管理。
 
+Launch at Login 由 `SMAppService.mainApp.status` 唯一决定；不使用 UserDefaults 保存副本。
+
 ---
 
 ## 3. 文件结构
@@ -72,14 +74,17 @@ CodexSatellites/
 │   └── CodexQuotaSnapshot.swift
 ├── Services/
 │   ├── CodexUsageClient.swift
-│   └── NotchGeometry.swift
+│   ├── NotchGeometry.swift
+│   └── LaunchAtLoginService.swift
 ├── Window/
 │   └── QuotaOverlayController.swift
 ├── Views/
-│   └── QuotaOrbView.swift
+│   ├── QuotaOrbView.swift
+│   └── SettingsBarView.swift
 ├── Tests/
 │   ├── CodexUsageClientTests.swift
-│   └── NotchGeometryTests.swift
+│   ├── NotchGeometryTests.swift
+│   └── LaunchAtLoginServiceTests.swift
 ├── script/
 │   └── build_and_run.sh
 └── .codex/environments/environment.toml
@@ -426,12 +431,13 @@ NSApplication.didChangeScreenParametersNotification
 
 ## 10. Window Architecture
 
-### 10.1 两个独立 `NSPanel`
+### 10.1 三个独立 `NSPanel`
 
 ```text
 QuotaOverlayController
 ├── leftPanel
-└── rightPanel
+├── rightPanel
+└── settingsPanel
 ```
 
 与竞品常见的“大透明 window + 中央 island”不同，本项目不创建覆盖大面积顶部屏幕的透明容器。
@@ -463,6 +469,8 @@ collectionBehavior includes canJoinAllSpaces
 
 是否加入 `.fullScreenAuxiliary` 需要根据 v0.1 目标行为决定；如果加入，必须验证不会在系统全屏顶部产生异常遮挡。
 
+Settings panel 与 quota panel 使用相同的 `.borderless, .nonactivatingPanel` 基线；设置条宽约 240pt、高约 44pt，水平居中于 `NotchGeometry.notchCenterX`，其 frame 顶部位于 `notchBottomEdge - 6pt`。所有 panel 均不调用 `makeKey()` 或 `NSApp.activate(...)`。
+
 ### 10.3 非激活
 
 Panel 不应成为 key/main window，不应夺取 active app。
@@ -484,7 +492,7 @@ Expanded：增加外侧宽度：
 
 ### 11.1 目标
 
-只需要 hover，不需要 click、drag、pin、keyboard。
+Hover 保持额度展开；click 只用于打开/关闭设置条及操作设置条内的 Launch at Login、Review…、Quit，不支持 drag、pin 或 keyboard interaction。
 
 ### 11.2 推荐
 
@@ -493,6 +501,8 @@ Expanded：增加外侧宽度：
 ```text
 NSEvent.addGlobalMonitorForEvents(matching: .mouseMoved)
 NSEvent.addLocalMonitorForEvents(matching: .mouseMoved)
+NSEvent.addGlobalMonitorForEvents(matching: .leftMouseDown)
+NSEvent.addLocalMonitorForEvents(matching: .leftMouseDown)
 ```
 
 统一调用：
@@ -527,6 +537,7 @@ remainingPercent: Double?
 freshness: fresh/stale/unavailable
 expanded: Bool
 side: left/right
+onActivate: () -> Void
 ```
 
 职责：
@@ -544,6 +555,8 @@ side: left/right
 - 解析 auth；
 - 计算 NSScreen；
 - 控制 refresh timer。
+
+`SettingsBarView` 只接收 `LaunchAtLoginState` 和 action closures，不直接依赖 `SMAppService`。`LaunchAtLoginService` 通过 `LoginItemServicing` seam 映射 `.enabled`、`.notRegistered`、`.requiresApproval` 和 `.notFound`，并对 register/unregister 做幂等处理。
 
 ---
 
@@ -629,8 +642,9 @@ NSPrefersDisplaySafeAreaCompatibilityMode = false
 1. `CodexUsageClient` 是 undocumented remote API 的唯一边界。
 2. `NotchGeometry` 是 NSScreen camera-housing 语义的唯一边界。
 3. `QuotaOverlayController` 是 AppKit window/mouse 的唯一主要边界。
-4. SwiftUI 只负责展示。
-5. 不存在第二份 auth source of truth。
-6. 不存在 Provider abstraction。
-7. 不存在后台持久化数据库。
-8. 所有未知都 fail closed。
+4. SwiftUI 只负责展示和发出设置条 action。
+5. `LaunchAtLoginService` 是系统登录项状态的唯一应用边界，不使用本地状态副本。
+6. 不存在第二份 auth source of truth。
+7. 不存在 Provider abstraction。
+8. 不存在后台持久化数据库。
+9. 所有未知都 fail closed。

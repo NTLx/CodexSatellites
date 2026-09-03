@@ -1,7 +1,6 @@
 # Codex Satellites v0.1 — Combined Handoff
 
 
-
 ---
 
 <!-- BEGIN 00_README.md -->
@@ -15,7 +14,7 @@
 
 ## 1. 项目一句话定义
 
-一个原生 macOS ambient HUD：在带刘海的 MacBook 内置屏幕上，**刘海左侧用一个极小圆环表示 Codex 5 小时剩余额度，右侧用一个极小圆环表示周剩余额度；鼠标悬浮时，两侧分别向外横向展开并显示剩余百分比。**
+一个原生 macOS ambient HUD：在带刘海的 MacBook 内置屏幕上，**刘海左侧用一个极小圆环表示 Codex 5 小时剩余额度，右侧用一个极小圆环表示周剩余额度；鼠标悬浮时，两侧分别向外横向展开并显示剩余百分比；点击任一 satellite 可打开仅含 Launch at Login 与 Quit 的紧凑设置条。**
 
 它不是 Dynamic Island Dashboard，不是菜单栏工具，不是多 Provider usage center。
 
@@ -29,6 +28,7 @@
 6. **硬件刘海本身保持硬件，不绘制中央软件“岛”。**
 7. **未知数据不伪装成 0%。**
 8. **能用简单方案解决的问题，不提前引入复杂抽象。**
+9. **只提供紧凑 inline Settings Bar，不创建独立 Settings Window。**
 
 ## 3. 文档结构
 
@@ -38,6 +38,7 @@
 - `04_TEST_ACCEPTANCE.md`：单元、集成、人工 UI 验收、异常路径及 v0.1 Release Gate。
 - `05_AGENT_EXECUTION_GUIDE.md`：AI Agent 执行约束、修改纪律、验证命令、禁止事项。
 - `06_RESEARCH_REFERENCES.md`：竞品逆向结论、官方 API、外部接口风险及未来迁移路径。
+- `CodexSatellites_Settings_LaunchAtLogin_Implementation.md`：本次紧凑设置条、开机启动和退出功能的实施约束。
 - `CodexSatellites-v0.1-COMBINED.md`：上述全部正文的单文件合集，方便一次性提供给 Agent。
 
 ## 4. 建议给实施 Agent 的使用方式
@@ -58,6 +59,7 @@
 - 带刘海的 MacBook 内屏上正确出现左右两个 quota orb；
 - 左边可靠表示 5h remaining，右边可靠表示 weekly remaining；
 - Hover 时两边分别向外展开百分比；
+- 点击任一 satellite 可打开紧凑设置条，Launch at Login 使用系统状态，Quit 结束当前实例；
 - App 不执行任何 Codex 授权行为，也不修改任何 Codex 文件；
 - 网络失败、token 失效、窗口缺失等情况不会显示错误额度；
 - 构建、测试、运行验证全部通过；
@@ -65,7 +67,6 @@
 
 
 <!-- END 00_README.md -->
-
 
 ---
 
@@ -133,6 +134,7 @@ v0.1 是：
 13. 自动定时刷新。
 14. 网络暂时失败时保留最近一次有效数据，并明确呈现 stale 状态。
 15. 无有效数据时显示 unavailable，而不是 0%。
+16. 点击任一 satellite 打开紧凑 inline Settings Bar，提供 Launch at Login 与 Quit。
 
 ### 2.2 明确不实现
 
@@ -152,7 +154,8 @@ v0.1 禁止加入：
 - Cost / token / history；
 - Claude / Gemini / Cursor / OpenRouter 等 Provider；
 - Provider abstraction / registry；
-- Settings 窗口；
+- 独立 Settings 窗口；
+- 除 Launch at Login 与 Quit 外的其它设置项；
 - 菜单栏 status item；
 - 通知；
 - 阈值告警；
@@ -210,8 +213,8 @@ remainingPercent = clamp(100 - usedPercent, 0 ... 100)
 - 黑色 hardware notch 不被软件重绘。
 - App UI 只存在于左右两侧安全区域。
 - 使用系统语义前景色与透明度，不采用固定风险颜色。
-- 不创建“第三个视觉主体”。
-- 不使用 Liquid Glass；v0.1 不需要任何背景面板。
+- 不创建常驻“第三个视觉主体”；设置条只在用户点击后临时出现。
+- 不使用 Liquid Glass；设置条使用系统 regular material utility surface。
 
 ### 4.2 Collapsed Orb
 
@@ -294,9 +297,21 @@ Hover 左侧时，左右都展开；Hover 右侧时，左右也都展开。
 
 鼠标离开整体交互区域后收起。
 
-允许加入 80–150 ms 的微小 collapse grace period，避免鼠标跨过物理刘海附近边界时闪烁；但不做 pin 状态。
+鼠标离开整体交互区域后，保持展开 3 秒，再沿原路径平滑收起；但不做 pin 状态。
 
-### 5.4 不抢焦点
+### 5.4 紧凑设置条
+
+点击任一 collapsed 或 expanded satellite 都切换设置条，不区分左右，也不支持右键或双击。
+
+设置条与硬件 notch 水平居中，在 notch 下方约 6pt 出现，内容严格限定为：
+
+```text
+Launch at Login   [switch]   |   Quit
+```
+
+当系统状态为 requires approval 时，switch 显示为 `Review…` 并打开系统 Login Items 设置；不可用时显示 `—`。再次点击任一 satellite、点击三块 panel 之外的区域或 geometry 失效时关闭设置条。设置条出现期间 quota 两侧保持 expanded，但不改变前台应用或键盘焦点。
+
+### 5.5 不抢焦点
 
 Hover 与显示变化不得：
 
@@ -314,6 +329,7 @@ Hover 与显示变化不得：
 - App 以 accessory / background utility 形态运行；
 - 无 Dock icon；
 - 无主窗口；
+- 不创建独立 Settings Window；
 - 找到带 notch 的目标内屏后显示；
 - 首次 usage fetch 异步执行，不阻塞 UI。
 
@@ -434,7 +450,6 @@ v0.2 及以后可能讨论：
 
 - 官方 `codex app-server` 数据源；
 - reset time；
-- launch at login；
 - 外接屏 fallback；
 - signed/notarized release；
 - adaptive warning semantics。
@@ -443,7 +458,6 @@ v0.2 及以后可能讨论：
 
 
 <!-- END 01_PRODUCT_UX_SPEC.md -->
-
 
 ---
 
@@ -509,6 +523,8 @@ QuotaOverlayController
 - 无 MenuBarExtra；
 - overlay 由 AppDelegate / app-level controller 管理。
 
+Launch at Login 由 `SMAppService.mainApp.status` 唯一决定；不使用 UserDefaults 保存副本。
+
 ---
 
 ## 3. 文件结构
@@ -523,14 +539,17 @@ CodexSatellites/
 │   └── CodexQuotaSnapshot.swift
 ├── Services/
 │   ├── CodexUsageClient.swift
-│   └── NotchGeometry.swift
+│   ├── NotchGeometry.swift
+│   └── LaunchAtLoginService.swift
 ├── Window/
 │   └── QuotaOverlayController.swift
 ├── Views/
-│   └── QuotaOrbView.swift
+│   ├── QuotaOrbView.swift
+│   └── SettingsBarView.swift
 ├── Tests/
 │   ├── CodexUsageClientTests.swift
-│   └── NotchGeometryTests.swift
+│   ├── NotchGeometryTests.swift
+│   └── LaunchAtLoginServiceTests.swift
 ├── script/
 │   └── build_and_run.sh
 └── .codex/environments/environment.toml
@@ -877,12 +896,13 @@ NSApplication.didChangeScreenParametersNotification
 
 ## 10. Window Architecture
 
-### 10.1 两个独立 `NSPanel`
+### 10.1 三个独立 `NSPanel`
 
 ```text
 QuotaOverlayController
 ├── leftPanel
-└── rightPanel
+├── rightPanel
+└── settingsPanel
 ```
 
 与竞品常见的“大透明 window + 中央 island”不同，本项目不创建覆盖大面积顶部屏幕的透明容器。
@@ -914,6 +934,8 @@ collectionBehavior includes canJoinAllSpaces
 
 是否加入 `.fullScreenAuxiliary` 需要根据 v0.1 目标行为决定；如果加入，必须验证不会在系统全屏顶部产生异常遮挡。
 
+Settings panel 与 quota panel 使用相同的 `.borderless, .nonactivatingPanel` 基线；设置条宽约 240pt、高约 44pt，水平居中于 `NotchGeometry.notchCenterX`，其 frame 顶部位于 `notchBottomEdge - 6pt`。所有 panel 均不调用 `makeKey()` 或 `NSApp.activate(...)`。
+
 ### 10.3 非激活
 
 Panel 不应成为 key/main window，不应夺取 active app。
@@ -935,7 +957,7 @@ Expanded：增加外侧宽度：
 
 ### 11.1 目标
 
-只需要 hover，不需要 click、drag、pin、keyboard。
+Hover 保持额度展开；click 只用于打开/关闭设置条及操作设置条内的 Launch at Login、Review…、Quit，不支持 drag、pin 或 keyboard interaction。
 
 ### 11.2 推荐
 
@@ -944,6 +966,8 @@ Expanded：增加外侧宽度：
 ```text
 NSEvent.addGlobalMonitorForEvents(matching: .mouseMoved)
 NSEvent.addLocalMonitorForEvents(matching: .mouseMoved)
+NSEvent.addGlobalMonitorForEvents(matching: .leftMouseDown)
+NSEvent.addLocalMonitorForEvents(matching: .leftMouseDown)
 ```
 
 统一调用：
@@ -978,6 +1002,7 @@ remainingPercent: Double?
 freshness: fresh/stale/unavailable
 expanded: Bool
 side: left/right
+onActivate: () -> Void
 ```
 
 职责：
@@ -995,6 +1020,8 @@ side: left/right
 - 解析 auth；
 - 计算 NSScreen；
 - 控制 refresh timer。
+
+`SettingsBarView` 只接收 `LaunchAtLoginState` 和 action closures，不直接依赖 `SMAppService`。`LaunchAtLoginService` 通过 `LoginItemServicing` seam 映射 `.enabled`、`.notRegistered`、`.requiresApproval` 和 `.notFound`，并对 register/unregister 做幂等处理。
 
 ---
 
@@ -1080,15 +1107,15 @@ NSPrefersDisplaySafeAreaCompatibilityMode = false
 1. `CodexUsageClient` 是 undocumented remote API 的唯一边界。
 2. `NotchGeometry` 是 NSScreen camera-housing 语义的唯一边界。
 3. `QuotaOverlayController` 是 AppKit window/mouse 的唯一主要边界。
-4. SwiftUI 只负责展示。
-5. 不存在第二份 auth source of truth。
-6. 不存在 Provider abstraction。
-7. 不存在后台持久化数据库。
-8. 所有未知都 fail closed。
+4. SwiftUI 只负责展示和发出设置条 action。
+5. `LaunchAtLoginService` 是系统登录项状态的唯一应用边界，不使用本地状态副本。
+6. 不存在第二份 auth source of truth。
+7. 不存在 Provider abstraction。
+8. 不存在后台持久化数据库。
+9. 所有未知都 fail closed。
 
 
 <!-- END 02_TECHNICAL_ARCHITECTURE.md -->
-
 
 ---
 
@@ -1489,7 +1516,6 @@ v0.1 直接隐藏，不做 menu bar fallback。
 
 <!-- END 03_IMPLEMENTATION_PLAN.md -->
 
-
 ---
 
 <!-- BEGIN 04_TEST_ACCEPTANCE.md -->
@@ -1579,6 +1605,16 @@ fixture 至少覆盖：
 - notch width 变化；
 - horizontal gap 输出。
 
+### 2.6 Launch at Login service
+
+使用 `LoginItemServicing` mock 覆盖：
+
+- `.notRegistered` → disabled；`.enabled` → enabled；`.requiresApproval` → requiresApproval；`.notFound` → unavailable；
+- disabled → enable 只 register 一次；enabled → disable 只 unregister 一次；
+- requiresApproval → enable 不重复 register，→ disable 可 unregister；
+- unavailable 不循环 register/unregister；
+- 不使用 UserDefaults 保存启动状态。
+
 ---
 
 ## 3. 网络集成测试
@@ -1621,6 +1657,9 @@ HTTP integration 使用：
 - [ ] 与 notch 间距左右一致。
 - [ ] 没有覆盖摄像头 housing。
 - [ ] 默认没有任何数字。
+- [ ] 点击任一 collapsed satellite 打开紧凑设置条。
+- [ ] 设置条位于硬件 notch 正下方并水平居中，尺寸保持约 240×44pt。
+- [ ] 设置条只有 Launch at Login 与 Quit。
 
 ### 4.2 Hover
 
@@ -1630,10 +1669,21 @@ HTTP integration 使用：
 - [ ] 右边向右展开。
 - [ ] 不向刘海中央扩张。
 - [ ] 离开后可靠收起。
-- [ ] 快速经过边缘不持续 flicker。
+- [ ] 鼠标离开整体交互区域后保持展开约 3 秒，再沿原路径平滑收起。
 - [ ] 展开/收起时当前 app 不失焦。
 
-### 4.3 数字
+### 4.3 设置条
+
+- [ ] 点击任一 expanded satellite 可关闭设置条。
+- [ ] 设置条打开期间两侧百分比保持展开。
+- [ ] Launch at Login 开关反映 `SMAppService.mainApp.status`，关闭后当前 App 继续运行。
+- [ ] requires approval 显示 `Review…`，只打开系统 Login Items 设置。
+- [ ] unavailable 显示 `—` 或 disabled control，Quit 仍可用。
+- [ ] 点击左右 satellite、设置条之外关闭设置条，且原点击继续送达目标 App。
+- [ ] 点击 Quit 只终止当前实例，不 unregister Login Item。
+- [ ] Reduce Motion 开启时无 slide/bounce。
+
+### 4.4 数字
 
 人工注入 mock 或真实数据验证：
 
@@ -1646,7 +1696,7 @@ HTTP integration 使用：
 
 三位数不得改变 notch 内侧 anchor。
 
-### 4.4 Fresh/Stale
+### 4.5 Fresh/Stale
 
 - [ ] fresh 正常显示。
 - [ ] 断网后保留原百分比。
@@ -1736,7 +1786,7 @@ v0.1 不需要复杂 benchmark，但至少人工检查：
 
 Release 前检查源码/界面确认没有：
 
-- [ ] Settings；
+- [ ] 独立 Settings Window；
 - [ ] MenuBarExtra；
 - [ ] notification；
 - [ ] history；
@@ -1748,6 +1798,8 @@ Release 前检查源码/界面确认没有：
 - [ ] OAuth；
 - [ ] update framework；
 - [ ] analytics。
+
+允许且仅允许一个临时 compact Settings Bar，内容为 Launch at Login、requires approval 时的 Review… 和 Quit。
 
 如果有，应删除或明确证明它是满足本 SPEC 的必要最小实现。
 
@@ -1767,6 +1819,8 @@ v0.1 只有在以下全部为 PASS 时才可标记完成：
 [PASS] No focus stealing
 [PASS] Fresh/stale behavior
 [PASS] Display-change behavior
+[PASS] Compact settings bar behavior
+[PASS] Launch at Login state mapping
 [PASS] Scope-creep audit
 ```
 
@@ -1787,6 +1841,8 @@ v0.1 只有在以下全部为 PASS 时才可标记完成：
 - `~/.codex` write audit: PASS / FAIL
 - Fresh/stale network behavior: PASS / FAIL
 - Display-change behavior: PASS / FAIL / NOT TESTED
+- Compact settings bar: PASS / FAIL / NOT TESTED
+- Launch at Login: PASS / FAIL / NOT TESTED
 - Scope audit: PASS / FAIL
 
 ### Changed files
@@ -1803,7 +1859,6 @@ Agent 不得把 `NOT TESTED` 写成 PASS。
 
 
 <!-- END 04_TEST_ACCEPTANCE.md -->
-
 
 ---
 
@@ -2113,7 +2168,6 @@ retry framework
 
 
 <!-- END 05_AGENT_EXECUTION_GUIDE.md -->
-
 
 ---
 

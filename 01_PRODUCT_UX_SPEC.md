@@ -60,6 +60,7 @@ v0.1 是：
 13. 自动定时刷新。
 14. 网络暂时失败时保留最近一次有效数据，并明确呈现 stale 状态。
 15. 无有效数据时显示 unavailable，而不是 0%。
+16. 点击任一 satellite 打开紧凑 inline Settings Bar，提供 Launch at Login 与 Quit。
 
 ### 2.2 明确不实现
 
@@ -79,7 +80,8 @@ v0.1 禁止加入：
 - Cost / token / history；
 - Claude / Gemini / Cursor / OpenRouter 等 Provider；
 - Provider abstraction / registry；
-- Settings 窗口；
+- 独立 Settings 窗口；
+- 除 Launch at Login 与 Quit 外的其它设置项；
 - 菜单栏 status item；
 - 通知；
 - 阈值告警；
@@ -137,8 +139,8 @@ remainingPercent = clamp(100 - usedPercent, 0 ... 100)
 - 黑色 hardware notch 不被软件重绘。
 - App UI 只存在于左右两侧安全区域。
 - 使用系统语义前景色与透明度，不采用固定风险颜色。
-- 不创建“第三个视觉主体”。
-- 不使用 Liquid Glass；v0.1 不需要任何背景面板。
+- 不创建常驻“第三个视觉主体”；设置条只在用户点击后临时出现。
+- 不使用 Liquid Glass；设置条使用系统 regular material utility surface。
 
 ### 4.2 Collapsed Orb
 
@@ -223,7 +225,19 @@ Hover 左侧时，左右都展开；Hover 右侧时，左右也都展开。
 
 鼠标离开整体交互区域后，保持展开 3 秒，再沿原路径平滑收起；但不做 pin 状态。
 
-### 5.4 不抢焦点
+### 5.4 紧凑设置条
+
+点击任一 collapsed 或 expanded satellite 都切换设置条，不区分左右，也不支持右键或双击。
+
+设置条与硬件 notch 水平居中，在 notch 下方约 6pt 出现，内容严格限定为：
+
+```text
+Launch at Login   [switch]   |   Quit
+```
+
+当系统状态为 requires approval 时，switch 显示为 `Review…` 并打开系统 Login Items 设置；不可用时显示 `—`。再次点击任一 satellite、点击三块 panel 之外的区域或 geometry 失效时关闭设置条。设置条出现期间 quota 两侧保持 expanded，但不改变前台应用或键盘焦点。
+
+### 5.5 不抢焦点
 
 Hover 与显示变化不得：
 
@@ -241,6 +255,7 @@ Hover 与显示变化不得：
 - App 以 accessory / background utility 形态运行；
 - 无 Dock icon；
 - 无主窗口；
+- 不创建独立 Settings Window；
 - 找到带 notch 的目标内屏后显示；
 - 首次 usage fetch 异步执行，不阻塞 UI。
 
@@ -361,7 +376,6 @@ v0.2 及以后可能讨论：
 
 - 官方 `codex app-server` 数据源；
 - reset time；
-- launch at login；
 - 外接屏 fallback；
 - signed/notarized release；
 - adaptive warning semantics。

@@ -83,6 +83,16 @@ fixture 至少覆盖：
 - notch width 变化；
 - horizontal gap 输出。
 
+### 2.6 Launch at Login service
+
+使用 `LoginItemServicing` mock 覆盖：
+
+- `.notRegistered` → disabled；`.enabled` → enabled；`.requiresApproval` → requiresApproval；`.notFound` → unavailable；
+- disabled → enable 只 register 一次；enabled → disable 只 unregister 一次；
+- requiresApproval → enable 不重复 register，→ disable 可 unregister；
+- unavailable 不循环 register/unregister；
+- 不使用 UserDefaults 保存启动状态。
+
 ---
 
 ## 3. 网络集成测试
@@ -125,6 +135,9 @@ HTTP integration 使用：
 - [ ] 与 notch 间距左右一致。
 - [ ] 没有覆盖摄像头 housing。
 - [ ] 默认没有任何数字。
+- [ ] 点击任一 collapsed satellite 打开紧凑设置条。
+- [ ] 设置条位于硬件 notch 正下方并水平居中，尺寸保持约 240×44pt。
+- [ ] 设置条只有 Launch at Login 与 Quit。
 
 ### 4.2 Hover
 
@@ -137,7 +150,18 @@ HTTP integration 使用：
 - [ ] 鼠标离开整体交互区域后保持展开约 3 秒，再沿原路径平滑收起。
 - [ ] 展开/收起时当前 app 不失焦。
 
-### 4.3 数字
+### 4.3 设置条
+
+- [ ] 点击任一 expanded satellite 可关闭设置条。
+- [ ] 设置条打开期间两侧百分比保持展开。
+- [ ] Launch at Login 开关反映 `SMAppService.mainApp.status`，关闭后当前 App 继续运行。
+- [ ] requires approval 显示 `Review…`，只打开系统 Login Items 设置。
+- [ ] unavailable 显示 `—` 或 disabled control，Quit 仍可用。
+- [ ] 点击左右 satellite、设置条之外关闭设置条，且原点击继续送达目标 App。
+- [ ] 点击 Quit 只终止当前实例，不 unregister Login Item。
+- [ ] Reduce Motion 开启时无 slide/bounce。
+
+### 4.4 数字
 
 人工注入 mock 或真实数据验证：
 
@@ -150,7 +174,7 @@ HTTP integration 使用：
 
 三位数不得改变 notch 内侧 anchor。
 
-### 4.4 Fresh/Stale
+### 4.5 Fresh/Stale
 
 - [ ] fresh 正常显示。
 - [ ] 断网后保留原百分比。
@@ -240,7 +264,7 @@ v0.1 不需要复杂 benchmark，但至少人工检查：
 
 Release 前检查源码/界面确认没有：
 
-- [ ] Settings；
+- [ ] 独立 Settings Window；
 - [ ] MenuBarExtra；
 - [ ] notification；
 - [ ] history；
@@ -252,6 +276,8 @@ Release 前检查源码/界面确认没有：
 - [ ] OAuth；
 - [ ] update framework；
 - [ ] analytics。
+
+允许且仅允许一个临时 compact Settings Bar，内容为 Launch at Login、requires approval 时的 Review… 和 Quit。
 
 如果有，应删除或明确证明它是满足本 SPEC 的必要最小实现。
 
@@ -271,6 +297,8 @@ v0.1 只有在以下全部为 PASS 时才可标记完成：
 [PASS] No focus stealing
 [PASS] Fresh/stale behavior
 [PASS] Display-change behavior
+[PASS] Compact settings bar behavior
+[PASS] Launch at Login state mapping
 [PASS] Scope-creep audit
 ```
 
@@ -291,6 +319,8 @@ v0.1 只有在以下全部为 PASS 时才可标记完成：
 - `~/.codex` write audit: PASS / FAIL
 - Fresh/stale network behavior: PASS / FAIL
 - Display-change behavior: PASS / FAIL / NOT TESTED
+- Compact settings bar: PASS / FAIL / NOT TESTED
+- Launch at Login: PASS / FAIL / NOT TESTED
 - Scope audit: PASS / FAIL
 
 ### Changed files

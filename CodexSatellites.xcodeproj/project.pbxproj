@@ -13,8 +13,11 @@
 		A00000000000000000000004 /* NotchGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000004 /* NotchGeometry.swift */; };
 		A00000000000000000000005 /* QuotaOrbView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000005 /* QuotaOrbView.swift */; };
 		A00000000000000000000006 /* QuotaOverlayController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000006 /* QuotaOverlayController.swift */; };
+		A00000000000000000000009 /* LaunchAtLoginService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000011 /* LaunchAtLoginService.swift */; };
+		A00000000000000000000010 /* SettingsBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000012 /* SettingsBarView.swift */; };
 		A00000000000000000000007 /* CodexUsageClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000007 /* CodexUsageClientTests.swift */; };
 		A00000000000000000000008 /* NotchGeometryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000008 /* NotchGeometryTests.swift */; };
+		A00000000000000000000011 /* LaunchAtLoginServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000013 /* LaunchAtLoginServiceTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,8 +27,11 @@
 		B00000000000000000000004 /* NotchGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotchGeometry.swift; sourceTree = "<group>"; };
 		B00000000000000000000005 /* QuotaOrbView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuotaOrbView.swift; sourceTree = "<group>"; };
 		B00000000000000000000006 /* QuotaOverlayController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuotaOverlayController.swift; sourceTree = "<group>"; };
+		B00000000000000000000011 /* LaunchAtLoginService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchAtLoginService.swift; sourceTree = "<group>"; };
+		B00000000000000000000012 /* SettingsBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsBarView.swift; sourceTree = "<group>"; };
 		B00000000000000000000007 /* CodexUsageClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexUsageClientTests.swift; sourceTree = "<group>"; };
 		B00000000000000000000008 /* NotchGeometryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotchGeometryTests.swift; sourceTree = "<group>"; };
+		B00000000000000000000013 /* LaunchAtLoginServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchAtLoginServiceTests.swift; sourceTree = "<group>"; };
 		B00000000000000000000009 /* CodexSatellites.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CodexSatellites.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B00000000000000000000010 /* CodexSatellitesTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CodexSatellitesTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -39,10 +45,10 @@
 		D00000000000000000000001 = {isa = PBXGroup; children = (D00000000000000000000002, D00000000000000000000003, D00000000000000000000004, D00000000000000000000005, D00000000000000000000006, D00000000000000000000007, D00000000000000000000008, ); sourceTree = "<group>"; };
 		D00000000000000000000002 /* App */ = {isa = PBXGroup; children = (B00000000000000000000001, ); path = App; sourceTree = "<group>"; };
 		D00000000000000000000003 /* Models */ = {isa = PBXGroup; children = (B00000000000000000000002, ); path = Models; sourceTree = "<group>"; };
-		D00000000000000000000004 /* Services */ = {isa = PBXGroup; children = (B00000000000000000000003, B00000000000000000000004, ); path = Services; sourceTree = "<group>"; };
-		D00000000000000000000005 /* Views */ = {isa = PBXGroup; children = (B00000000000000000000005, ); path = Views; sourceTree = "<group>"; };
+		D00000000000000000000004 /* Services */ = {isa = PBXGroup; children = (B00000000000000000000003, B00000000000000000000004, B00000000000000000000011, ); path = Services; sourceTree = "<group>"; };
+		D00000000000000000000005 /* Views */ = {isa = PBXGroup; children = (B00000000000000000000005, B00000000000000000000012, ); path = Views; sourceTree = "<group>"; };
 		D00000000000000000000006 /* Window */ = {isa = PBXGroup; children = (B00000000000000000000006, ); path = Window; sourceTree = "<group>"; };
-		D00000000000000000000007 /* Tests */ = {isa = PBXGroup; children = (B00000000000000000000007, B00000000000000000000008, ); path = Tests; sourceTree = "<group>"; };
+		D00000000000000000000007 /* Tests */ = {isa = PBXGroup; children = (B00000000000000000000007, B00000000000000000000008, B00000000000000000000013, ); path = Tests; sourceTree = "<group>"; };
 		D00000000000000000000008 /* Products */ = {isa = PBXGroup; children = (B00000000000000000000009, B00000000000000000000010, ); name = Products; sourceTree = "<group>"; };
 /* End PBXGroup section */
 
@@ -61,8 +67,8 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		C00000000000000000000003 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (A00000000000000000000001, A00000000000000000000002, A00000000000000000000003, A00000000000000000000004, A00000000000000000000005, A00000000000000000000006, ); runOnlyForDeploymentPostprocessing = 0; };
-		C00000000000000000000005 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (A00000000000000000000007, A00000000000000000000008, ); runOnlyForDeploymentPostprocessing = 0; };
+		C00000000000000000000003 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (A00000000000000000000001, A00000000000000000000002, A00000000000000000000003, A00000000000000000000004, A00000000000000000000005, A00000000000000000000006, A00000000000000000000009, A00000000000000000000010, ); runOnlyForDeploymentPostprocessing = 0; };
+		C00000000000000000000005 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (A00000000000000000000007, A00000000000000000000008, A00000000000000000000011, ); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
