@@ -6,6 +6,8 @@ Minimal Codex quota satellites for the MacBook notch.
 
 CodexSatellites is a native macOS ambient HUD for the built-in display of a notched MacBook. It keeps the hardware notch untouched and shows two small quota orbs beside it:
 
+CodexSatellites is an independent community utility and is not affiliated with or endorsed by OpenAI.
+
 - Left satellite → Codex 5h remaining
 - Right satellite → Codex weekly remaining
 
@@ -48,7 +50,18 @@ Use `./script/build_and_run.sh --verify` to build, launch, and verify the proces
 
 ## Current status
 
-v0.1 MVP / pre-release validation
+v0.1.0 release engineering
+
+## Release engineering
+
+The outside-Mac-App-Store release workflow uses Developer ID signing, Hardened Runtime, notarization, stapling, and a DMG:
+
+```bash
+./script/release.sh preflight
+./script/release.sh all
+```
+
+The release script reads signing and notarization identity from the local environment and Keychain. It never stores credentials in the repository. Generated artifacts and release evidence live under the ignored `dist/` directory.
 
 ## Known limitations
 

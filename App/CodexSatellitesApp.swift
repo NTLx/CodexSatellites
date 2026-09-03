@@ -4,7 +4,8 @@ import OSLog
 @MainActor
 @main
 final class CodexSatellitesApp: NSObject, NSApplicationDelegate {
-    private let logger = Logger(subsystem: "com.codexsatellites.app", category: "app")
+    private static let loggerSubsystem = Bundle.main.bundleIdentifier ?? "io.github.ntlx.codexsatellites"
+    private let logger = Logger(subsystem: CodexSatellitesApp.loggerSubsystem, category: "app")
     private var overlayController: QuotaOverlayController?
 
     static func main() {

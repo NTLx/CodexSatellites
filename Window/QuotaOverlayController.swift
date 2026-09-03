@@ -25,7 +25,8 @@ final class QuotaOverlayController {
         static let settingsAnimationOffset: CGFloat = 6
     }
 
-    private let logger = Logger(subsystem: "com.codexsatellites.app", category: "window")
+    private static let loggerSubsystem = Bundle.main.bundleIdentifier ?? "io.github.ntlx.codexsatellites"
+    private let logger = Logger(subsystem: QuotaOverlayController.loggerSubsystem, category: "window")
     private let usageClient = CodexUsageClient()
     private let launchAtLoginService: LaunchAtLoginService
     private let leftPanel: NSPanel

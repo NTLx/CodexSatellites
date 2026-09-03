@@ -18,6 +18,7 @@
 		A00000000000000000000007 /* CodexUsageClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000007 /* CodexUsageClientTests.swift */; };
 		A00000000000000000000008 /* NotchGeometryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000008 /* NotchGeometryTests.swift */; };
 		A00000000000000000000011 /* LaunchAtLoginServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000013 /* LaunchAtLoginServiceTests.swift */; };
+		A00000000000000000000012 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000014 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,6 +35,7 @@
 		B00000000000000000000013 /* LaunchAtLoginServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchAtLoginServiceTests.swift; sourceTree = "<group>"; };
 		B00000000000000000000009 /* CodexSatellites.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CodexSatellites.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B00000000000000000000010 /* CodexSatellitesTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CodexSatellitesTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		B00000000000000000000014 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Resources/Assets.xcassets; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,7 +64,7 @@
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		C00000000000000000000004 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+		C00000000000000000000004 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (A00000000000000000000012, ); runOnlyForDeploymentPostprocessing = 0; };
 		C00000000000000000000006 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXResourcesBuildPhase section */
 
@@ -82,10 +84,10 @@
 /* Begin XCBuildConfiguration section */
 		F00000000000000000000003 /* Debug */ = {isa = XCBuildConfiguration; buildSettings = { ALWAYS_SEARCH_USER_PATHS = NO; CLANG_ENABLE_MODULES = YES; CLANG_ENABLE_OBJC_ARC = YES; MACOSX_DEPLOYMENT_TARGET = 15.0; SWIFT_VERSION = 5.10; }; name = Debug; };
 		F00000000000000000000004 /* Release */ = {isa = XCBuildConfiguration; buildSettings = { ALWAYS_SEARCH_USER_PATHS = NO; CLANG_ENABLE_MODULES = YES; CLANG_ENABLE_OBJC_ARC = YES; MACOSX_DEPLOYMENT_TARGET = 15.0; SWIFT_VERSION = 5.10; }; name = Release; };
-		F00000000000000000000005 /* Debug */ = {isa = XCBuildConfiguration; buildSettings = { CODE_SIGN_STYLE = Automatic; CURRENT_PROJECT_VERSION = 1; DEBUG_INFORMATION_FORMAT = dwarf; ENABLE_HARDENED_RUNTIME = YES; ENABLE_TESTABILITY = YES; GENERATE_INFOPLIST_FILE = YES; INFOPLIST_KEY_CFBundleDisplayName = CodexSatellites; INFOPLIST_KEY_LSUIElement = YES; INFOPLIST_KEY_NSHighResolutionCapable = YES; MACOSX_DEPLOYMENT_TARGET = 15.0; PRODUCT_BUNDLE_IDENTIFIER = com.codexsatellites.app; PRODUCT_NAME = CodexSatellites; SWIFT_VERSION = 5.10; VERSIONING_SYSTEM = apple-generic; MARKETING_VERSION = 0.1; }; name = Debug; };
-		F00000000000000000000006 /* Release */ = {isa = XCBuildConfiguration; buildSettings = { CODE_SIGN_STYLE = Automatic; CURRENT_PROJECT_VERSION = 1; ENABLE_HARDENED_RUNTIME = YES; GENERATE_INFOPLIST_FILE = YES; INFOPLIST_KEY_CFBundleDisplayName = CodexSatellites; INFOPLIST_KEY_LSUIElement = YES; INFOPLIST_KEY_NSHighResolutionCapable = YES; MACOSX_DEPLOYMENT_TARGET = 15.0; PRODUCT_BUNDLE_IDENTIFIER = com.codexsatellites.app; PRODUCT_NAME = CodexSatellites; SWIFT_VERSION = 5.10; VERSIONING_SYSTEM = apple-generic; MARKETING_VERSION = 0.1; }; name = Release; };
-		F00000000000000000000007 /* Debug */ = {isa = XCBuildConfiguration; buildSettings = { BUNDLE_LOADER = "$(TEST_HOST)"; CODE_SIGN_STYLE = Automatic; CURRENT_PROJECT_VERSION = 1; GENERATE_INFOPLIST_FILE = YES; MACOSX_DEPLOYMENT_TARGET = 15.0; PRODUCT_BUNDLE_IDENTIFIER = com.codexsatellites.tests; PRODUCT_NAME = CodexSatellitesTests; SWIFT_VERSION = 5.10; TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CodexSatellites.app/Contents/MacOS/CodexSatellites"; }; name = Debug; };
-		F00000000000000000000008 /* Release */ = {isa = XCBuildConfiguration; buildSettings = { BUNDLE_LOADER = "$(TEST_HOST)"; CODE_SIGN_STYLE = Automatic; CURRENT_PROJECT_VERSION = 1; GENERATE_INFOPLIST_FILE = YES; MACOSX_DEPLOYMENT_TARGET = 15.0; PRODUCT_BUNDLE_IDENTIFIER = com.codexsatellites.tests; PRODUCT_NAME = CodexSatellitesTests; SWIFT_VERSION = 5.10; TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CodexSatellites.app/Contents/MacOS/CodexSatellites"; }; name = Release; };
+		F00000000000000000000005 /* Debug */ = {isa = XCBuildConfiguration; buildSettings = { CODE_SIGNING_ALLOWED = NO; CODE_SIGN_STYLE = Automatic; CURRENT_PROJECT_VERSION = 1; DEBUG_INFORMATION_FORMAT = dwarf; ENABLE_HARDENED_RUNTIME = YES; ENABLE_TESTABILITY = YES; GENERATE_INFOPLIST_FILE = YES; INFOPLIST_KEY_CFBundleDisplayName = CodexSatellites; INFOPLIST_KEY_LSUIElement = YES; INFOPLIST_KEY_NSHighResolutionCapable = YES; MACOSX_DEPLOYMENT_TARGET = 15.0; PRODUCT_BUNDLE_IDENTIFIER = io.github.ntlx.codexsatellites; PRODUCT_NAME = CodexSatellites; SWIFT_VERSION = 5.10; VERSIONING_SYSTEM = apple-generic; MARKETING_VERSION = 0.1.0; ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon; }; name = Debug; };
+		F00000000000000000000006 /* Release */ = {isa = XCBuildConfiguration; buildSettings = { CODE_SIGN_STYLE = Automatic; CURRENT_PROJECT_VERSION = 1; ENABLE_HARDENED_RUNTIME = YES; GENERATE_INFOPLIST_FILE = YES; INFOPLIST_KEY_CFBundleDisplayName = CodexSatellites; INFOPLIST_KEY_LSUIElement = YES; INFOPLIST_KEY_NSHighResolutionCapable = YES; MACOSX_DEPLOYMENT_TARGET = 15.0; PRODUCT_BUNDLE_IDENTIFIER = io.github.ntlx.codexsatellites; PRODUCT_NAME = CodexSatellites; SWIFT_VERSION = 5.10; VERSIONING_SYSTEM = apple-generic; MARKETING_VERSION = 0.1.0; ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon; }; name = Release; };
+		F00000000000000000000007 /* Debug */ = {isa = XCBuildConfiguration; buildSettings = { BUNDLE_LOADER = "$(TEST_HOST)"; CODE_SIGNING_ALLOWED = NO; CODE_SIGN_STYLE = Automatic; CURRENT_PROJECT_VERSION = 1; GENERATE_INFOPLIST_FILE = YES; MACOSX_DEPLOYMENT_TARGET = 15.0; PRODUCT_BUNDLE_IDENTIFIER = io.github.ntlx.codexsatellites.tests; PRODUCT_NAME = CodexSatellitesTests; SWIFT_VERSION = 5.10; TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CodexSatellites.app/Contents/MacOS/CodexSatellites"; }; name = Debug; };
+		F00000000000000000000008 /* Release */ = {isa = XCBuildConfiguration; buildSettings = { BUNDLE_LOADER = "$(TEST_HOST)"; CODE_SIGNING_ALLOWED = NO; CODE_SIGN_STYLE = Automatic; CURRENT_PROJECT_VERSION = 1; GENERATE_INFOPLIST_FILE = YES; MACOSX_DEPLOYMENT_TARGET = 15.0; PRODUCT_BUNDLE_IDENTIFIER = io.github.ntlx.codexsatellites.tests; PRODUCT_NAME = CodexSatellitesTests; SWIFT_VERSION = 5.10; TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CodexSatellites.app/Contents/MacOS/CodexSatellites"; }; name = Release; };
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */

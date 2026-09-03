@@ -79,10 +79,11 @@ enum CodexUsageError: Error, Equatable {
 struct CodexUsageClient {
     typealias Transport = (URLRequest) async throws -> (Data, URLResponse)
 
+    private static let loggerSubsystem = Bundle.main.bundleIdentifier ?? "io.github.ntlx.codexsatellites"
     private let authReader: CodexAuthReader
     private let endpoint: URL
     private let transport: Transport
-    private let logger = Logger(subsystem: "com.codexsatellites.app", category: "usage")
+    private let logger = Logger(subsystem: CodexUsageClient.loggerSubsystem, category: "usage")
 
     init(
         authReader: CodexAuthReader = CodexAuthReader(),

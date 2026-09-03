@@ -3,7 +3,7 @@ set -euo pipefail
 
 MODE="${1:-run}"
 APP_NAME="CodexSatellites"
-BUNDLE_ID="com.codexsatellites.app"
+BUNDLE_ID="io.github.ntlx.codexsatellites"
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PROJECT="$ROOT_DIR/CodexSatellites.xcodeproj"
