@@ -1,0 +1,92 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A00000000000000000000001 /* CodexNotchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000001 /* CodexNotchApp.swift */; };
+		A00000000000000000000002 /* CodexQuotaSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000002 /* CodexQuotaSnapshot.swift */; };
+		A00000000000000000000003 /* CodexUsageClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000003 /* CodexUsageClient.swift */; };
+		A00000000000000000000004 /* NotchGeometry.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000004 /* NotchGeometry.swift */; };
+		A00000000000000000000005 /* QuotaOrbView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000005 /* QuotaOrbView.swift */; };
+		A00000000000000000000006 /* QuotaOverlayController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000006 /* QuotaOverlayController.swift */; };
+		A00000000000000000000007 /* CodexUsageClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000007 /* CodexUsageClientTests.swift */; };
+		A00000000000000000000008 /* NotchGeometryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000008 /* NotchGeometryTests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		B00000000000000000000001 /* CodexNotchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexNotchApp.swift; sourceTree = "<group>"; };
+		B00000000000000000000002 /* CodexQuotaSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexQuotaSnapshot.swift; sourceTree = "<group>"; };
+		B00000000000000000000003 /* CodexUsageClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexUsageClient.swift; sourceTree = "<group>"; };
+		B00000000000000000000004 /* NotchGeometry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotchGeometry.swift; sourceTree = "<group>"; };
+		B00000000000000000000005 /* QuotaOrbView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuotaOrbView.swift; sourceTree = "<group>"; };
+		B00000000000000000000006 /* QuotaOverlayController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuotaOverlayController.swift; sourceTree = "<group>"; };
+		B00000000000000000000007 /* CodexUsageClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexUsageClientTests.swift; sourceTree = "<group>"; };
+		B00000000000000000000008 /* NotchGeometryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotchGeometryTests.swift; sourceTree = "<group>"; };
+		B00000000000000000000009 /* CodexNotch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CodexNotch.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B00000000000000000000010 /* CodexNotchTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CodexNotchTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		C00000000000000000000001 /* Frameworks */ = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+		C00000000000000000000002 /* Frameworks */ = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		D00000000000000000000001 = {isa = PBXGroup; children = (D00000000000000000000002, D00000000000000000000003, D00000000000000000000004, D00000000000000000000005, D00000000000000000000006, D00000000000000000000007, D00000000000000000000008, ); sourceTree = "<group>"; };
+		D00000000000000000000002 /* App */ = {isa = PBXGroup; children = (B00000000000000000000001, ); path = App; sourceTree = "<group>"; };
+		D00000000000000000000003 /* Models */ = {isa = PBXGroup; children = (B00000000000000000000002, ); path = Models; sourceTree = "<group>"; };
+		D00000000000000000000004 /* Services */ = {isa = PBXGroup; children = (B00000000000000000000003, B00000000000000000000004, ); path = Services; sourceTree = "<group>"; };
+		D00000000000000000000005 /* Views */ = {isa = PBXGroup; children = (B00000000000000000000005, ); path = Views; sourceTree = "<group>"; };
+		D00000000000000000000006 /* Window */ = {isa = PBXGroup; children = (B00000000000000000000006, ); path = Window; sourceTree = "<group>"; };
+		D00000000000000000000007 /* Tests */ = {isa = PBXGroup; children = (B00000000000000000000007, B00000000000000000000008, ); path = Tests; sourceTree = "<group>"; };
+		D00000000000000000000008 /* Products */ = {isa = PBXGroup; children = (B00000000000000000000009, B00000000000000000000010, ); name = Products; sourceTree = "<group>"; };
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		E00000000000000000000001 /* CodexNotch */ = {isa = PBXNativeTarget; buildConfigurationList = F00000000000000000000001 /* Build configuration list for PBXNativeTarget "CodexNotch" */; buildPhases = (C00000000000000000000003, C00000000000000000000001, C00000000000000000000004, ); buildRules = (); dependencies = (); name = CodexNotch; productName = CodexNotch; productReference = B00000000000000000000009 /* CodexNotch.app */; productType = "com.apple.product-type.application"; };
+		E00000000000000000000002 /* CodexNotchTests */ = {isa = PBXNativeTarget; buildConfigurationList = F00000000000000000000002 /* Build configuration list for PBXNativeTarget "CodexNotchTests" */; buildPhases = (C00000000000000000000005, C00000000000000000000002, C00000000000000000000006, ); buildRules = (); dependencies = (E00000000000000000000003, ); name = CodexNotchTests; productName = CodexNotchTests; productReference = B00000000000000000000010 /* CodexNotchTests.xctest */; productType = "com.apple.product-type.bundle.unit-test"; };
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		E00000000000000000000000 /* Project object */ = {isa = PBXProject; attributes = {LastSwiftUpdateCheck = 2600; LastUpgradeCheck = 2600; TargetAttributes = {E00000000000000000000001 = {CreatedOnToolsVersion = 26.0; }; E00000000000000000000002 = {CreatedOnToolsVersion = 26.0; TestTargetID = E00000000000000000000001; }; }; }; buildConfigurationList = F00000000000000000000000 /* Build configuration list for PBXProject "CodexNotch" */; compatibilityVersion = "Xcode 16.0"; developmentRegion = en; hasScannedForEncodings = 0; knownRegions = (en, Base, ); mainGroup = D00000000000000000000001; productRefGroup = D00000000000000000000008 /* Products */; projectDirPath = ""; projectRoot = ""; targets = (E00000000000000000000001, E00000000000000000000002, ); };
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		C00000000000000000000004 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+		C00000000000000000000006 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		C00000000000000000000003 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (A00000000000000000000001, A00000000000000000000002, A00000000000000000000003, A00000000000000000000004, A00000000000000000000005, A00000000000000000000006, ); runOnlyForDeploymentPostprocessing = 0; };
+		C00000000000000000000005 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (A00000000000000000000007, A00000000000000000000008, ); runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		E00000000000000000000003 /* PBXTargetDependency */ = {isa = PBXTargetDependency; target = E00000000000000000000001 /* CodexNotch */; targetProxy = E00000000000000000000004 /* PBXContainerItemProxy */; };
+/* End PBXTargetDependency section */
+
+/* Begin PBXContainerItemProxy section */
+		E00000000000000000000004 /* PBXContainerItemProxy */ = {isa = PBXContainerItemProxy; containerPortal = E00000000000000000000000 /* Project object */; proxyType = 1; remoteGlobalIDString = E00000000000000000000001; remoteInfo = CodexNotch; };
+/* End PBXContainerItemProxy section */
+
+/* Begin XCBuildConfiguration section */
+		F00000000000000000000003 /* Debug */ = {isa = XCBuildConfiguration; buildSettings = { ALWAYS_SEARCH_USER_PATHS = NO; CLANG_ENABLE_MODULES = YES; CLANG_ENABLE_OBJC_ARC = YES; MACOSX_DEPLOYMENT_TARGET = 15.0; SWIFT_VERSION = 5.10; }; name = Debug; };
+		F00000000000000000000004 /* Release */ = {isa = XCBuildConfiguration; buildSettings = { ALWAYS_SEARCH_USER_PATHS = NO; CLANG_ENABLE_MODULES = YES; CLANG_ENABLE_OBJC_ARC = YES; MACOSX_DEPLOYMENT_TARGET = 15.0; SWIFT_VERSION = 5.10; }; name = Release; };
+		F00000000000000000000005 /* Debug */ = {isa = XCBuildConfiguration; buildSettings = { CODE_SIGN_STYLE = Automatic; CURRENT_PROJECT_VERSION = 1; DEBUG_INFORMATION_FORMAT = dwarf; ENABLE_HARDENED_RUNTIME = YES; ENABLE_TESTABILITY = YES; GENERATE_INFOPLIST_FILE = YES; INFOPLIST_KEY_CFBundleDisplayName = CodexNotch; INFOPLIST_KEY_LSUIElement = YES; INFOPLIST_KEY_NSHighResolutionCapable = YES; MACOSX_DEPLOYMENT_TARGET = 15.0; PRODUCT_BUNDLE_IDENTIFIER = com.codexnotch.app; PRODUCT_NAME = CodexNotch; SWIFT_VERSION = 5.10; VERSIONING_SYSTEM = apple-generic; MARKETING_VERSION = 0.1; }; name = Debug; };
+		F00000000000000000000006 /* Release */ = {isa = XCBuildConfiguration; buildSettings = { CODE_SIGN_STYLE = Automatic; CURRENT_PROJECT_VERSION = 1; ENABLE_HARDENED_RUNTIME = YES; GENERATE_INFOPLIST_FILE = YES; INFOPLIST_KEY_CFBundleDisplayName = CodexNotch; INFOPLIST_KEY_LSUIElement = YES; INFOPLIST_KEY_NSHighResolutionCapable = YES; MACOSX_DEPLOYMENT_TARGET = 15.0; PRODUCT_BUNDLE_IDENTIFIER = com.codexnotch.app; PRODUCT_NAME = CodexNotch; SWIFT_VERSION = 5.10; VERSIONING_SYSTEM = apple-generic; MARKETING_VERSION = 0.1; }; name = Release; };
+		F00000000000000000000007 /* Debug */ = {isa = XCBuildConfiguration; buildSettings = { BUNDLE_LOADER = "$(TEST_HOST)"; CODE_SIGN_STYLE = Automatic; CURRENT_PROJECT_VERSION = 1; GENERATE_INFOPLIST_FILE = YES; MACOSX_DEPLOYMENT_TARGET = 15.0; PRODUCT_BUNDLE_IDENTIFIER = com.codexnotch.tests; PRODUCT_NAME = CodexNotchTests; SWIFT_VERSION = 5.10; TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CodexNotch.app/Contents/MacOS/CodexNotch"; }; name = Debug; };
+		F00000000000000000000008 /* Release */ = {isa = XCBuildConfiguration; buildSettings = { BUNDLE_LOADER = "$(TEST_HOST)"; CODE_SIGN_STYLE = Automatic; CURRENT_PROJECT_VERSION = 1; GENERATE_INFOPLIST_FILE = YES; MACOSX_DEPLOYMENT_TARGET = 15.0; PRODUCT_BUNDLE_IDENTIFIER = com.codexnotch.tests; PRODUCT_NAME = CodexNotchTests; SWIFT_VERSION = 5.10; TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CodexNotch.app/Contents/MacOS/CodexNotch"; }; name = Release; };
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		F00000000000000000000000 /* Build configuration list for PBXProject "CodexNotch" */ = {isa = XCConfigurationList; buildConfigurations = (F00000000000000000000003, F00000000000000000000004, ); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+		F00000000000000000000001 /* Build configuration list for PBXNativeTarget "CodexNotch" */ = {isa = XCConfigurationList; buildConfigurations = (F00000000000000000000005, F00000000000000000000006, ); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+		F00000000000000000000002 /* Build configuration list for PBXNativeTarget "CodexNotchTests" */ = {isa = XCConfigurationList; buildConfigurations = (F00000000000000000000007, F00000000000000000000008, ); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+/* End XCConfigurationList section */
+	};
+	rootObject = E00000000000000000000000 /* Project object */;
+}
