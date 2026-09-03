@@ -1,6 +1,8 @@
 .DS_Store
 build/
 dist/
+.artwork-import/
+CodexSatellites-Artwork-*.zip
 DerivedData/
 xcuserdata/
 *.xcuserstate

@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="360" viewBox="0 0 1800 360">
+<defs><linearGradient id="w" x1="0" x2="1"><stop offset="0" stop-color="#F1F8FF"/><stop offset=".52" stop-color="#61B7FF"/><stop offset="1" stop-color="#9665FF"/></linearGradient></defs>
+<g transform="translate(20 40) scale(.273)">
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#141D33"/><stop offset="1" stop-color="#050810"/>
+  </linearGradient>
+  <linearGradient id="cyanBlue"><stop offset="0" stop-color="#49E2EF"/><stop offset="1" stop-color="#49A0FF"/></linearGradient>
+  <linearGradient id="blueViolet"><stop offset="0" stop-color="#49A0FF"/><stop offset="1" stop-color="#9665FF"/></linearGradient>
+  <filter id="glow"><feGaussianBlur stdDeviation="10" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<rect x="34" y="34" width="956" height="956" rx="214" fill="url(#bg)" stroke="#687DA9" stroke-opacity=".55" stroke-width="3"/>
+<path d="M333 44H691V120C691 171 660 210 610 210H414C364 210 333 171 333 120Z" fill="#020307" stroke="#4B5773" stroke-width="3"/>
+<circle cx="512" cy="119" r="21" fill="#03050A" stroke="#263044" stroke-width="2"/><circle cx="512" cy="119" r="8" fill="#112B58"/><circle cx="512" cy="119" r="4" fill="#49A0FF"/>
+<g filter="url(#glow)">
+  <circle cx="300" cy="500" r="102" fill="none" stroke="url(#cyanBlue)" stroke-width="8"/>
+  <circle cx="300" cy="500" r="150" fill="none" stroke="#49E2EF" stroke-width="5" stroke-linecap="round" stroke-dasharray="1 26" opacity=".8"/>
+  <circle cx="300" cy="500" r="14" fill="#F7FAFF"/>
+  <circle cx="389" cy="451" r="10" fill="#F7FAFF"/>
+  <circle cx="724" cy="500" r="102" fill="none" stroke="url(#blueViolet)" stroke-width="8"/>
+  <circle cx="724" cy="500" r="150" fill="none" stroke="#9665FF" stroke-width="5" stroke-linecap="round" stroke-dasharray="1 26" opacity=".8"/>
+  <circle cx="724" cy="500" r="14" fill="#F7FAFF"/>
+  <circle cx="817" cy="543" r="10" fill="#F7FAFF"/>
+</g>
+</g>
+<text x="335" y="188" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="112" font-weight="400" fill="url(#w)">CodexSatellites</text>
+<text x="339" y="270" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif" font-size="30" fill="#A9B6CF">Ambient Codex quota around the MacBook notch</text>
+</svg>
