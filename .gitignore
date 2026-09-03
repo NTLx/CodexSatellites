@@ -9,3 +9,7 @@ xcuserdata/
 auth.json
 *.auth.json
 credentials.json
+*.p12
+*.p8
+*.cer
+*.mobileprovision

@@ -258,6 +258,7 @@ notary_submit() {
 notarize_app() {
     require_notary
     [[ -d "$APP_PATH" ]] || die "signed app missing; run build first"
+    verify_signed_app
     rm -f "$APP_ZIP"
     ditto -c -k --keepParent "$APP_PATH" "$APP_ZIP"
     notary_submit app "$APP_ZIP"
@@ -290,6 +291,18 @@ end tell
 APPLESCRIPT
 }
 
+detach_mount() {
+    local mount_point="$1"
+    local attempt
+    for attempt in {1..20}; do
+        if hdiutil detach "$mount_point" >/dev/null 2>&1; then
+            return 0
+        fi
+        sleep 0.25
+    done
+    return 1
+}
+
 create_styled_dmg() {
     local source_app="$1"
     local final_dmg="$2"
@@ -316,7 +329,7 @@ create_styled_dmg() {
 
     cleanup_mount() {
         if [[ "$mount_active" -eq 1 ]]; then
-            hdiutil detach "$mount_point" >/dev/null 2>&1 || true
+            detach_mount "$mount_point" || true
         fi
     }
     trap cleanup_mount EXIT
@@ -331,7 +344,7 @@ create_styled_dmg() {
         fi
         sync
         sleep 2
-        if hdiutil detach "$mount_point" >/dev/null; then
+        if detach_mount "$mount_point"; then
             mount_active=0
         else
             cleanup_mount
@@ -352,7 +365,7 @@ create_styled_dmg() {
 package_dmg() {
     require_signing
     [[ -d "$APP_PATH" ]] || die "signed app missing; run build first"
-    xcrun stapler validate "$APP_PATH"
+    verify_notarized_app
     mkdir -p "$DIST_DIR" "$WORK_DIR" "$LOG_DIR"
     create_styled_dmg "$APP_PATH" "$DMG_PATH" "$RW_DMG" "$MOUNT_POINT"
     codesign --force --timestamp --sign "$SIGNING_IDENTITY" "$DMG_PATH"
@@ -370,25 +383,34 @@ notarize_dmg() {
 
 verify_dmg() {
     [[ -f "$DMG_PATH" ]] || die "DMG missing"
+    hdiutil verify "$DMG_PATH"
     codesign --verify --verbose=4 "$DMG_PATH"
     xcrun stapler validate "$DMG_PATH"
     spctl -a -vv -t open --context context:primary-signature "$DMG_PATH"
-    log "DMG verification passed"
+    log "DMG container, signature, staple, and Gatekeeper checks passed"
 }
 
 write_checksum() {
     mkdir -p "$DIST_DIR"
-    shasum -a 256 "$DMG_PATH" >"$CHECKSUMS_PATH"
-    shasum -a 256 -c "$CHECKSUMS_PATH"
+    (
+        cd "$DIST_DIR"
+        shasum -a 256 "$(basename "$DMG_PATH")" >"$(basename "$CHECKSUMS_PATH")"
+        shasum -a 256 -c "$(basename "$CHECKSUMS_PATH")"
+    )
+}
+
+running_app_pids() {
+    pgrep -x "$APP_NAME" 2>/dev/null | sort -n || true
 }
 
 preview_smoke_test() {
     local mount_active=0
+    local before_pids after_pids new_pids remaining_new_pids attempt pid
     rm -rf "$PREVIEW_MOUNT_POINT"
     mkdir -p "$PREVIEW_MOUNT_POINT"
     cleanup_preview_mount() {
         if [[ "$mount_active" -eq 1 ]]; then
-            hdiutil detach "$PREVIEW_MOUNT_POINT" >/dev/null 2>&1 || true
+            detach_mount "$PREVIEW_MOUNT_POINT" || true
         fi
     }
     trap cleanup_preview_mount EXIT
@@ -396,11 +418,40 @@ preview_smoke_test() {
     mount_active=1
     [[ -d "$PREVIEW_MOUNT_POINT/$APP_NAME.app" ]] || die "preview DMG is missing the app"
     [[ -L "$PREVIEW_MOUNT_POINT/Applications" ]] || die "preview DMG is missing Applications alias"
+    before_pids="$(running_app_pids)"
     /usr/bin/open -n "$PREVIEW_MOUNT_POINT/$APP_NAME.app"
-    sleep 1
-    pgrep -x "$APP_NAME" >/dev/null || die "preview app launch smoke test failed"
-    pkill -x "$APP_NAME" >/dev/null 2>&1 || true
-    hdiutil detach "$PREVIEW_MOUNT_POINT" >/dev/null
+    for attempt in {1..20}; do
+        sleep 0.25
+        after_pids="$(running_app_pids)"
+        new_pids="$(
+            comm -13 \
+                <(printf '%s\n' "$before_pids" | sed '/^$/d' | sort -n) \
+                <(printf '%s\n' "$after_pids" | sed '/^$/d' | sort -n)
+        )"
+        [[ -n "$new_pids" ]] && break
+    done
+    [[ -n "$new_pids" ]] || die "preview app launch smoke test failed: no new process"
+    while IFS= read -r pid; do
+        [[ -n "$pid" ]] || continue
+        kill "$pid" >/dev/null 2>&1 || true
+    done <<<"$new_pids"
+    for attempt in {1..20}; do
+        remaining_new_pids=""
+        while IFS= read -r pid; do
+            [[ -n "$pid" ]] || continue
+            if kill -0 "$pid" >/dev/null 2>&1; then
+                remaining_new_pids+="$pid"$'\n'
+            fi
+        done <<<"$new_pids"
+        [[ -z "$remaining_new_pids" ]] && break
+        sleep 0.25
+    done
+    [[ -z "$remaining_new_pids" ]] || die "preview app did not exit after smoke test"
+    while IFS= read -r pid; do
+        [[ -n "$pid" ]] || continue
+        kill -0 "$pid" >/dev/null 2>&1 || die "preview smoke test altered existing process $pid"
+    done <<<"$before_pids"
+    detach_mount "$PREVIEW_MOUNT_POINT" || die "could not detach preview DMG volume cleanly"
     mount_active=0
     trap - EXIT
     log "preview app launch smoke test passed"

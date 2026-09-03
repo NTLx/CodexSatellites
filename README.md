@@ -71,3 +71,9 @@ The release script reads signing and notarization identity from the local enviro
 - Codex usage currently depends on an undocumented ChatGPT usage endpoint.
 - Full-screen Space behavior is a v0.1 compatibility limitation unless explicitly validated.
 - The app assumes an existing local Codex login and does not manage authentication.
+
+## License
+
+CodexSatellites is released under the [MIT License](LICENSE).
+
+The public release is distributed under the MIT License.
