@@ -8,7 +8,7 @@
 
 # Codex Satellites v0.1 — 文档索引
 
-> 工作名：**Codex Satellites**（仅作为开发期代号，避免与现有 CodexNotch 等项目混淆）  
+> 项目名：**Codex Satellites**  
 > 目标版本：**v0.1 MVP**  
 > 文档状态：Implementation Ready  
 > 最后核验：2026-09-03

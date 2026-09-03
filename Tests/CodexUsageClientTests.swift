@@ -1,6 +1,6 @@
 import Foundation
 import XCTest
-@testable import CodexNotch
+@testable import CodexSatellites
 
 final class CodexUsageClientTests: XCTestCase {
     private let fetchedAt = Date(timeIntervalSince1970: 1_700_000_000)

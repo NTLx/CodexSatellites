@@ -18,7 +18,7 @@ final class QuotaOverlayController {
         static let collapseAnimationDuration: TimeInterval = 0.18
     }
 
-    private let logger = Logger(subsystem: "com.codexnotch.app", category: "window")
+    private let logger = Logger(subsystem: "com.codexsatellites.app", category: "window")
     private let usageClient = CodexUsageClient()
     private let leftPanel: NSPanel
     private let rightPanel: NSPanel

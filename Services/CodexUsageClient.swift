@@ -82,7 +82,7 @@ struct CodexUsageClient {
     private let authReader: CodexAuthReader
     private let endpoint: URL
     private let transport: Transport
-    private let logger = Logger(subsystem: "com.codexnotch.app", category: "usage")
+    private let logger = Logger(subsystem: "com.codexsatellites.app", category: "usage")
 
     init(
         authReader: CodexAuthReader = CodexAuthReader(),

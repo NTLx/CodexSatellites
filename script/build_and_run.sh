@@ -2,11 +2,11 @@
 set -euo pipefail
 
 MODE="${1:-run}"
-APP_NAME="CodexNotch"
-BUNDLE_ID="com.codexnotch.app"
+APP_NAME="CodexSatellites"
+BUNDLE_ID="com.codexsatellites.app"
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-PROJECT="$ROOT_DIR/CodexNotch.xcodeproj"
+PROJECT="$ROOT_DIR/CodexSatellites.xcodeproj"
 DERIVED_DATA="$ROOT_DIR/build/DerivedData"
 APP_BUNDLE="$DERIVED_DATA/Build/Products/Debug/$APP_NAME.app"
 APP_BINARY="$APP_BUNDLE/Contents/MacOS/$APP_NAME"
@@ -50,4 +50,3 @@ case "$MODE" in
     exit 2
     ;;
 esac
-

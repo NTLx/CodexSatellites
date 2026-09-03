@@ -1,6 +1,6 @@
 import CoreGraphics
 import XCTest
-@testable import CodexNotch
+@testable import CodexSatellites
 
 final class NotchGeometryTests: XCTestCase {
     func testCalculatesEdgesFromAuxiliaryAreas() {
