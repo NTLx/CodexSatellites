@@ -9,6 +9,7 @@ struct QuotaWindow: Equatable, Sendable {
 struct CodexQuotaSnapshot: Equatable, Sendable {
     let fiveHour: QuotaWindow?
     let weekly: QuotaWindow?
+    let availableResetCount: Int?
     let fetchedAt: Date
 }
 
@@ -47,4 +48,3 @@ struct SnapshotStateMachine: Equatable, Sendable {
         freshness = .stale(snapshot)
     }
 }
-

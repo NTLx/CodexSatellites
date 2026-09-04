@@ -60,7 +60,8 @@ v0.1 是：
 13. 自动定时刷新。
 14. 网络暂时失败时保留最近一次有效数据，并明确呈现 stale 状态。
 15. 无有效数据时显示 unavailable，而不是 0%。
-16. 点击任一 satellite 打开紧凑 inline Settings Bar，提供 Launch at Login 与 Quit。
+16. 点击任一 satellite 打开紧凑 inline Settings Bar，提供 icon-only Launch at Login、刷新频率与 Quit controls。
+17. 刷新频率固定为 `1m`、`5m`、`15m`，首次安装默认 `1m`，并持久化用户选择。
 
 ### 2.2 明确不实现
 
@@ -81,7 +82,7 @@ v0.1 禁止加入：
 - Claude / Gemini / Cursor / OpenRouter 等 Provider；
 - Provider abstraction / registry；
 - 独立 Settings 窗口；
-- 除 Launch at Login 与 Quit 外的其它设置项；
+- 除 Launch at Login、刷新频率与 Quit 外的其它设置项；
 - 菜单栏 status item；
 - 通知；
 - 阈值告警；
@@ -148,13 +149,13 @@ remainingPercent = clamp(100 - usedPercent, 0 ... 100)
 
 | 参数 | 建议值 | 说明 |
 |---|---:|---|
-| 外径 | 8–10 pt | 先以 9 pt 实现，可根据真机微调 |
-| ring line width | 1.5–2 pt | 默认 1.75 pt |
+| 外径 | 14 pt | 保持现有 footprint |
+| ring line width | 2.5 pt | 保持 14 pt 外径，不扩大 footprint |
 | 与 notch 水平间距 | 8–12 pt | 默认 10 pt |
 | 垂直中心 | 与 camera housing top band 视觉中心对齐 | 从真实 screen geometry 推导 |
-| opacity（fresh） | 0.85–1.0 | 默认 0.9 |
-| opacity（stale） | fresh 的约 55% | 不增加颜色 |
-| unavailable | hollow ring + secondary opacity | 不显示错误数值 |
+| opacity（fresh） | 1.0 | 使用白色 remaining arc |
+| opacity（stale） | 0.72 | 保留同色且可读 |
+| opacity（unavailable） | 0.78 | neutral 高对比 hollow ring，不使用 quota 色 |
 
 这些尺寸属于可调 UI constant，不属于业务规则。真机视觉优先。
 
@@ -163,14 +164,14 @@ remainingPercent = clamp(100 - usedPercent, 0 ... 100)
 左侧：
 
 ```text
-[72%  ◕]   [notch]
+[◕  72%]   [notch]
 ← expand
 ```
 
 右侧：
 
 ```text
-[notch]   [◑  41%]
+[notch]   [41%  ◑]
                      expand →
 ```
 
@@ -181,8 +182,11 @@ remainingPercent = clamp(100 - usedPercent, 0 ... 100)
 - 数字使用 tabular / monospaced digit 能力，避免 `9%` → `100%` 时跳动；
 - 文本只包含 `0%...100%` 或 `—`；
 - 不显示 `5h`、`weekly` 标签；左右空间关系本身已经表达语义。
+- 展开时字符串从刘海侧向圆圈横向滑入，同时圆圈随 panel 向外移动；收回时两者沿原路同步返回。
 
 建议展开宽度：40–52 pt，具体以字体和 100% 宽度为准。
+
+有效数据时，圆环只用白色绘制 remaining progress arc，展开后的对应 percentage 也使用白色；used 部分完全透明，不绘制 track。unavailable 保持 neutral 高对比 hollow ring 与 `—`，不显示有效 quota progress，也不增加 glow 或 neon shadow。
 
 ### 4.4 动画
 
@@ -193,6 +197,8 @@ remainingPercent = clamp(100 - usedPercent, 0 ... 100)
 - expand：约 160–220 ms；
 - collapse：约 140–200 ms；
 - spring 可用，但不能有明显 bounce；
+- 左侧字符串从右侧（刘海侧）滑向左侧圆圈；右侧字符串从左侧（刘海侧）滑向右侧圆圈；
+- 圆圈与字符串由同一 panel 的宽度/位置动画同步移动，不能出现文字单独漂移或圆圈突然跳位；
 - 环形额度变化可做轻微 interpolation，但不是 MVP 必需。
 
 验收标准不是某个固定 duration，而是：
@@ -232,10 +238,12 @@ Hover 左侧时，左右都展开；Hover 右侧时，左右也都展开。
 设置条与硬件 notch 水平居中，在 notch 下方约 6pt 出现，内容严格限定为：
 
 ```text
-Launch at Login   [switch]   |   Quit
+        (↻)   (5m)   (2)   (⏻)
 ```
 
-当系统状态为 requires approval 时，switch 显示为 `Review…` 并打开系统 Login Items 设置；不可用时显示 `—`。再次点击任一 satellite、点击三块 panel 之外的区域或 geometry 失效时关闭设置条。设置条出现期间 quota 两侧保持 expanded，但不改变前台应用或键盘焦点。
+设置条约为 `176×44pt`，由四个 `32pt` 圆形 control 和 `8pt` 间距组成，只有频率与 reset count control 常驻显示数字。Reset count control 显示 usage response 中 `rate_limit_reset_credits.applicable_available_count` 的当前值，只读且不可点击。Launch at Login 使用 `arrow.triangle.2.circlepath`；enabled 以系统 accent、active background/stroke 表达，disabled 为 neutral，requires approval 使用橙色 `exclamationmark.triangle` 并打开系统 Login Items，不可用使用 disabled `circle.slash`。Quit 使用 `power`。
+
+再次点击任一 satellite 或点击 settings/satellite 之外时立即关闭设置条；外部 click 仍返回原事件，不吞掉目标应用的点击。设置条打开后 3 秒无交互自动关闭；settings 内鼠标移动或 control 操作重新计时。频率和普通 Launch at Login 操作保持 panel visible，Review 立即关闭并打开 System Settings，Quit 终止 app。设置条出现期间 quota 两侧保持 expanded，但不改变前台应用或键盘焦点。
 
 ### 5.5 不抢焦点
 
@@ -261,7 +269,9 @@ Hover 与显示变化不得：
 
 ### 6.2 推荐刷新节奏
 
-v0.1 默认：**每 60 秒**。
+v0.1 默认：**每 1 分钟**。用户可在 Settings Bar 中循环选择：`1m → 5m → 15m → 1m`；选择写入 UserDefaults，缺失或非法值回退 `1m`。
+
+切换频率时保存新 preference，取消旧 refresh task，启动唯一的新 loop，并从切换时刻重新计时；点击频率 control 不立即额外请求 quota。实现必须避免多次切换留下并行 refresh loop。
 
 额外即时刷新时机：
 
@@ -269,6 +279,8 @@ v0.1 默认：**每 60 秒**。
 - Mac wake；
 - 网络从不可用恢复（若实现成本低）；
 - display configuration 改变不要求额外 fetch，只重算 geometry。
+
+Wake 始终立即 refresh，即使当前频率为 `15m`。
 
 不要低于 30 秒频繁轮询。
 

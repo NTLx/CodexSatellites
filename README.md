@@ -16,8 +16,9 @@ CodexSatellites is an independent community utility and is not affiliated with o
 ## Interaction
 
 - Hover → both satellites expand and show remaining percentages.
-- Click either satellite → a compact Settings Bar appears.
-- Settings Bar → `Launch at Login` and `Quit` only.
+- Click either satellite → a compact icon-only Settings Bar appears.
+- Settings Bar → icon-only Launch at Login, refresh frequency, available reset count, and Quit controls.
+- Quota check interval → `1m`, `5m`, or `15m`.
 
 ## Requirements
 

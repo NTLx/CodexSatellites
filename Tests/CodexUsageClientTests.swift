@@ -7,13 +7,26 @@ final class CodexUsageClientTests: XCTestCase {
 
     func testClassifiesStandardWindowsByDuration() throws {
         let snapshot = try parse("""
-        {"rate_limit":{"primary_window":{"used_percent":28,"limit_window_seconds":18000,"reset_at":1700001000},"secondary_window":{"used_percent":59,"limit_window_seconds":604800,"reset_at":1700500000}}}
+        {"rate_limit":{"primary_window":{"used_percent":28,"limit_window_seconds":18000,"reset_at":1700001000},"secondary_window":{"used_percent":59,"limit_window_seconds":604800,"reset_at":1700500000}},"rate_limit_reset_credits":{"available_count":5,"applicable_available_count":2}}
         """)
 
         XCTAssertEqual(snapshot.fiveHour?.remainingPercent, 72)
         XCTAssertEqual(snapshot.fiveHour?.windowDurationSeconds, 18000)
         XCTAssertEqual(snapshot.weekly?.remainingPercent, 41)
         XCTAssertEqual(snapshot.weekly?.windowDurationSeconds, 604800)
+        XCTAssertEqual(snapshot.availableResetCount, 2)
+    }
+
+    func testMissingOrInvalidResetCountIsUnavailableWithoutInvalidatingQuota() throws {
+        let missing = try parse("""
+        {"rate_limit":{"primary_window":{"used_percent":28,"limit_window_seconds":18000}}}
+        """)
+        XCTAssertNil(missing.availableResetCount)
+
+        let invalid = try parse("""
+        {"rate_limit":{"primary_window":{"used_percent":28,"limit_window_seconds":18000}},"rate_limit_reset_credits":{"available_count":5,"applicable_available_count":2.5}}
+        """)
+        XCTAssertNil(invalid.availableResetCount)
     }
 
     func testClassifiesWeeklyWhenItIsPrimary() throws {
@@ -117,7 +130,12 @@ final class CodexUsageClientTests: XCTestCase {
     }
 
     func testSnapshotFreshnessStateMachineKeepsLastGoodSnapshot() {
-        let snapshot = CodexQuotaSnapshot(fiveHour: nil, weekly: nil, fetchedAt: fetchedAt)
+        let snapshot = CodexQuotaSnapshot(
+            fiveHour: nil,
+            weekly: nil,
+            availableResetCount: nil,
+            fetchedAt: fetchedAt
+        )
         var state = SnapshotStateMachine()
 
         state.applyFailure()

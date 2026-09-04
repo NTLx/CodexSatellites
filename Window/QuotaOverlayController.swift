@@ -8,16 +8,15 @@ import SwiftUI
 final class QuotaOverlayController {
     private enum OverlayMetrics {
         static let orbDiameter: CGFloat = 14
-        static let orbLineWidth: CGFloat = 2.25
+        static let orbLineWidth: CGFloat = 2.5
         static let panelHeight: CGFloat = 24
         static let collapsedWidth: CGFloat = 24
         static let expandedWidth: CGFloat = 60
         static let horizontalGap: CGFloat = 10
         static let hoverPadding: CGFloat = 10
-        static let settingsWidth: CGFloat = 240
+        static let settingsWidth: CGFloat = 176
         static let settingsHeight: CGFloat = 44
         static let settingsNotchGap: CGFloat = 6
-        static let collapseDelay: Duration = .seconds(3)
         static let expandAnimationDuration: TimeInterval = 0.2
         static let collapseAnimationDuration: TimeInterval = 0.18
         static let settingsShowDuration: TimeInterval = 0.18
@@ -26,9 +25,11 @@ final class QuotaOverlayController {
     }
 
     private static let loggerSubsystem = Bundle.main.bundleIdentifier ?? "io.github.ntlx.codexsatellites"
+    static let settingsAutoHideDelay: Duration = .seconds(3)
     private let logger = Logger(subsystem: QuotaOverlayController.loggerSubsystem, category: "window")
     private let usageClient = CodexUsageClient()
     private let launchAtLoginService: LaunchAtLoginService
+    private let refreshPreference: QuotaRefreshPreference
     private let leftPanel: NSPanel
     private let rightPanel: NSPanel
     private let settingsPanel: NSPanel
@@ -41,7 +42,13 @@ final class QuotaOverlayController {
     private var settingsVisible = false
     private var currentGeometry: NotchGeometry?
     private var refreshTask: Task<Void, Never>?
+    private var refreshInterval: QuotaRefreshInterval
+    private var refreshLoopGeneration = 0
+    private var refreshInFlight = false
+    private var refreshPending = false
+    private var refreshFollowUpTask: Task<Void, Never>?
     private var collapseTask: Task<Void, Never>?
+    private var settingsAutoHideTask: Task<Void, Never>?
     private var screenChangeObserver: NSObjectProtocol?
     private var wakeObserver: NSObjectProtocol?
     private var globalMouseMonitor: Any?
@@ -50,8 +57,10 @@ final class QuotaOverlayController {
     private var localClickMonitor: Any?
     private var started = false
 
-    init() {
+    init(refreshPreference: QuotaRefreshPreference = QuotaRefreshPreference()) {
         launchAtLoginService = LaunchAtLoginService()
+        self.refreshPreference = refreshPreference
+        refreshInterval = refreshPreference.interval
         leftHostingView = NSHostingView(rootView: QuotaOrbView(
             remainingPercent: nil,
             freshness: .unavailable,
@@ -68,8 +77,11 @@ final class QuotaOverlayController {
         ))
         settingsHostingView = NSHostingView(rootView: SettingsBarView(
             launchAtLoginState: .unavailable,
+            refreshInterval: refreshInterval,
+            availableResetCount: nil,
             onSetLaunchAtLogin: { _ in },
             onReviewLoginItems: {},
+            onAdvanceRefreshInterval: {},
             onQuit: {}
         ))
         leftPanel = Self.makePanel(contentView: leftHostingView)
@@ -85,16 +97,19 @@ final class QuotaOverlayController {
         observeMouseMovement()
         updateGeometry()
         updateHoverState(at: NSEvent.mouseLocation)
-        refreshTask = Task { [weak self] in
-            await self?.refreshLoop()
-        }
+        startRefreshLoop(immediately: true)
     }
 
     func stop() {
+        cancelSettingsAutoHide()
         guard started else { return }
         started = false
+        refreshLoopGeneration += 1
         refreshTask?.cancel()
         refreshTask = nil
+        refreshPending = false
+        refreshFollowUpTask?.cancel()
+        refreshFollowUpTask = nil
         collapseTask?.cancel()
         collapseTask = nil
         removeObservers()
@@ -165,7 +180,7 @@ final class QuotaOverlayController {
         ) { [weak self] _ in
             Task { @MainActor [weak self] in
                 self?.updateGeometry()
-                await self?.refreshOnce()
+                await self?.requestRefresh()
             }
         }
     }
@@ -296,6 +311,9 @@ final class QuotaOverlayController {
 
     private func updateHoverState(at location: NSPoint) {
         guard currentGeometry != nil else { return }
+        if settingsVisible, settingsPanel.frame.contains(location) {
+            scheduleSettingsAutoHide()
+        }
         if interactionRegion.contains(location) {
             collapseTask?.cancel()
             collapseTask = nil
@@ -318,7 +336,7 @@ final class QuotaOverlayController {
     private func scheduleCollapse() {
         collapseTask?.cancel()
         collapseTask = Task { @MainActor [weak self] in
-            try? await Task.sleep(for: OverlayMetrics.collapseDelay)
+            try? await Task.sleep(for: Self.settingsAutoHideDelay)
             guard !Task.isCancelled else { return }
             self?.collapseIfCursorOutside()
         }
@@ -377,10 +395,12 @@ final class QuotaOverlayController {
                 settingsPanel.animator().setFrame(finalFrame, display: true)
             }
         }
+        scheduleSettingsAutoHide()
         logger.info("settings visible=true")
     }
 
     private func hideSettingsBar(animated: Bool) {
+        cancelSettingsAutoHide()
         guard settingsVisible else {
             settingsPanel.orderOut(nil)
             return
@@ -409,11 +429,30 @@ final class QuotaOverlayController {
         }, completionHandler: { [weak self] in
             Task { @MainActor [weak self] in
                 guard let self, !self.settingsVisible else { return }
-                self.settingsPanel.alphaValue = 1
                 self.settingsPanel.orderOut(nil)
+                self.settingsPanel.alphaValue = 1
                 self.logger.info("settings visible=false")
             }
         })
+    }
+
+    private func scheduleSettingsAutoHide() {
+        guard settingsVisible else { return }
+        settingsAutoHideTask?.cancel()
+        settingsAutoHideTask = Task { @MainActor [weak self] in
+            do {
+                try await Task.sleep(for: Self.settingsAutoHideDelay)
+            } catch {
+                return
+            }
+            guard let self, !Task.isCancelled, self.settingsVisible else { return }
+            self.hideSettingsBar(animated: true)
+        }
+    }
+
+    private func cancelSettingsAutoHide() {
+        settingsAutoHideTask?.cancel()
+        settingsAutoHideTask = nil
     }
 
     private func settingsFrame(for geometry: NotchGeometry) -> CGRect {
@@ -432,6 +471,8 @@ final class QuotaOverlayController {
             || settingsPanel.frame.contains(location)
         if !isInside {
             hideSettingsBar(animated: true)
+        } else if settingsPanel.frame.contains(location) {
+            scheduleSettingsAutoHide()
         }
     }
 
@@ -442,11 +483,21 @@ final class QuotaOverlayController {
             logger.error("login item update failed error=\(String(describing: error), privacy: .public)")
         }
         render()
+        scheduleSettingsAutoHide()
     }
 
     private func reviewLoginItems() {
         hideSettingsBar(animated: true)
         SMAppService.openSystemSettingsLoginItems()
+    }
+
+    private func advanceRefreshInterval() {
+        let nextInterval = refreshInterval.next
+        refreshPreference.interval = nextInterval
+        refreshInterval = nextInterval
+        startRefreshLoop(immediately: false)
+        render()
+        scheduleSettingsAutoHide()
     }
 
     private func quit() {
@@ -493,11 +544,16 @@ final class QuotaOverlayController {
     private func makeSettingsBarView() -> SettingsBarView {
         SettingsBarView(
             launchAtLoginState: launchAtLoginService.state(),
+            refreshInterval: refreshInterval,
+            availableResetCount: state.freshness.snapshot?.availableResetCount,
             onSetLaunchAtLogin: { [weak self] enabled in
                 self?.setLaunchAtLogin(enabled)
             },
             onReviewLoginItems: { [weak self] in
                 self?.reviewLoginItems()
+            },
+            onAdvanceRefreshInterval: { [weak self] in
+                self?.advanceRefreshInterval()
             },
             onQuit: { [weak self] in
                 self?.quit()
@@ -505,25 +561,74 @@ final class QuotaOverlayController {
         )
     }
 
-    private func refreshLoop() async {
-        await refreshOnce()
+    private func startRefreshLoop(immediately: Bool) {
+        refreshLoopGeneration += 1
+        let generation = refreshLoopGeneration
+        let interval = refreshInterval
+        refreshTask?.cancel()
+        refreshTask = Task { @MainActor [weak self] in
+            await self?.refreshLoop(
+                interval: interval,
+                generation: generation,
+                immediately: immediately
+            )
+        }
+    }
+
+    private func refreshLoop(
+        interval: QuotaRefreshInterval,
+        generation: Int,
+        immediately: Bool
+    ) async {
+        guard isCurrentRefreshLoop(generation) else { return }
+        if immediately {
+            await requestRefresh()
+        }
+        guard isCurrentRefreshLoop(generation) else { return }
         while !Task.isCancelled {
             do {
-                try await Task.sleep(for: .seconds(60))
+                try await Task.sleep(for: interval.duration)
             } catch {
                 return
             }
-            await refreshOnce()
+            guard isCurrentRefreshLoop(generation) else { return }
+            await requestRefresh()
+        }
+    }
+
+    private func isCurrentRefreshLoop(_ generation: Int) -> Bool {
+        started && refreshLoopGeneration == generation && !Task.isCancelled
+    }
+
+    private func requestRefresh() async {
+        guard started, !Task.isCancelled else { return }
+        if refreshInFlight {
+            refreshPending = true
+            return
+        }
+        refreshInFlight = true
+        await refreshOnce()
+        refreshInFlight = false
+
+        guard refreshPending else { return }
+        refreshPending = false
+        guard started else { return }
+        refreshFollowUpTask?.cancel()
+        refreshFollowUpTask = Task { @MainActor [weak self] in
+            await self?.requestRefresh()
         }
     }
 
     private func refreshOnce() async {
+        guard !Task.isCancelled else { return }
         do {
             let snapshot = try await usageClient.fetch()
+            guard started, !Task.isCancelled else { return }
             state.applySuccess(snapshot)
             render()
             logger.info("usage state=fresh")
         } catch {
+            guard started, !Task.isCancelled else { return }
             state.applyFailure()
             render()
             switch state.freshness {

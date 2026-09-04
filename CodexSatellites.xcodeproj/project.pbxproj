@@ -19,6 +19,10 @@
 		A00000000000000000000008 /* NotchGeometryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000008 /* NotchGeometryTests.swift */; };
 		A00000000000000000000011 /* LaunchAtLoginServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000013 /* LaunchAtLoginServiceTests.swift */; };
 		A00000000000000000000012 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000014 /* Assets.xcassets */; };
+		A00000000000000000000013 /* Localizable.xcstrings in Resources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000015 /* Localizable.xcstrings */; };
+		A00000000000000000000014 /* QuotaRefreshInterval.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000016 /* QuotaRefreshInterval.swift */; };
+		A00000000000000000000015 /* QuotaRefreshPreference.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000017 /* QuotaRefreshPreference.swift */; };
+		A00000000000000000000016 /* QuotaRefreshIntervalTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000018 /* QuotaRefreshIntervalTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -36,6 +40,10 @@
 		B00000000000000000000009 /* CodexSatellites.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CodexSatellites.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B00000000000000000000010 /* CodexSatellitesTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CodexSatellitesTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B00000000000000000000014 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Resources/Assets.xcassets; sourceTree = "<group>"; };
+		B00000000000000000000015 /* Localizable.xcstrings */ = {isa = PBXFileReference; lastKnownFileType = text.json.xcstrings; path = Resources/Localizable.xcstrings; sourceTree = "<group>"; };
+		B00000000000000000000016 /* QuotaRefreshInterval.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuotaRefreshInterval.swift; sourceTree = "<group>"; };
+		B00000000000000000000017 /* QuotaRefreshPreference.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuotaRefreshPreference.swift; sourceTree = "<group>"; };
+		B00000000000000000000018 /* QuotaRefreshIntervalTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuotaRefreshIntervalTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -44,13 +52,13 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		D00000000000000000000001 = {isa = PBXGroup; children = (D00000000000000000000002, D00000000000000000000003, D00000000000000000000004, D00000000000000000000005, D00000000000000000000006, D00000000000000000000007, D00000000000000000000008, ); sourceTree = "<group>"; };
+		D00000000000000000000001 = {isa = PBXGroup; children = (D00000000000000000000002, D00000000000000000000003, D00000000000000000000004, D00000000000000000000005, D00000000000000000000006, D00000000000000000000007, D00000000000000000000008, B00000000000000000000015, ); sourceTree = "<group>"; };
 		D00000000000000000000002 /* App */ = {isa = PBXGroup; children = (B00000000000000000000001, ); path = App; sourceTree = "<group>"; };
-		D00000000000000000000003 /* Models */ = {isa = PBXGroup; children = (B00000000000000000000002, ); path = Models; sourceTree = "<group>"; };
-		D00000000000000000000004 /* Services */ = {isa = PBXGroup; children = (B00000000000000000000003, B00000000000000000000004, B00000000000000000000011, ); path = Services; sourceTree = "<group>"; };
+		D00000000000000000000003 /* Models */ = {isa = PBXGroup; children = (B00000000000000000000002, B00000000000000000000016, ); path = Models; sourceTree = "<group>"; };
+		D00000000000000000000004 /* Services */ = {isa = PBXGroup; children = (B00000000000000000000003, B00000000000000000000004, B00000000000000000000011, B00000000000000000000017, ); path = Services; sourceTree = "<group>"; };
 		D00000000000000000000005 /* Views */ = {isa = PBXGroup; children = (B00000000000000000000005, B00000000000000000000012, ); path = Views; sourceTree = "<group>"; };
 		D00000000000000000000006 /* Window */ = {isa = PBXGroup; children = (B00000000000000000000006, ); path = Window; sourceTree = "<group>"; };
-		D00000000000000000000007 /* Tests */ = {isa = PBXGroup; children = (B00000000000000000000007, B00000000000000000000008, B00000000000000000000013, ); path = Tests; sourceTree = "<group>"; };
+		D00000000000000000000007 /* Tests */ = {isa = PBXGroup; children = (B00000000000000000000007, B00000000000000000000008, B00000000000000000000013, B00000000000000000000018, ); path = Tests; sourceTree = "<group>"; };
 		D00000000000000000000008 /* Products */ = {isa = PBXGroup; children = (B00000000000000000000009, B00000000000000000000010, ); name = Products; sourceTree = "<group>"; };
 /* End PBXGroup section */
 
@@ -60,17 +68,17 @@
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		E00000000000000000000000 /* Project object */ = {isa = PBXProject; attributes = {LastSwiftUpdateCheck = 2600; LastUpgradeCheck = 2600; TargetAttributes = {E00000000000000000000001 = {CreatedOnToolsVersion = 26.0; }; E00000000000000000000002 = {CreatedOnToolsVersion = 26.0; TestTargetID = E00000000000000000000001; }; }; }; buildConfigurationList = F00000000000000000000000 /* Build configuration list for PBXProject "CodexSatellites" */; compatibilityVersion = "Xcode 16.0"; developmentRegion = en; hasScannedForEncodings = 0; knownRegions = (en, Base, ); mainGroup = D00000000000000000000001; productRefGroup = D00000000000000000000008 /* Products */; projectDirPath = ""; projectRoot = ""; targets = (E00000000000000000000001, E00000000000000000000002, ); };
+		E00000000000000000000000 /* Project object */ = {isa = PBXProject; attributes = {LastSwiftUpdateCheck = 2600; LastUpgradeCheck = 2600; TargetAttributes = {E00000000000000000000001 = {CreatedOnToolsVersion = 26.0; }; E00000000000000000000002 = {CreatedOnToolsVersion = 26.0; TestTargetID = E00000000000000000000001; }; }; }; buildConfigurationList = F00000000000000000000000 /* Build configuration list for PBXProject "CodexSatellites" */; compatibilityVersion = "Xcode 16.0"; developmentRegion = en; hasScannedForEncodings = 0; knownRegions = (en, Base, zh-Hans, ); mainGroup = D00000000000000000000001; productRefGroup = D00000000000000000000008 /* Products */; projectDirPath = ""; projectRoot = ""; targets = (E00000000000000000000001, E00000000000000000000002, ); };
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
-		C00000000000000000000004 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (A00000000000000000000012, ); runOnlyForDeploymentPostprocessing = 0; };
+		C00000000000000000000004 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (A00000000000000000000012, A00000000000000000000013, ); runOnlyForDeploymentPostprocessing = 0; };
 		C00000000000000000000006 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		C00000000000000000000003 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (A00000000000000000000001, A00000000000000000000002, A00000000000000000000003, A00000000000000000000004, A00000000000000000000005, A00000000000000000000006, A00000000000000000000009, A00000000000000000000010, ); runOnlyForDeploymentPostprocessing = 0; };
-		C00000000000000000000005 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (A00000000000000000000007, A00000000000000000000008, A00000000000000000000011, ); runOnlyForDeploymentPostprocessing = 0; };
+		C00000000000000000000003 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (A00000000000000000000001, A00000000000000000000002, A00000000000000000000003, A00000000000000000000004, A00000000000000000000005, A00000000000000000000006, A00000000000000000000009, A00000000000000000000010, A00000000000000000000014, A00000000000000000000015, ); runOnlyForDeploymentPostprocessing = 0; };
+		C00000000000000000000005 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (A00000000000000000000007, A00000000000000000000008, A00000000000000000000011, A00000000000000000000016, ); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */

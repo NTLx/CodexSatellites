@@ -21,7 +21,7 @@ struct QuotaOrbView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private let diameter: CGFloat = 14
-    private let lineWidth: CGFloat = 2.25
+    private let lineWidth: CGFloat = 2.5
 
     var body: some View {
         Button(action: onActivate) {
@@ -30,10 +30,12 @@ struct QuotaOrbView: View {
                     orb
                     if expanded {
                         percentageText
+                            .transition(.move(edge: .trailing))
                     }
                 } else {
                     if expanded {
                         percentageText
+                            .transition(.move(edge: .leading))
                     }
                     orb
                 }
@@ -54,11 +56,11 @@ struct QuotaOrbView: View {
         ZStack {
             if freshness == .unavailable {
                 Circle()
-                    .stroke(Color.primary.opacity(0.55), lineWidth: lineWidth)
+                    .stroke(Color.primary.opacity(0.78), lineWidth: lineWidth)
             } else if let remainingPercent {
                 Circle()
                     .trim(from: 0, to: CGFloat(min(max(remainingPercent / 100, 0), 1)))
-                    .stroke(Color.primary.opacity(0.9), style: StrokeStyle(lineWidth: lineWidth, lineCap: .round))
+                    .stroke(Color.white, style: StrokeStyle(lineWidth: lineWidth, lineCap: .round))
                     .rotationEffect(.degrees(-90))
             }
         }
@@ -68,7 +70,7 @@ struct QuotaOrbView: View {
     private var percentageText: some View {
         Text(displayValue)
             .font(.system(size: 14, weight: .semibold, design: .monospaced))
-            .foregroundStyle(Color.primary)
+            .foregroundStyle(Color.white)
             .monospacedDigit()
             .fixedSize()
     }
@@ -81,11 +83,11 @@ struct QuotaOrbView: View {
     private var opacity: Double {
         switch freshness {
         case .fresh:
-            return 0.9
+            return 1.0
         case .stale:
-            return 0.5
+            return 0.72
         case .unavailable:
-            return 0.6
+            return 0.78
         }
     }
 }

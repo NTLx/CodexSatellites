@@ -165,7 +165,12 @@ enum CodexUsageParser {
             throw CodexUsageError.invalidPayload
         }
 
-        return CodexQuotaSnapshot(fiveHour: fiveHour, weekly: weekly, fetchedAt: fetchedAt)
+        return CodexQuotaSnapshot(
+            fiveHour: fiveHour,
+            weekly: weekly,
+            availableResetCount: parseAvailableResetCount(from: root),
+            fetchedAt: fetchedAt
+        )
     }
 
     private static func parseWindow(_ value: Any) -> RawWindow? {
@@ -209,5 +214,21 @@ enum CodexUsageParser {
             windowDurationSeconds: raw.durationSeconds,
             resetsAt: raw.resetsAt
         )
+    }
+
+    private static func parseAvailableResetCount(from root: [String: Any]) -> Int? {
+        guard let resetCredits = root["rate_limit_reset_credits"] as? [String: Any],
+              let value = number(resetCredits["applicable_available_count"]) else {
+            return nil
+        }
+
+        let count = value.doubleValue
+        guard count.isFinite,
+              count >= 0,
+              count.rounded() == count,
+              count <= Double(Int.max) else {
+            return nil
+        }
+        return Int(count)
     }
 }

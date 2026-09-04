@@ -71,11 +71,13 @@ CodexSatellites/
 ├── App/
 │   └── CodexSatellitesApp.swift
 ├── Models/
-│   └── CodexQuotaSnapshot.swift
+│   ├── CodexQuotaSnapshot.swift
+│   └── QuotaRefreshInterval.swift
 ├── Services/
 │   ├── CodexUsageClient.swift
 │   ├── NotchGeometry.swift
-│   └── LaunchAtLoginService.swift
+│   ├── LaunchAtLoginService.swift
+│   └── QuotaRefreshPreference.swift
 ├── Window/
 │   └── QuotaOverlayController.swift
 ├── Views/
@@ -84,7 +86,10 @@ CodexSatellites/
 ├── Tests/
 │   ├── CodexUsageClientTests.swift
 │   ├── NotchGeometryTests.swift
-│   └── LaunchAtLoginServiceTests.swift
+│   ├── LaunchAtLoginServiceTests.swift
+│   └── QuotaRefreshIntervalTests.swift
+├── Resources/
+│   └── Localizable.xcstrings
 ├── script/
 │   └── build_and_run.sh
 └── .codex/environments/environment.toml
@@ -469,7 +474,7 @@ collectionBehavior includes canJoinAllSpaces
 
 是否加入 `.fullScreenAuxiliary` 需要根据 v0.1 目标行为决定；如果加入，必须验证不会在系统全屏顶部产生异常遮挡。
 
-Settings panel 与 quota panel 使用相同的 `.borderless, .nonactivatingPanel` 基线；设置条宽约 240pt、高约 44pt，水平居中于 `NotchGeometry.notchCenterX`，其 frame 顶部位于 `notchBottomEdge - 6pt`。所有 panel 均不调用 `makeKey()` 或 `NSApp.activate(...)`。
+Settings panel 与 quota panel 使用相同的 `.borderless, .nonactivatingPanel` 基线；设置条宽约 176pt、高约 44pt，水平居中于 `NotchGeometry.notchCenterX`，其 frame 顶部位于 `notchBottomEdge - 6pt`。所有 panel 均不调用 `makeKey()` 或 `NSApp.activate(...)`。
 
 ### 10.3 非激活
 
@@ -492,7 +497,7 @@ Expanded：增加外侧宽度：
 
 ### 11.1 目标
 
-Hover 保持额度展开；click 只用于打开/关闭设置条及操作设置条内的 Launch at Login、Review…、Quit，不支持 drag、pin 或 keyboard interaction。
+Hover 保持额度展开；click 只用于打开/关闭设置条及操作设置条内的 Launch at Login、Review Login Items、Quit controls，不支持 drag、pin 或 keyboard interaction。
 
 ### 11.2 推荐
 
@@ -510,6 +515,8 @@ NSEvent.addLocalMonitorForEvents(matching: .leftMouseDown)
 ```text
 updateHoverState(cursorLocation)
 ```
+
+当 `settingsVisible` 且 pointer 位于 settings panel 内时，`mouseMoved` 会重置独立的 settings auto-hide task。settings bar 的 task 与 satellite hover 的 `collapseTask` 分离，延迟固定为 3 秒；hide/stop 必须取消它。settings 外部 click 立即 hide，但 local monitor 返回原 event，保证目标应用继续收到点击。
 
 ### 11.3 启动边界
 
@@ -542,10 +549,10 @@ onActivate: () -> Void
 
 职责：
 
-- 圆形 track；
-- progress arc；
+- 有效数据只绘制白色 remaining progress arc，used 部分完全透明；unavailable 绘制 neutral 高对比 hollow ring；
 - 百分比文本；
 - 左右布局顺序；
+- 百分比从 notch 侧向 orb 横向滑入，orb 随 panel 向外同步移动，并沿原路反向移出；
 - 动画。
 
 不允许 View：
@@ -556,7 +563,7 @@ onActivate: () -> Void
 - 计算 NSScreen；
 - 控制 refresh timer。
 
-`SettingsBarView` 只接收 `LaunchAtLoginState` 和 action closures，不直接依赖 `SMAppService`。`LaunchAtLoginService` 通过 `LoginItemServicing` seam 映射 `.enabled`、`.notRegistered`、`.requiresApproval` 和 `.notFound`，并对 register/unregister 做幂等处理。
+`SettingsBarView` 只接收 `LaunchAtLoginState`、`QuotaRefreshInterval`、可用 reset count 和 action closures，不直接依赖 `SMAppService` 或 UserDefaults。控件使用 native SwiftUI `.help(...)` 与 localized accessibility labels；除频率值和 reset count 外不渲染常驻文字，reset count control 只读且 disabled。`LaunchAtLoginService` 通过 `LoginItemServicing` seam 映射 `.enabled`、`.notRegistered`、`.requiresApproval` 和 `.notFound`，并对 register/unregister 做幂等处理。`SMAppService.mainApp.status` 是 Launch at Login 唯一 source of truth，UserDefaults 只保存刷新频率。
 
 ---
 
@@ -566,6 +573,7 @@ onActivate: () -> Void
 
 - 当前 `SnapshotFreshness`；
 - refresh task；
+- 当前 `QuotaRefreshInterval` 与 refresh-loop generation；
 - last-good snapshot。
 
 不要为 v0.1 创建复杂 Store 层。
@@ -581,10 +589,12 @@ fetch
   ↓
 update fresh/stale
   ↓
-sleep 60s
+sleep selected interval (1m / 5m / 15m)
   ↓
 repeat while app alive
 ```
+
+启动 loop 先立即 fetch；频率切换保存 preference、cancel 旧 task、以新 interval 启动唯一 loop，但不立即 fetch，从切换时刻重新计时。Wake 通过独立的立即 refresh 路径触发，不受当前 interval 延迟影响。loop generation 和取消检查防止旧 task 在切换后继续更新状态。
 
 App 不需要持久化 quota snapshot 到磁盘。
 

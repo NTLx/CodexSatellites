@@ -93,6 +93,17 @@ fixture 至少覆盖：
 - unavailable 不循环 register/unregister；
 - 不使用 UserDefaults 保存启动状态。
 
+### 2.7 Refresh frequency and localization
+
+使用 isolated `UserDefaults` suite 测试：
+
+- `1m → 5m → 15m → 1m`；
+- `1m`、`5m`、`15m` display text；
+- missing preference → `1m`；invalid preference → `1m`；
+- `1m` / `5m` / `15m` persistence；
+- UserDefaults 只出现刷新频率 key，不写 Launch at Login 状态；
+- `en` 与 `zh-Hans` 的 native `.help(...)` / accessibility strings，尤其 `Quota Check Frequency` / `额度检查频率`。
+
 ---
 
 ## 3. 网络集成测试
@@ -136,15 +147,19 @@ HTTP integration 使用：
 - [ ] 没有覆盖摄像头 housing。
 - [ ] 默认没有任何数字。
 - [ ] 点击任一 collapsed satellite 打开紧凑设置条。
-- [ ] 设置条位于硬件 notch 正下方并水平居中，尺寸保持约 240×44pt。
-- [ ] 设置条只有 Launch at Login 与 Quit。
+- [ ] 设置条位于硬件 notch 正下方并水平居中，尺寸约 176×44pt。
+- [ ] 设置条为四个 32pt control、8pt spacing、12pt horizontal padding。
+- [ ] 除频率的 `1m` / `5m` / `15m` 和 reset count 数字外无常驻文字。
+- [ ] 第四个 control 显示当前 available reset count，样式一致但不可点击。
 
 ### 4.2 Hover
 
 - [ ] Hover 左侧，两边同时展开。
 - [ ] Hover 右侧，两边同时展开。
+- [ ] 百分比从 notch 侧向 orb 横向滑入，orb 同步被向外顶出；鼠标移开后两者沿原路同步滑回。
 - [ ] 左边向左展开。
 - [ ] 右边向右展开。
+- [ ] satellite 收回延迟与 Settings Bar 自动收回延迟相同，均为 3 秒。
 - [ ] 不向刘海中央扩张。
 - [ ] 离开后可靠收起。
 - [ ] 鼠标离开整体交互区域后保持展开约 3 秒，再沿原路径平滑收起。
@@ -154,14 +169,29 @@ HTTP integration 使用：
 
 - [ ] 点击任一 expanded satellite 可关闭设置条。
 - [ ] 设置条打开期间两侧百分比保持展开。
-- [ ] Launch at Login 开关反映 `SMAppService.mainApp.status`，关闭后当前 App 继续运行。
-- [ ] requires approval 显示 `Review…`，只打开系统 Login Items 设置。
-- [ ] unavailable 显示 `—` 或 disabled control，Quit 仍可用。
+- [ ] Launch at Login 图标反映 `SMAppService.mainApp.status`，关闭后当前 App 继续运行。
+- [ ] requires approval 显示橙色 warning icon，只打开系统 Login Items 设置。
+- [ ] unavailable 显示 disabled `circle.slash` icon，Quit 仍可用。
 - [ ] 点击左右 satellite、设置条之外关闭设置条，且原点击继续送达目标 App。
 - [ ] 点击 Quit 只终止当前实例，不 unregister Login Item。
 - [ ] Reduce Motion 开启时无 slide/bounce。
+- [ ] open → 3 秒无操作 → 自动关闭。
+- [ ] open → 2 秒在 settings 内移动鼠标 → 从最近一次移动重新计时。
+- [ ] open → frequency click → 保持打开并重新计时。
+- [ ] open → satellite re-click → 立即关闭。
+- [ ] open → outside click → 立即关闭且原点击继续送达目标 App。
+- [ ] Settings Bar 收回动画结束后不闪现。
 
-### 4.4 Launch at Login end-to-end
+### 4.4 Localization and visual contrast
+
+- [ ] English tooltip: `Launch at Login`、`Review Login Items`、`Launch at Login Unavailable`、`Quota Check Frequency`、`Quit`。
+- [ ] zh-Hans tooltip: `登录时启动`、`检查登录项`、`登录时启动不可用`、`额度检查频率`、`退出`。
+- [ ] 有效数据的左右 orb remaining progress arc 和展开 percentage 均为白色，used 部分完全透明。
+- [ ] fresh / stale / unavailable opacity 为 `1.0` / `0.72` / `0.78`。
+- [ ] unavailable 是 neutral 高对比 hollow ring，不显示 cyan/violet quota。
+- [ ] 无 glow / neon shadow，orb diameter 仍为 14pt，ring line width 为 2.5pt。
+
+### 4.5 Launch at Login end-to-end
 
 必须使用稳定 `.app` 路径验证，不能只依赖单元测试或 `SMAppService.status`。
 
@@ -187,7 +217,7 @@ HTTP integration 使用：
 - [ ] Login Item 不被 unregister
 - [ ] 下一次登录仍自动启动
 
-### 4.5 数字
+### 4.6 数字
 
 人工注入 mock 或真实数据验证：
 
@@ -200,7 +230,7 @@ HTTP integration 使用：
 
 三位数不得改变 notch 内侧 anchor。
 
-### 4.6 Fresh/Stale
+### 4.7 Fresh/Stale
 
 - [ ] fresh 正常显示。
 - [ ] 断网后保留原百分比。
@@ -227,6 +257,7 @@ HTTP integration 使用：
 
 - [ ] Wake 后 geometry 正确。
 - [ ] Wake 后尽快 refresh usage。
+- [ ] 当前为 `15m` 时 Wake 仍立即 refresh。
 - [ ] 不出现 duplicate panels。
 
 ### 5.4 Spaces / Full Screen
@@ -278,7 +309,8 @@ v0.1 不需要复杂 benchmark，但至少人工检查：
 
 - [ ] idle 时 CPU 长期接近 0，不存在 25Hz/60Hz 永久 polling；
 - [ ] 没有 runaway timer；
-- [ ] 60s refresh 不叠加 concurrent request；
+- [ ] 1m / 5m / 15m refresh 不叠加 concurrent request；
+- [ ] 多次切换频率后只存在一个 refresh loop；
 - [ ] app termination 能取消 refresh task / event monitor；
 - [ ] memory 无明显持续增长。
 
@@ -303,7 +335,7 @@ Release 前检查源码/界面确认没有：
 - [ ] update framework；
 - [ ] analytics。
 
-允许且仅允许一个临时 compact Settings Bar，内容为 Launch at Login、requires approval 时的 Review… 和 Quit。
+允许且仅允许一个临时 compact Settings Bar，内容为 Launch at Login、刷新频率和 Quit；requires approval 时 Launch control 改为 Review Login Items 行为。
 
 如果有，应删除或明确证明它是满足本 SPEC 的必要最小实现。
 

@@ -2,32 +2,24 @@ import SwiftUI
 
 struct SettingsBarView: View {
     let launchAtLoginState: LaunchAtLoginState
+    let refreshInterval: QuotaRefreshInterval
+    let availableResetCount: Int?
     let onSetLaunchAtLogin: (Bool) -> Void
     let onReviewLoginItems: () -> Void
+    let onAdvanceRefreshInterval: () -> Void
     let onQuit: () -> Void
 
+    private let controlSize: CGFloat = 32
+
     var body: some View {
-        HStack(spacing: 10) {
-            Text("Launch at Login")
-                .font(.system(size: 13, weight: .medium))
-                .lineLimit(1)
-
-            Spacer(minLength: 0)
-
+        HStack(spacing: 8) {
             launchControl
-
-            Divider()
-                .frame(height: 18)
-
-            Button(action: onQuit) {
-                Label("Quit", systemImage: "power")
-                    .font(.system(size: 13, weight: .medium))
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel("Quit")
+            frequencyControl
+            resetCountControl
+            quitControl
         }
         .padding(.horizontal, 12)
-        .frame(width: 240, height: 44)
+        .frame(width: 176, height: 44)
         .background(
             .regularMaterial,
             in: RoundedRectangle(cornerRadius: 13, style: .continuous)
@@ -42,25 +34,104 @@ struct SettingsBarView: View {
     private var launchControl: some View {
         switch launchAtLoginState {
         case .enabled, .disabled:
-            Toggle(
-                "Launch at Login",
-                isOn: Binding(
-                    get: { launchAtLoginState == .enabled },
-                    set: onSetLaunchAtLogin
-                )
+            iconButton(
+                systemName: "arrow.triangle.2.circlepath",
+                help: "Launch at Login",
+                foreground: launchAtLoginState == .enabled ? Color.accentColor : .primary,
+                active: launchAtLoginState == .enabled,
+                action: { onSetLaunchAtLogin(launchAtLoginState != .enabled) }
             )
-            .labelsHidden()
-            .toggleStyle(.switch)
-            .accessibilityLabel("Launch at Login")
         case .requiresApproval:
-            Button("Review…", action: onReviewLoginItems)
-                .buttonStyle(.plain)
-                .foregroundStyle(.secondary)
-                .accessibilityLabel("Review Login Items")
+            iconButton(
+                systemName: "exclamationmark.triangle",
+                help: "Review Login Items",
+                foreground: .orange,
+                action: onReviewLoginItems
+            )
         case .unavailable:
-            Text("—")
-                .foregroundStyle(.secondary)
-                .accessibilityLabel("Launch at Login unavailable")
+            iconButton(
+                systemName: "circle.slash",
+                help: "Launch at Login Unavailable",
+                foreground: .secondary,
+                action: {}
+            )
+            .disabled(true)
         }
+    }
+
+    private var frequencyControl: some View {
+        Button(action: onAdvanceRefreshInterval) {
+            Text(refreshInterval.displayText)
+                .font(.system(size: 11, weight: .semibold, design: .monospaced))
+                .monospacedDigit()
+                .frame(width: controlSize, height: controlSize)
+                .contentShape(Circle())
+        }
+        .buttonStyle(.plain)
+        .background(Circle().fill(Color.primary.opacity(0.08)))
+        .overlay {
+            Circle()
+                .stroke(Color.primary.opacity(0.12), lineWidth: 0.5)
+        }
+        .help("Quota Check Frequency")
+        .accessibilityLabel(Text("Quota Check Frequency"))
+        .accessibilityValue(Text(refreshInterval.displayText))
+    }
+
+    private var quitControl: some View {
+        iconButton(
+            systemName: "power",
+            help: "Quit",
+            action: onQuit
+        )
+    }
+
+    private var resetCountControl: some View {
+        Button(action: {}) {
+            Text(availableResetCount.map(String.init) ?? "—")
+                .font(.system(size: 11, weight: .semibold, design: .monospaced))
+                .monospacedDigit()
+                .frame(width: controlSize, height: controlSize)
+                .contentShape(Circle())
+        }
+        .buttonStyle(.plain)
+        .disabled(true)
+        .background(Circle().fill(Color.primary.opacity(0.08)))
+        .overlay {
+            Circle()
+                .stroke(Color.primary.opacity(0.12), lineWidth: 0.5)
+        }
+        .help("Available Reset Count")
+        .accessibilityLabel(Text("Available Reset Count"))
+        .accessibilityValue(Text(availableResetCount.map(String.init) ?? "—"))
+    }
+
+    private func iconButton(
+        systemName: String,
+        help: LocalizedStringKey,
+        foreground: Color = .primary,
+        active: Bool = false,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            Image(systemName: systemName)
+                .font(.system(size: 13, weight: .semibold))
+                .frame(width: controlSize, height: controlSize)
+                .contentShape(Circle())
+        }
+        .buttonStyle(.plain)
+        .foregroundStyle(foreground)
+        .background {
+            if active {
+                Circle().fill(Color.accentColor.opacity(0.14))
+            }
+        }
+        .overlay {
+            if active {
+                Circle().stroke(Color.accentColor.opacity(0.36), lineWidth: 0.75)
+            }
+        }
+        .help(help)
+        .accessibilityLabel(Text(help))
     }
 }
