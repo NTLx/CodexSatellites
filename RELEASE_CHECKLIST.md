@@ -9,29 +9,13 @@ Use:
 - `NOT TESTED`
 - `BLOCKED`
 
-## Current verification status
-
-Run date: 2026-09-05.
-
-The five automated baseline gates below are `PASS` for this run:
-
-- `./script/build_and_run.sh --verify`
-- XCTest with 0 failures
-- `./script/release.sh preview`
-- Preview DMG `hdiutil verify`
-- Preview DMG contents: `CodexSatellites.app`, `Applications`, and `LICENSE.txt`
-
-Every unchecked gate in sections 2–14 is `NOT TESTED` for this run. No real-Mac, Launch-at-Login E2E, signing, notarization, Gatekeeper, final-DMG, SHA256 publication, or release-approval result is inferred from the automated baseline.
-
-Release classification for this run: `NOT READY`.
-
 ## 1. Automated baseline
 
-- [x] PASS — `./script/build_and_run.sh --verify` passes.
-- [x] PASS — `xcodebuild ... test` passes with 0 failures.
-- [x] PASS — `./script/release.sh preview` succeeds.
-- [x] PASS — Preview DMG passes `hdiutil verify`.
-- [x] PASS — Preview DMG contains `CodexSatellites.app`, `Applications`, and `LICENSE.txt`.
+- [ ] `./script/build_and_run.sh --verify` passes.
+- [ ] `xcodebuild ... test` passes with 0 failures.
+- [ ] `./script/release.sh preview` succeeds.
+- [ ] Preview DMG passes `hdiutil verify`.
+- [ ] Preview DMG contains `CodexSatellites.app`, `Applications`, and `LICENSE.txt`.
 
 ## 2. Real notched MacBook
 
