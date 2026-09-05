@@ -1,4 +1,5 @@
 import Foundation
+import CoreFoundation
 import OSLog
 
 struct CodexAuthCredentials: Sendable {
@@ -191,7 +192,10 @@ enum CodexUsageParser {
     }
 
     private static func number(_ value: Any?) -> NSNumber? {
-        guard let value, !(value is Bool) else { return nil }
+        guard let value,
+              CFGetTypeID(value as CFTypeRef) != CFBooleanGetTypeID() else {
+            return nil
+        }
         return value as? NSNumber
     }
 
@@ -218,7 +222,7 @@ enum CodexUsageParser {
 
     private static func parseAvailableResetCount(from root: [String: Any]) -> Int? {
         guard let resetCredits = root["rate_limit_reset_credits"] as? [String: Any],
-              let value = number(resetCredits["applicable_available_count"]) else {
+              let value = number(resetCredits["available_count"]) else {
             return nil
         }
 

@@ -542,10 +542,17 @@ final class QuotaOverlayController {
     }
 
     private func makeSettingsBarView() -> SettingsBarView {
-        SettingsBarView(
+        let availableResetCount: Int?
+        if case let .fresh(snapshot) = state.freshness {
+            availableResetCount = snapshot.availableResetCount
+        } else {
+            availableResetCount = nil
+        }
+
+        return SettingsBarView(
             launchAtLoginState: launchAtLoginService.state(),
             refreshInterval: refreshInterval,
-            availableResetCount: state.freshness.snapshot?.availableResetCount,
+            availableResetCount: availableResetCount,
             onSetLaunchAtLogin: { [weak self] enabled in
                 self?.setLaunchAtLogin(enabled)
             },

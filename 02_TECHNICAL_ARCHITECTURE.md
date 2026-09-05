@@ -563,7 +563,7 @@ onActivate: () -> Void
 - 计算 NSScreen；
 - 控制 refresh timer。
 
-`SettingsBarView` 只接收 `LaunchAtLoginState`、`QuotaRefreshInterval`、可用 reset count 和 action closures，不直接依赖 `SMAppService` 或 UserDefaults。控件使用 native SwiftUI `.help(...)` 与 localized accessibility labels；除频率值和 reset count 外不渲染常驻文字，reset count control 只读且 disabled。`LaunchAtLoginService` 通过 `LoginItemServicing` seam 映射 `.enabled`、`.notRegistered`、`.requiresApproval` 和 `.notFound`，并对 register/unregister 做幂等处理。`SMAppService.mainApp.status` 是 Launch at Login 唯一 source of truth，UserDefaults 只保存刷新频率。
+`SettingsBarView` 只接收 `LaunchAtLoginState`、`QuotaRefreshInterval`、可用 reset count 和 action closures，不直接依赖 `SMAppService` 或 UserDefaults。控件使用 native SwiftUI `.help(...)` 与 localized accessibility labels；除频率值和 reset count 外不渲染常驻文字，reset count control 是只读 indicator，stale 或 unavailable 时显示 `—`。四个 control 都保持圆形背景与描边，Launch at Login 的 inactive 状态与 Quit 使用 neutral treatment。`LaunchAtLoginService` 通过 `LoginItemServicing` seam 映射 `.enabled`、`.notRegistered`、`.requiresApproval` 和 `.notFound`，并对 register/unregister 做幂等处理。`SMAppService.mainApp.status` 是 Launch at Login 唯一 source of truth，UserDefaults 只保存刷新频率。
 
 ---
 

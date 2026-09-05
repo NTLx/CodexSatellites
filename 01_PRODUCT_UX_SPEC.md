@@ -241,7 +241,7 @@ Hover 左侧时，左右都展开；Hover 右侧时，左右也都展开。
         (↻)   (5m)   (2)   (⏻)
 ```
 
-设置条约为 `176×44pt`，由四个 `32pt` 圆形 control 和 `8pt` 间距组成，只有频率与 reset count control 常驻显示数字。Reset count control 显示 usage response 中 `rate_limit_reset_credits.applicable_available_count` 的当前值，只读且不可点击。Launch at Login 使用 `arrow.triangle.2.circlepath`；enabled 以系统 accent、active background/stroke 表达，disabled 为 neutral，requires approval 使用橙色 `exclamationmark.triangle` 并打开系统 Login Items，不可用使用 disabled `circle.slash`。Quit 使用 `power`。
+设置条约为 `176×44pt`，由四个 `32pt` 圆形 control 和 `8pt` 间距组成，只有频率与 reset count control 常驻显示数字。Reset count control 显示 usage response 中 canonical 字段 `rate_limit_reset_credits.available_count` 的当前值，只读且不可点击；数据 stale 或 unavailable 时显示 `—`。Launch at Login 使用 `arrow.triangle.2.circlepath`；enabled 以系统 accent、active background/stroke 表达，disabled 为 neutral，requires approval 使用橙色 `exclamationmark.triangle` 并打开系统 Login Items，不可用使用 disabled `circle.slash`。Quit 使用 `power`。
 
 再次点击任一 satellite 或点击 settings/satellite 之外时立即关闭设置条；外部 click 仍返回原事件，不吞掉目标应用的点击。设置条打开后 3 秒无交互自动关闭；settings 内鼠标移动或 control 操作重新计时。频率和普通 Launch at Login 操作保持 panel visible，Review 立即关闭并打开 System Settings，Quit 终止 app。设置条出现期间 quota 两侧保持 expanded，但不改变前台应用或键盘焦点。
 

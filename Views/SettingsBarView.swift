@@ -87,23 +87,19 @@ struct SettingsBarView: View {
     }
 
     private var resetCountControl: some View {
-        Button(action: {}) {
-            Text(availableResetCount.map(String.init) ?? "—")
-                .font(.system(size: 11, weight: .semibold, design: .monospaced))
-                .monospacedDigit()
-                .frame(width: controlSize, height: controlSize)
-                .contentShape(Circle())
-        }
-        .buttonStyle(.plain)
-        .disabled(true)
-        .background(Circle().fill(Color.primary.opacity(0.08)))
-        .overlay {
-            Circle()
-                .stroke(Color.primary.opacity(0.12), lineWidth: 0.5)
-        }
-        .help("Available Reset Count")
-        .accessibilityLabel(Text("Available Reset Count"))
-        .accessibilityValue(Text(availableResetCount.map(String.init) ?? "—"))
+        Text(availableResetCount.map(String.init) ?? "—")
+            .font(.system(size: 11, weight: .semibold, design: .monospaced))
+            .monospacedDigit()
+            .frame(width: controlSize, height: controlSize)
+            .contentShape(Circle())
+            .background(Circle().fill(Color.primary.opacity(0.08)))
+            .overlay {
+                Circle()
+                    .stroke(Color.primary.opacity(0.12), lineWidth: 0.5)
+            }
+            .help("Available Reset Count")
+            .accessibilityLabel(Text("Available Reset Count"))
+            .accessibilityValue(Text(availableResetCount.map(String.init) ?? "—"))
     }
 
     private func iconButton(
@@ -121,15 +117,21 @@ struct SettingsBarView: View {
         }
         .buttonStyle(.plain)
         .foregroundStyle(foreground)
-        .background {
-            if active {
-                Circle().fill(Color.accentColor.opacity(0.14))
-            }
-        }
+        .background(
+            Circle().fill(
+                active
+                    ? Color.accentColor.opacity(0.14)
+                    : Color.primary.opacity(0.08)
+            )
+        )
         .overlay {
-            if active {
-                Circle().stroke(Color.accentColor.opacity(0.36), lineWidth: 0.75)
-            }
+            Circle()
+                .stroke(
+                    active
+                        ? Color.accentColor.opacity(0.36)
+                        : Color.primary.opacity(0.12),
+                    lineWidth: active ? 0.75 : 0.5
+                )
         }
         .help(help)
         .accessibilityLabel(Text(help))
