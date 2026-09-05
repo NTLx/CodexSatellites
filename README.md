@@ -46,10 +46,8 @@ Use `./script/build_and_run.sh --verify` to build, launch, and verify the proces
 
 ## Documentation
 
-- [Product & UX SPEC](01_PRODUCT_UX_SPEC.md)
-- [Technical Architecture](02_TECHNICAL_ARCHITECTURE.md)
-- [Test & Acceptance](04_TEST_ACCEPTANCE.md)
-- [Research & Reference Notes](06_RESEARCH_REFERENCES.md)
+- [Agent Engineering Contract](AGENTS.md)
+- [Release Checklist](RELEASE_CHECKLIST.md)
 
 ## Current status
 
