@@ -17,8 +17,7 @@ final class QuotaOverlayController {
         static let settingsWidth: CGFloat = 176
         static let settingsHeight: CGFloat = 44
         static let settingsNotchGap: CGFloat = 6
-        static let expandAnimationDuration: TimeInterval = 0.2
-        static let collapseAnimationDuration: TimeInterval = 0.18
+        static let orbAnimationDuration: TimeInterval = 0.2
         static let settingsShowDuration: TimeInterval = 0.18
         static let settingsHideDuration: TimeInterval = 0.15
         static let settingsAnimationOffset: CGFloat = 6
@@ -47,7 +46,6 @@ final class QuotaOverlayController {
     private var refreshInFlight = false
     private var refreshPending = false
     private var refreshFollowUpTask: Task<Void, Never>?
-    private var collapseTask: Task<Void, Never>?
     private var settingsAutoHideTask: Task<Void, Never>?
     private var screenChangeObserver: NSObjectProtocol?
     private var wakeObserver: NSObjectProtocol?
@@ -65,6 +63,7 @@ final class QuotaOverlayController {
             remainingPercent: nil,
             freshness: .unavailable,
             expanded: false,
+            animationDuration: OverlayMetrics.orbAnimationDuration,
             side: .left,
             onActivate: {}
         ))
@@ -72,6 +71,7 @@ final class QuotaOverlayController {
             remainingPercent: nil,
             freshness: .unavailable,
             expanded: false,
+            animationDuration: OverlayMetrics.orbAnimationDuration,
             side: .right,
             onActivate: {}
         ))
@@ -110,8 +110,6 @@ final class QuotaOverlayController {
         refreshPending = false
         refreshFollowUpTask?.cancel()
         refreshFollowUpTask = nil
-        collapseTask?.cancel()
-        collapseTask = nil
         removeObservers()
         settingsVisible = false
         settingsPanel.alphaValue = 1
@@ -300,9 +298,7 @@ final class QuotaOverlayController {
         }
 
         NSAnimationContext.runAnimationGroup { context in
-            context.duration = effectiveExpanded
-                ? OverlayMetrics.expandAnimationDuration
-                : OverlayMetrics.collapseAnimationDuration
+            context.duration = OverlayMetrics.orbAnimationDuration
             context.timingFunction = CAMediaTimingFunction(name: .easeInEaseOut)
             leftPanel.animator().setFrame(leftFrame, display: true)
             rightPanel.animator().setFrame(rightFrame, display: true)
@@ -315,11 +311,9 @@ final class QuotaOverlayController {
             scheduleSettingsAutoHide()
         }
         if interactionRegion.contains(location) {
-            collapseTask?.cancel()
-            collapseTask = nil
             setExpanded(true)
         } else if expanded && !settingsVisible {
-            scheduleCollapse()
+            setExpanded(false)
         }
     }
 
@@ -331,20 +325,6 @@ final class QuotaOverlayController {
         let left = leftPanel.frame.insetBy(dx: -OverlayMetrics.hoverPadding, dy: -OverlayMetrics.hoverPadding)
         let right = rightPanel.frame.insetBy(dx: -OverlayMetrics.hoverPadding, dy: -OverlayMetrics.hoverPadding)
         return left.union(right)
-    }
-
-    private func scheduleCollapse() {
-        collapseTask?.cancel()
-        collapseTask = Task { @MainActor [weak self] in
-            try? await Task.sleep(for: Self.settingsAutoHideDelay)
-            guard !Task.isCancelled else { return }
-            self?.collapseIfCursorOutside()
-        }
-    }
-
-    private func collapseIfCursorOutside() {
-        guard !interactionRegion.contains(NSEvent.mouseLocation) else { return }
-        setExpanded(false)
     }
 
     private func setExpanded(_ value: Bool) {
@@ -524,6 +504,7 @@ final class QuotaOverlayController {
             remainingPercent: snapshot?.fiveHour?.remainingPercent,
             freshness: freshness(for: snapshot?.fiveHour),
             expanded: effectiveExpanded,
+            animationDuration: OverlayMetrics.orbAnimationDuration,
             side: .left,
             onActivate: { [weak self] in
                 self?.toggleSettingsBar()
@@ -533,6 +514,7 @@ final class QuotaOverlayController {
             remainingPercent: snapshot?.weekly?.remainingPercent,
             freshness: freshness(for: snapshot?.weekly),
             expanded: effectiveExpanded,
+            animationDuration: OverlayMetrics.orbAnimationDuration,
             side: .right,
             onActivate: { [weak self] in
                 self?.toggleSettingsBar()

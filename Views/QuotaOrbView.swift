@@ -15,6 +15,7 @@ struct QuotaOrbView: View {
     let remainingPercent: Double?
     let freshness: OrbFreshness
     let expanded: Bool
+    let animationDuration: Double
     let side: QuotaOrbSide
     let onActivate: () -> Void
 
@@ -46,7 +47,7 @@ struct QuotaOrbView: View {
         }
         .buttonStyle(.plain)
         .opacity(opacity)
-        .animation(reduceMotion ? .linear(duration: 0.01) : .easeInOut(duration: 0.2), value: expanded)
+        .animation(reduceMotion ? .linear(duration: 0.01) : .easeInOut(duration: animationDuration), value: expanded)
         .accessibilityLabel(side == .left ? "Codex five hour remaining" : "Codex weekly remaining")
         .accessibilityValue(displayValue)
         .accessibilityHint("Click to open settings")
