@@ -37,7 +37,6 @@ Do not add without explicit owner request:
 
 - ordinary Settings window;
 - menu bar item;
-- notifications;
 - quota history;
 - cost/token dashboard;
 - reset countdown;
@@ -167,6 +166,10 @@ Current v0.1 visual design uses high-contrast white remaining arcs and percentag
 
 Do not change colors/geometry/animation as incidental cleanup.
 
+The panel frame animation and the SwiftUI orb content animation must share the single `OverlayMetrics.orbAnimationDuration` value. Mismatched durations let the content grow wider than the panel and clip the orb at the panel's fixed edge.
+
+Hover exit collapses the orbs immediately. Orb expansion is coupled to Settings Bar visibility through `effectiveExpanded`, so hiding the bar — including its 3-second auto-dismiss — also retracts the orbs whenever the cursor is not over them. That coupling is intended; do not decouple it.
+
 ## Freshness invariant
 
 States:
@@ -178,6 +181,31 @@ States:
 Quota percentages may display last-good data in stale state with reduced opacity.
 
 Reset count displays `—` when not fresh.
+
+## Notifications invariant
+
+Native macOS notifications are delivered by `QuotaNotificationService`, driven by `QuotaChangeDetector` transitions between the previous and current snapshot inside the existing refresh loop.
+
+Triggers:
+
+- 5-hour quota reset to 100%;
+- weekly quota reset to 100%;
+- 5-hour quota crossing below 10%;
+- weekly quota crossing below 10%;
+- available reset count increased;
+- available reset count decreased.
+
+Rules:
+
+- detection is transition-based, never state-based; a first fetch is a silent baseline;
+- the previous snapshot is in-memory only (see the Persistence invariant);
+- notification text is English-only;
+- missing/unknown reset count never produces a notification;
+- denied or unavailable authorization is a silent no-op;
+- no in-app notification toggle — macOS System Settings owns that;
+- notification delivery requires a signed build and a running app;
+- Debug builds are linker-signed only, so `UNUserNotificationCenter` refuses authorization (`UNErrorDomain Code=1`); `script/build_and_run.sh` ad-hoc re-signs the built bundle for local testing and that step must stay;
+- real quota changes cannot force every trigger, so verify delivery by temporarily forcing a detector event and reverting it.
 
 ## Persistence invariant
 
@@ -201,7 +229,7 @@ Do not add third-party runtime dependencies without explicit owner approval.
 Current release identity:
 
 - Bundle ID: `io.github.ntlx.codexsatellites`
-- version: `0.1.0`
+- version: `0.2.0`
 - build: `1`
 - license: MIT
 - minimum macOS: 15+
@@ -209,6 +237,10 @@ Current release identity:
 - Hardened Runtime: ON
 
 Do not change release identity casually.
+
+## Agent skills
+
+`.agents/skills/build-macos-apps/` packages macOS/Xcode guidance (build/run/debug, SwiftUI patterns, AppKit interop, signing, notarization, telemetry). Consult it explicitly for non-trivial macOS or Xcode work.
 
 ## Build and test
 

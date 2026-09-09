@@ -19,6 +19,7 @@ CodexSatellites is an independent community utility and is not affiliated with o
 - Click either satellite → a compact icon-only Settings Bar appears.
 - Settings Bar → icon-only Launch at Login, refresh frequency, available reset count, and Quit controls.
 - Quota check interval → `1m`, `5m`, or `15m`.
+- Notifications → native macOS alerts when a quota window resets to 100%, crosses below 10%, or the available reset count changes.
 
 ## Requirements
 
@@ -51,7 +52,7 @@ Use `./script/build_and_run.sh --verify` to build, launch, and verify the proces
 
 ## Current status
 
-v0.1.0 release engineering
+v0.2.0 release engineering
 
 ## Release engineering
 
@@ -70,6 +71,8 @@ The release script reads signing and notarization identity from the local enviro
 - Codex usage currently depends on an undocumented ChatGPT usage endpoint.
 - Full-screen Space behavior is a v0.1 compatibility limitation unless explicitly validated.
 - The app assumes an existing local Codex login and does not manage authentication.
+- Notifications require a signed build and the app to be running; the unsigned preview DMG cannot deliver them.
+- Notifications are English-only and have no in-app toggle — use macOS System Settings → Notifications.
 
 ## License
 

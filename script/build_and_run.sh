@@ -21,6 +21,13 @@ xcodebuild \
   CODE_SIGNING_ALLOWED=NO \
   build
 
+# Debug builds are linker-signed only, which makes UNUserNotificationCenter
+# refuse authorization. Ad-hoc sign the bundle so the Info.plist is sealed
+# under the real bundle identifier and notifications can be tested locally.
+if ! codesign --force --deep --sign - --identifier "$BUNDLE_ID" "$APP_BUNDLE"; then
+  printf 'warning: ad-hoc signing failed; notifications will be unavailable\n' >&2
+fi
+
 open_app() {
   /usr/bin/open -n "$APP_BUNDLE"
 }

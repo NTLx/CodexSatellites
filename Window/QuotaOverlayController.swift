@@ -29,6 +29,7 @@ final class QuotaOverlayController {
     private let usageClient = CodexUsageClient()
     private let launchAtLoginService: LaunchAtLoginService
     private let refreshPreference: QuotaRefreshPreference
+    private let notifier: QuotaNotificationDelivering
     private let leftPanel: NSPanel
     private let rightPanel: NSPanel
     private let settingsPanel: NSPanel
@@ -55,9 +56,13 @@ final class QuotaOverlayController {
     private var localClickMonitor: Any?
     private var started = false
 
-    init(refreshPreference: QuotaRefreshPreference = QuotaRefreshPreference()) {
+    init(
+        refreshPreference: QuotaRefreshPreference = QuotaRefreshPreference(),
+        notifier: QuotaNotificationDelivering? = nil
+    ) {
         launchAtLoginService = LaunchAtLoginService()
         self.refreshPreference = refreshPreference
+        self.notifier = notifier ?? QuotaNotificationService()
         refreshInterval = refreshPreference.interval
         leftHostingView = NSHostingView(rootView: QuotaOrbView(
             remainingPercent: nil,
@@ -97,6 +102,7 @@ final class QuotaOverlayController {
         observeMouseMovement()
         updateGeometry()
         updateHoverState(at: NSEvent.mouseLocation)
+        Task { await notifier.requestAuthorizationIfNeeded() }
         startRefreshLoop(immediately: true)
     }
 
@@ -613,9 +619,14 @@ final class QuotaOverlayController {
         do {
             let snapshot = try await usageClient.fetch()
             guard started, !Task.isCancelled else { return }
+            let previous = state.freshness.snapshot
             state.applySuccess(snapshot)
+            let events = QuotaChangeDetector.events(previous: previous, current: snapshot)
+            for event in events {
+                await notifier.deliver(event, at: snapshot.fetchedAt)
+            }
             render()
-            logger.info("usage state=fresh")
+            logger.info("usage state=fresh events=\(events.count, privacy: .public)")
         } catch {
             guard started, !Task.isCancelled else { return }
             state.applyFailure()

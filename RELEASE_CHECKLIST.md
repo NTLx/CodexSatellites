@@ -178,12 +178,12 @@ Use a stable installed app path such as `/Applications/CodexSatellites.app`.
 ## 14. Publication
 
 - [ ] Source tree is final.
-- [ ] Version `0.1.0`, build `1`.
-- [ ] `ReleaseNotes/v0.1.0.md` accurate.
+- [ ] Version `0.2.0`, build `1`.
+- [ ] `ReleaseNotes/v0.2.0.md` accurate.
 - [ ] MIT License present.
 - [ ] Final DMG + `SHA256SUMS` ready.
 - [ ] Owner approves publication.
-- [ ] Tag `v0.1.0`.
+- [ ] Tag `v0.2.0`.
 - [ ] Publish GitHub Release.
 
 ## Final classification
