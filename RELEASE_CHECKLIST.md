@@ -173,6 +173,8 @@ Ad-hoc widget transport (`widgetContainer`):
 - [ ] `pluginkit -m -p com.apple.widgetkit-extension -v` lists `io.github.ntlx.codexsatellites.widget`.
 - [ ] App writes `quota-snapshot.json` to the widget extension's container after a successful fetch.
 - [ ] Widget process loads the same snapshot (`snapshot operation=load transport=widgetContainer result=success`).
+- [ ] Both Small and Medium added together; opening and closing Notification Center repeatedly stays responsive.
+- [ ] Runtime logs contain no `transport=appGroup` and no `kTCCServiceSystemPolicyAppData`.
 - [ ] Small widget shows 5-hour and weekly gauges plus a last-updated time.
 - [ ] Medium widget shows both gauges plus reset times and a last-updated time.
 - [ ] Widget follows Light/Dark automatically.

@@ -195,9 +195,9 @@ Data flow is one-way:
 - sharing is implemented in `Shared/WidgetQuotaSnapshot.swift` with an explicit `WidgetSnapshotTransport`; `activeTransport` is `widgetContainer` for ad-hoc/preview builds and switches to `appGroup` once a Developer ID build provisions the App Group;
 - on macOS 15+ App Group containers are protected and membership must be authorized by the code-signing/provisioning model; an ad-hoc build has neither a provisioning profile authorizing the registered `group.*` App Group nor a Developer Team ID for a team-prefixed macOS group, so the widget's group-container read is denied by TCC (`kTCCServiceSystemPolicyAppData`);
 - for ad-hoc builds the non-sandboxed app writes `~/Library/Containers/io.github.ntlx.codexsatellites.widget/Data/Documents/quota-snapshot.json` and the widget reads its own container; this is a development compatibility workaround, not the production sharing architecture;
-- `load()` reads every transport and takes the newest `fetchedAt`, so a stale file can never shadow fresh data during a migration;
+- `activeTransport` is the single source of truth: `.widgetContainer` resolves, reads, and deletes only the widget's own container and must never touch the App Group; only a provisioned `.appGroup` build may fall back to `.widgetContainer` for legacy migration;
 - snapshot reads/writes log `operation`/`transport`/`result` only — never quota values, tokens, or paths;
-- the app publishes the snapshot after every successful fetch (`fresh`) and after a failure that retains last-good data (`stale`), then calls `WidgetCenter.reloadTimelines`;
+- the app saves the snapshot after every successful fetch (`fresh`) and after a failure that retains last-good data (`stale`), but calls `WidgetCenter.reloadTimelines` only when the displayed content (quota percentages, reset times, freshness) actually changes — `fetchedAt` alone must not trigger a reload;
 - the widget must never read Codex auth, call the usage endpoint, or perform OAuth.
 
 Signing/entitlements:
@@ -309,7 +309,8 @@ Reference measurements (v0.2.0, built-in display): hover enter → first frame c
 The widget extension is a separate process; the widget gallery is not scriptable.
 
 - registration: `pluginkit -m -p com.apple.widgetkit-extension -v | grep codex` after launching the app;
-- shared data: the app writes `~/Library/Group Containers/group.io.github.ntlx.codexsatellites/quota-snapshot.json`;
+- shared data (ad-hoc): the app writes `~/Library/Containers/io.github.ntlx.codexsatellites.widget/Data/Documents/quota-snapshot.json`; a Developer ID build uses the App Group container;
+- logs: `log show --info --predicate 'subsystem == "io.github.ntlx.codexsatellites.widget"'` must show only `transport=widgetContainer` for ad-hoc builds, with no App Group load and no `kTCCServiceSystemPolicyAppData` denial;
 - layout: render the real views offscreen with `ImageRenderer` at `.systemSmall` 158×158 and `.systemMedium` 338×158, including ~16pt content margins;
 - if PlugInKit rejects the appex, `log show --predicate 'process == "pkd"'` reports `plug-ins must be sandboxed`;
 - placing the widget on the desktop/gallery is a manual user action; report `NOT TESTED` unless actually observed.

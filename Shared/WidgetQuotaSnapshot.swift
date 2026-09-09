@@ -26,6 +26,16 @@ extension WidgetQuotaSnapshot {
         fetchedAt: Date(),
         freshness: .fresh
     )
+
+    /// Fields the widget actually renders. `fetchedAt` is excluded so a refresh
+    /// that changes nothing visible does not spend a timeline reload.
+    func hasSameDisplayedContent(as other: WidgetQuotaSnapshot) -> Bool {
+        fiveHourRemainingPercent == other.fiveHourRemainingPercent
+            && weeklyRemainingPercent == other.weeklyRemainingPercent
+            && fiveHourResetsAt == other.fiveHourResetsAt
+            && weeklyResetsAt == other.weeklyResetsAt
+            && freshness == other.freshness
+    }
 }
 
 /// How the snapshot travels from the app to the widget extension.
@@ -43,7 +53,7 @@ enum WidgetSnapshotError: Error {
 ///
 /// On macOS 15+ App Group containers are protected and membership must be
 /// authorized by the code-signing/provisioning model. An ad-hoc build has
-/// neither a provisioning profile authorizing a registered `group.*` App Group
+/// neither a provisioning profile authorizing the registered `group.*` App Group
 /// nor a Developer Team ID usable with a team-prefixed macOS App Group, so the
 /// widget extension's read of the group container is denied by TCC
 /// (`kTCCServiceSystemPolicyAppData`).
@@ -52,16 +62,20 @@ enum WidgetSnapshotError: Error {
 /// extension's own sandbox container: the non-sandboxed app writes into
 /// `~/Library/Containers/<widget-id>/Data/Documents`, and the widget reads it
 /// as its own data. This is a development compatibility workaround, not the
-/// production sharing architecture; a Developer ID build with a provisioned
-/// `group.io.github.ntlx.codexsatellites` switches `activeTransport` to
-/// `.appGroup`.
+/// production sharing architecture.
+///
+/// `activeTransport` is the single source of truth. In `.widgetContainer` mode
+/// the App Group container is never resolved, read, or deleted, so the widget
+/// hot path can never trigger the TCC denial. Only a provisioned `.appGroup`
+/// build may fall back to the legacy preview snapshot for migration.
 enum WidgetSnapshotStore {
     static let appGroupIdentifier = "group.io.github.ntlx.codexsatellites"
     static let widgetBundleIdentifier = "io.github.ntlx.codexsatellites.widget"
     static let widgetKind = "CodexSatellitesWidget"
 
     /// Preview / ad-hoc builds use the widget extension's own container. Switch
-    /// this to `.appGroup` once a Developer ID build provisions the App Group.
+    /// this to `.appGroup` manually once a Developer ID build provisions the
+    /// App Group.
     static let activeTransport: WidgetSnapshotTransport = .widgetContainer
 
     private static let fileName = "quota-snapshot.json"
@@ -69,6 +83,58 @@ enum WidgetSnapshotStore {
         subsystem: "io.github.ntlx.codexsatellites.widget",
         category: "snapshot"
     )
+
+    /// Transports the widget may read, in priority order.
+    static func readableTransports(for transport: WidgetSnapshotTransport) -> [WidgetSnapshotTransport] {
+        transport == .appGroup ? [.appGroup, .widgetContainer] : [.widgetContainer]
+    }
+
+    static func load() -> WidgetQuotaSnapshot? {
+        for transport in readableTransports(for: activeTransport) {
+            if let snapshot = load(from: transport) {
+                return snapshot
+            }
+        }
+        return nil
+    }
+
+    static func save(_ snapshot: WidgetQuotaSnapshot) {
+        guard let url = writeURL(for: activeTransport) else {
+            logError("save", activeTransport, CocoaError(.fileNoSuchFile))
+            return
+        }
+        switch encode(snapshot, to: url) {
+        case .success:
+            log("save", activeTransport, "success")
+        case let .failure(error):
+            logError("save", activeTransport, error)
+        }
+    }
+
+    static func clear() {
+        guard let url = writeURL(for: activeTransport) else { return }
+        try? FileManager.default.removeItem(at: url)
+        log("clear", activeTransport, "done")
+    }
+
+    private static func load(from transport: WidgetSnapshotTransport) -> WidgetQuotaSnapshot? {
+        guard let url = readURL(for: transport) else {
+            log("load", transport, "unavailable")
+            return nil
+        }
+        switch decode(at: url) {
+        case let .success(snapshot):
+            log("load", transport, "success")
+            return snapshot
+        case let .failure(error):
+            if isMissingFile(error) {
+                log("load", transport, "missing")
+            } else {
+                logError("load", transport, error)
+            }
+            return nil
+        }
+    }
 
     /// Writer side (non-sandboxed app): its home directory is the real home, so
     /// the widget extension's container is addressed explicitly.
@@ -102,55 +168,6 @@ enum WidgetSnapshotStore {
                 .containerURL(forSecurityApplicationGroupIdentifier: appGroupIdentifier)?
                 .appendingPathComponent(fileName, isDirectory: false)
         }
-    }
-
-    static func load() -> WidgetQuotaSnapshot? {
-        var snapshots: [WidgetQuotaSnapshot] = []
-        for transport in WidgetSnapshotTransport.allCases {
-            guard let url = readURL(for: transport) else {
-                log("load", transport, "unavailable")
-                continue
-            }
-            switch decode(at: url) {
-            case let .success(snapshot):
-                log("load", transport, "success")
-                snapshots.append(snapshot)
-            case let .failure(error):
-                if isMissingFile(error) {
-                    log("load", transport, "missing")
-                } else {
-                    logError("load", transport, error)
-                }
-            }
-        }
-        return newestSnapshot(from: snapshots)
-    }
-
-    static func save(_ snapshot: WidgetQuotaSnapshot) {
-        guard let url = writeURL(for: activeTransport) else {
-            logError("save", activeTransport, CocoaError(.fileNoSuchFile))
-            return
-        }
-        switch encode(snapshot, to: url) {
-        case .success:
-            log("save", activeTransport, "success")
-        case let .failure(error):
-            logError("save", activeTransport, error)
-        }
-    }
-
-    static func clear() {
-        for transport in WidgetSnapshotTransport.allCases {
-            guard let url = writeURL(for: transport) else { continue }
-            try? FileManager.default.removeItem(at: url)
-            log("clear", transport, "done")
-        }
-    }
-
-    /// When more than one transport holds a snapshot, the newest `fetchedAt`
-    /// wins so a stale file can never shadow fresh data during a migration.
-    static func newestSnapshot(from snapshots: [WidgetQuotaSnapshot]) -> WidgetQuotaSnapshot? {
-        snapshots.max { $0.fetchedAt < $1.fetchedAt }
     }
 
     private static func decode(at url: URL) -> Result<WidgetQuotaSnapshot, Error> {
