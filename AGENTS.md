@@ -163,7 +163,7 @@ Do not:
 - activate the app during hover;
 - expand toward the center of the notch.
 
-Current v0.1 visual design uses high-contrast white remaining arcs and percentage text.
+Current visual design uses high-contrast white remaining arcs and percentage text.
 
 Do not change colors/geometry/animation as incidental cleanup.
 
@@ -270,7 +270,6 @@ Do not add third-party runtime dependencies without explicit owner approval.
 Current release identity:
 
 - Bundle ID: `io.github.ntlx.codexsatellites`
-- version: `0.3.0`
 - build: derived from `git rev-list --count HEAD` and passed as `CURRENT_PROJECT_VERSION`
 - license: MIT
 - minimum macOS: 15+
@@ -307,7 +306,7 @@ CodexSatellites is an accessory app with non-activating panels, so the computer-
 - measure: poll `CGWindowListCopyWindowInfo` for panel bounds/alpha — no Screen Recording needed, and accurate enough to time the animation frame by frame;
 - capture: `screencapture -R` or `SCScreenshotManager.captureImage`; `CGWindowListCreateImage` is obsoleted on macOS 15+.
 
-Reference measurements (v0.2.0, built-in display): hover enter → first frame change ≈40ms, hover exit ≈54ms (no debounce timer); orb 24→60pt ≈200ms with ~27 distinct intermediate widths; Settings Bar show ≈0.15s, hide ≈0.12s, auto-dismiss ≈3.2–3.4s. Both panels must change with identical timestamps.
+Reference measurements (built-in display): hover enter → first frame change ≈40ms, hover exit ≈54ms (no debounce timer); orb 24→60pt ≈200ms with ~27 distinct intermediate widths; Settings Bar show ≈0.15s, hide ≈0.12s, auto-dismiss ≈3.2–3.4s. Both panels must change with identical timestamps.
 
 ### Verifying the widget manually
 

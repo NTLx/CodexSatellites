@@ -62,10 +62,6 @@ Use `./script/build_and_run.sh --verify` to build, launch, and verify the proces
 - [Agent Engineering Contract](AGENTS.md)
 - [Release Checklist](RELEASE_CHECKLIST.md)
 
-## Current status
-
-v0.3.0 release engineering
-
 ## Release engineering
 
 The outside-Mac-App-Store release workflow uses Developer ID signing, Hardened Runtime, notarization, stapling, and a DMG:
