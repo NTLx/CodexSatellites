@@ -3,7 +3,6 @@ import OSLog
 import QuartzCore
 import ServiceManagement
 import SwiftUI
-import WidgetKit
 
 @MainActor
 final class QuotaOverlayController {
@@ -39,7 +38,6 @@ final class QuotaOverlayController {
     private var settingsHostingView: NSHostingView<SettingsBarView>
 
     private var state = SnapshotStateMachine()
-    private var lastPublishedWidgetSnapshot: WidgetQuotaSnapshot?
     private var expanded = false
     private var settingsVisible = false
     private var currentGeometry: NotchGeometry?
@@ -606,19 +604,11 @@ final class QuotaOverlayController {
             fetchedAt: snapshot.fetchedAt,
             freshness: freshness
         )
-        let previous = lastPublishedWidgetSnapshot
-        lastPublishedWidgetSnapshot = widgetSnapshot
         WidgetSnapshotStore.save(widgetSnapshot)
-
-        // Only spend a timeline reload when something the widget renders changed.
-        guard previous?.hasSameDisplayedContent(as: widgetSnapshot) != true else { return }
-        WidgetCenter.shared.reloadTimelines(ofKind: WidgetSnapshotStore.widgetKind)
     }
 
     private func clearWidgetSnapshot() {
-        lastPublishedWidgetSnapshot = nil
         WidgetSnapshotStore.clear()
-        WidgetCenter.shared.reloadTimelines(ofKind: WidgetSnapshotStore.widgetKind)
     }
 
     private func requestRefresh() async {

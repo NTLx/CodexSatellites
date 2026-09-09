@@ -57,25 +57,6 @@ final class WidgetSnapshotStoreTests: XCTestCase {
         )
     }
 
-    /// A refresh that only moves `fetchedAt` must not spend a timeline reload.
-    func testDisplayedContentIgnoresFetchedAt() {
-        let earlier = snapshot(fiveHour: 73, weekly: 42, fetchedAt: Date(timeIntervalSince1970: 100))
-        let later = snapshot(fiveHour: 73, weekly: 42, fetchedAt: Date(timeIntervalSince1970: 200))
-        XCTAssertTrue(earlier.hasSameDisplayedContent(as: later))
-    }
-
-    func testDisplayedContentDetectsQuotaChange() {
-        let before = snapshot(fiveHour: 73, weekly: 42, fetchedAt: Date(timeIntervalSince1970: 100))
-        let after = snapshot(fiveHour: 72, weekly: 42, fetchedAt: Date(timeIntervalSince1970: 100))
-        XCTAssertFalse(before.hasSameDisplayedContent(as: after))
-    }
-
-    func testDisplayedContentDetectsFreshnessChange() {
-        let fresh = snapshot(fiveHour: 73, weekly: 42, fetchedAt: Date(timeIntervalSince1970: 100))
-        let stale = snapshot(fiveHour: 73, weekly: 42, fetchedAt: Date(timeIntervalSince1970: 100), freshness: .stale)
-        XCTAssertFalse(fresh.hasSameDisplayedContent(as: stale))
-    }
-
     func testEncodeCarriesSchemaVersion() {
         let original = snapshot(fiveHour: 73, weekly: 42, fetchedAt: Date(timeIntervalSince1970: 100))
         guard let data = WidgetSnapshotStore.encodeSnapshot(original),

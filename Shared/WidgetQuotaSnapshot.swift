@@ -78,16 +78,6 @@ extension WidgetQuotaSnapshot {
         fetchedAt: Date(),
         freshness: .fresh
     )
-
-    /// Fields the widget actually renders. `fetchedAt` is excluded so a refresh
-    /// that changes nothing visible does not spend a timeline reload.
-    func hasSameDisplayedContent(as other: WidgetQuotaSnapshot) -> Bool {
-        fiveHourRemainingPercent == other.fiveHourRemainingPercent
-            && weeklyRemainingPercent == other.weeklyRemainingPercent
-            && fiveHourResetsAt == other.fiveHourResetsAt
-            && weeklyResetsAt == other.weeklyResetsAt
-            && freshness == other.freshness
-    }
 }
 
 /// How the snapshot travels from the app to the widget extension.

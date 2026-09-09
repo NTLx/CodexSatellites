@@ -199,7 +199,12 @@ Data flow is one-way:
 - the snapshot payload is a rolling-upgrade IPC contract: after an app update an older widget build may still be reading while the newer app writes, so new fields stay optional and existing fields are never removed, retyped, or repurposed; bump `WidgetQuotaSnapshot.currentSchemaVersion` only for a breaking change;
 - macOS may keep an already-running widget extension process on the previous binary after the app is replaced in place; no public WidgetKit API can force a reload. Treat this as a known platform limitation — do not add `killall chronod`, `pluginkit`, or `lsregister` workarounds to product code;
 - snapshot reads/writes log `operation`/`transport`/`result` only — never quota values, tokens, or paths;
-- the app saves the snapshot after every successful fetch (`fresh`) and after a failure that retains last-good data (`stale`), but calls `WidgetCenter.reloadTimelines` only when the displayed content (quota percentages, reset times, freshness) actually changes — `fetchedAt` alone must not trigger a reload;
+- app polling frequency and WidgetKit rendering are deliberately decoupled;
+- the app writes the latest `WidgetQuotaSnapshot` after every quota fetch, including a `stale` snapshot when a failed fetch retains last-good data;
+- the widget has no scheduled refresh and its timeline policy is `.never`;
+- normal quota changes and snapshot clearing do not call `WidgetCenter.reloadTimelines`;
+- the widget never polls Codex directly; WidgetKit is the sole owner of when the next widget timeline is requested;
+- do not implement visibility/`onAppear`-based refresh hacks, timers, background tasks, push refresh, or private lifecycle workarounds;
 - the widget must never read Codex auth, call the usage endpoint, or perform OAuth.
 
 Signing/entitlements:

@@ -185,6 +185,15 @@ Ad-hoc widget transport (`widgetContainer`):
 - [ ] No TCC prompt appears and no `SystemPolicyAppData` denial is logged for the primary transport.
 - [ ] App Sandbox absent on the app; App Sandbox present on the widget extension.
 
+Widget refresh model:
+
+- [ ] App `1m`/`5m`/`15m` polling continues updating `quota-snapshot.json`.
+- [ ] Widget Provider returns one entry with `.never`.
+- [ ] Normal app quota refresh does not call `WidgetCenter.reloadTimelines`.
+- [ ] Widget performs no direct network request.
+- [ ] Widget performs no Timer or background refresh.
+- [ ] When WidgetKit requests a new timeline, it reads the latest available snapshot.
+
 App Group transport (Developer ID builds only):
 
 - [ ] `BLOCKED` — ad-hoc signing has no authorized App Group identity or provisioning. Re-test after switching `WidgetSnapshotStore.activeTransport` to `.appGroup` on a provisioned build.

@@ -23,7 +23,7 @@ CodexSatellites ships a WidgetKit widget in two sizes:
 
 Add it from the desktop: right-click the desktop → **Edit Widgets…** → **CodexSatellites**. macOS does not allow an app to place a widget for you.
 
-The widget is a read-only presentation layer. The app remains the only component that reads Codex authentication and requests usage; it publishes a small snapshot that the widget reads. The widget works on any Mac — including Mac mini, Mac Studio, and external displays — even though the notch satellites require a built-in notched display.
+The widget is a read-only presentation layer. The app remains the only component that reads Codex authentication and requests usage; it publishes a small snapshot that the widget reads. The `1m` / `5m` / `15m` setting controls quota polling by the app, not widget rendering. The widget performs no scheduled background refresh and reads the latest snapshot whenever WidgetKit requests a new timeline. WidgetKit decides when a widget timeline is requested. The widget works on any Mac — including Mac mini, Mac Studio, and external displays — even though the notch satellites require a built-in notched display.
 
 ## Interaction
 
@@ -83,7 +83,7 @@ The release script reads signing and notarization identity from the local enviro
 - Notifications are English-only and have no in-app toggle — use macOS System Settings → Notifications.
 - The widget requires a code-signed build to be registered by macOS; both `./script/build_and_run.sh` and `./script/release.sh preview` ad-hoc sign locally, so the widget can be tested without a Developer ID.
 - The widget extension is sandboxed (a macOS requirement) and reads only the snapshot the app publishes; it never reads Codex auth or calls the usage endpoint.
-- On macOS, an already-running widget extension may keep using the previous widget code after CodexSatellites is updated, even though the installed app and widget extension report a newer build number. This was observed during local ad-hoc upgrade testing: widget data kept refreshing, but presentation changes did not appear until macOS recycled the widget extension process. A logout or restart should force a fresh process. Developer ID upgrade behaviour remains to be verified.
+- On macOS, an already-running widget extension may keep using the previous widget code after CodexSatellites is updated, even though the installed app and widget extension report a newer build number. This was observed during local ad-hoc upgrade testing: widget data kept refreshing, but presentation changes did not appear until macOS recycled the widget extension process. There is no public API that guarantees recycling; restarting the WidgetKit host or logging out may create a fresh process. Developer ID upgrade behaviour remains to be verified.
 
 ## License
 

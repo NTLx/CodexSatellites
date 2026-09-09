@@ -30,7 +30,6 @@ struct CodexWidgetProvider: TimelineProvider {
         let snapshot = WidgetSnapshotStore.load()
         logger.info("timeline build=\(Self.buildNumber, privacy: .public) snapshot=\(snapshot == nil ? "missing" : "loaded", privacy: .public) freshness=\(snapshot?.freshness.rawValue ?? "none", privacy: .public)")
         let entry = CodexWidgetEntry(date: Date(), snapshot: snapshot)
-        let next = Date().addingTimeInterval(15 * 60)
-        completion(Timeline(entries: [entry], policy: .after(next)))
+        completion(Timeline(entries: [entry], policy: .never))
     }
 }
