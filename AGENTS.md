@@ -282,6 +282,7 @@ Current release identity:
 - Hardened Runtime: ON
 - widget extension bundle ID: `io.github.ntlx.codexsatellites.widget`
 - App Group: `group.io.github.ntlx.codexsatellites`
+- GitHub Release titles use the version tag directly, such as `v0.3.0`; do not prefix the product name.
 
 Do not change release identity casually.
 
