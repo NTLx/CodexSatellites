@@ -14,6 +14,10 @@ enum WidgetSnapshotFreshness: String, Codable, Sendable {
 /// therefore stay optional, and existing fields must not be removed, retyped, or
 /// repurposed. Bump `currentSchemaVersion` only for a breaking change.
 struct WidgetQuotaSnapshot: Codable, Equatable, Sendable {
+    /// Version implied by a payload that predates the `schemaVersion` field.
+    /// It must stay fixed so a future `currentSchemaVersion` bump cannot make a
+    /// legacy payload look newer than it is.
+    static let legacySchemaVersion = 1
     static let currentSchemaVersion = 1
 
     let schemaVersion: Int
@@ -45,7 +49,7 @@ struct WidgetQuotaSnapshot: Codable, Equatable, Sendable {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         let version = try container.decodeIfPresent(Int.self, forKey: .schemaVersion)
-            ?? Self.currentSchemaVersion
+            ?? Self.legacySchemaVersion
         guard version <= Self.currentSchemaVersion else {
             throw DecodingError.dataCorruptedError(
                 forKey: .schemaVersion,

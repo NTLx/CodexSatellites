@@ -91,7 +91,7 @@ final class WidgetSnapshotStoreTests: XCTestCase {
         {"fiveHourRemainingPercent":73,"weeklyRemainingPercent":42,"fetchedAt":"2026-09-09T06:00:00Z","freshness":"fresh"}
         """
         let decoded = WidgetSnapshotStore.decodeSnapshot(from: Data(json.utf8))
-        XCTAssertEqual(decoded?.schemaVersion, WidgetQuotaSnapshot.currentSchemaVersion)
+        XCTAssertEqual(decoded?.schemaVersion, WidgetQuotaSnapshot.legacySchemaVersion)
         XCTAssertEqual(decoded?.fiveHourRemainingPercent, 73)
     }
 
