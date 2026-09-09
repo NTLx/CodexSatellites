@@ -18,8 +18,8 @@ CodexSatellites is an independent community utility and is not affiliated with o
 
 CodexSatellites ships a WidgetKit widget in two sizes:
 
-- **Small** → 5-hour and weekly remaining gauges with a last-updated time.
-- **Medium** → both gauges plus reset times and a last-updated time.
+- **Small** → 5-hour and weekly remaining gauges.
+- **Medium** → both gauges plus reset times.
 
 Add it from the desktop: right-click the desktop → **Edit Widgets…** → **CodexSatellites**. macOS does not allow an app to place a widget for you.
 
@@ -87,6 +87,7 @@ The release script reads signing and notarization identity from the local enviro
 - Notifications are English-only and have no in-app toggle — use macOS System Settings → Notifications.
 - The widget requires a code-signed build to be registered by macOS; both `./script/build_and_run.sh` and `./script/release.sh preview` ad-hoc sign locally, so the widget can be tested without a Developer ID.
 - The widget extension is sandboxed (a macOS requirement) and reads only the snapshot the app publishes; it never reads Codex auth or calls the usage endpoint.
+- On macOS, an already-running widget extension may keep using the previous widget code after CodexSatellites is updated, even though the installed app and widget extension report a newer build number. This was observed during local ad-hoc upgrade testing: widget data kept refreshing, but presentation changes did not appear until macOS recycled the widget extension process. A logout or restart should force a fresh process. Developer ID upgrade behaviour remains to be verified.
 
 ## License
 

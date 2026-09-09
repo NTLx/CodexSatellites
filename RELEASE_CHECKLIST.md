@@ -195,6 +195,14 @@ Widget upgrade (build N → N+1):
 - [ ] Install build N+1 over it without removing the widgets, killing chronod, or rebooting.
 - [ ] Launch the app and confirm both widgets report `timeline build=N+1`.
 
+Observed 2026-09-09 (ad-hoc, build 20 → 21):
+
+- `PASS` — build 21 app and appex installed; both reported `CFBundleVersion 21`.
+- `FAIL` — after launching build 21, chronod kept the pre-upgrade widget extension process; the timeline still ran the build 20 binary, and re-adding the widgets did not recycle it.
+- `PASS` — after the old extension process was terminated, chronod launched a new process reporting `timeline build=21`.
+
+Known limitation (non-blocking): macOS does not guarantee hot replacement of an already-running WidgetKit extension process when the containing app is replaced in place, and no public WidgetKit API can force it. Developer ID upgrade behaviour remains `NOT TESTED`.
+
 ## 14. Final install
 
 - [ ] Install from final signed/notarized DMG.

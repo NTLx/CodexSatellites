@@ -13,8 +13,10 @@ WIDGET_BUNDLE_ID="$BUNDLE_ID.widget"
 APP_GROUP_ID="group.io.github.ntlx.codexsatellites"
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-# Every installable DMG must carry a new CFBundleVersion so PlugInKit/WidgetKit
-# can tell an updated extension from the one it is already running.
+# Every installable source revision carries an identifiable CFBundleVersion. The
+# app and widget extension share one build number so installed and running widget
+# binaries can be told apart during upgrade diagnostics. It does not guarantee
+# hot replacement of an already-running WidgetKit extension process.
 BUILD_NUMBER="${BUILD_NUMBER:-$(git -C "$ROOT_DIR" rev-list --count HEAD 2>/dev/null || echo 1)}"
 DIST_DIR="$ROOT_DIR/dist"
 WORK_DIR="$DIST_DIR/work"

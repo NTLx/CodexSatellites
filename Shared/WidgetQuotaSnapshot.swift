@@ -8,13 +8,61 @@ enum WidgetSnapshotFreshness: String, Codable, Sendable {
 
 /// Codable projection of the app's quota state shared with the widget extension.
 /// The main app is the only writer; the widget is a read-only presentation layer.
+///
+/// This payload is a rolling-upgrade IPC contract: after an app update, an older
+/// widget build may still be reading while the newer app writes. New fields must
+/// therefore stay optional, and existing fields must not be removed, retyped, or
+/// repurposed. Bump `currentSchemaVersion` only for a breaking change.
 struct WidgetQuotaSnapshot: Codable, Equatable, Sendable {
+    static let currentSchemaVersion = 1
+
+    let schemaVersion: Int
     let fiveHourRemainingPercent: Double?
     let weeklyRemainingPercent: Double?
     let fiveHourResetsAt: Date?
     let weeklyResetsAt: Date?
     let fetchedAt: Date
     let freshness: WidgetSnapshotFreshness
+
+    init(
+        schemaVersion: Int = WidgetQuotaSnapshot.currentSchemaVersion,
+        fiveHourRemainingPercent: Double?,
+        weeklyRemainingPercent: Double?,
+        fiveHourResetsAt: Date?,
+        weeklyResetsAt: Date?,
+        fetchedAt: Date,
+        freshness: WidgetSnapshotFreshness
+    ) {
+        self.schemaVersion = schemaVersion
+        self.fiveHourRemainingPercent = fiveHourRemainingPercent
+        self.weeklyRemainingPercent = weeklyRemainingPercent
+        self.fiveHourResetsAt = fiveHourResetsAt
+        self.weeklyResetsAt = weeklyResetsAt
+        self.fetchedAt = fetchedAt
+        self.freshness = freshness
+    }
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let version = try container.decodeIfPresent(Int.self, forKey: .schemaVersion)
+            ?? Self.currentSchemaVersion
+        guard version <= Self.currentSchemaVersion else {
+            throw DecodingError.dataCorruptedError(
+                forKey: .schemaVersion,
+                in: container,
+                debugDescription: "unsupported snapshot schema version \(version)"
+            )
+        }
+        self.init(
+            schemaVersion: version,
+            fiveHourRemainingPercent: try container.decodeIfPresent(Double.self, forKey: .fiveHourRemainingPercent),
+            weeklyRemainingPercent: try container.decodeIfPresent(Double.self, forKey: .weeklyRemainingPercent),
+            fiveHourResetsAt: try container.decodeIfPresent(Date.self, forKey: .fiveHourResetsAt),
+            weeklyResetsAt: try container.decodeIfPresent(Date.self, forKey: .weeklyResetsAt),
+            fetchedAt: try container.decode(Date.self, forKey: .fetchedAt),
+            freshness: try container.decode(WidgetSnapshotFreshness.self, forKey: .freshness)
+        )
+    }
 }
 
 extension WidgetQuotaSnapshot {
