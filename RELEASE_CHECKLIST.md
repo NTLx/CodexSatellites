@@ -189,6 +189,12 @@ App Group transport (Developer ID builds only):
 
 - [ ] `BLOCKED` — ad-hoc signing has no authorized App Group identity or provisioning. Re-test after switching `WidgetSnapshotStore.activeTransport` to `.appGroup` on a provisioned build.
 
+Widget upgrade (build N → N+1):
+
+- [ ] Install build N, launch the app, add Small + Medium, and confirm `timeline build=N`.
+- [ ] Install build N+1 over it without removing the widgets, killing chronod, or rebooting.
+- [ ] Launch the app and confirm both widgets report `timeline build=N+1`.
+
 ## 14. Final install
 
 - [ ] Install from final signed/notarized DMG.
@@ -202,7 +208,7 @@ App Group transport (Developer ID builds only):
 ## 15. Publication
 
 - [ ] Source tree is final.
-- [ ] Version `0.3.0`, build `1`.
+- [ ] Version `0.3.0`; app and widget `CFBundleVersion` match the release build number.
 - [ ] `ReleaseNotes/v0.3.0.md` accurate.
 - [ ] MIT License present.
 - [ ] Final DMG + `SHA256SUMS` ready.

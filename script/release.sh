@@ -52,6 +52,17 @@ die() {
     exit 1
 }
 
+require_clean_tree() {
+    [[ -z "$(git -C "$ROOT_DIR" status --porcelain --untracked-files=no)" ]] \
+        || die "working tree has uncommitted changes; commit before a formal release"
+}
+
+warn_if_dirty_tree() {
+    if [[ -n "$(git -C "$ROOT_DIR" status --porcelain --untracked-files=no)" ]]; then
+        warn "working tree has uncommitted changes; the build number is the HEAD commit count and does not cover them"
+    fi
+}
+
 ensure_tools() {
     local tool
     for tool in xcodebuild security codesign spctl xcrun ditto hdiutil shasum plutil osascript lipo; do
@@ -185,6 +196,7 @@ PLIST
 }
 
 build() {
+    require_clean_tree
     require_signing
     check_artwork || die "artwork is incomplete; build cannot continue"
     mkdir -p "$WORK_DIR" "$LOG_DIR"
@@ -484,6 +496,7 @@ preview_structure_test() {
 
 preview() {
     ensure_tools
+    warn_if_dirty_tree
     check_artwork || die "artwork is incomplete; preview cannot be built"
     mkdir -p "$DIST_DIR" "$WORK_DIR" "$LOG_DIR"
     rm -rf "$PREVIEW_DERIVED"
@@ -498,10 +511,10 @@ preview() {
         build
     [[ -d "$PREVIEW_APP" ]] || die "preview build did not produce $PREVIEW_APP"
     ad_hoc_sign_preview_app "$PREVIEW_APP"
+    verify_versions "$PREVIEW_APP"
     create_styled_dmg "$PREVIEW_APP" "$PREVIEW_DMG_PATH" "$PREVIEW_RW_DMG" "$MOUNT_POINT"
     hdiutil verify "$PREVIEW_DMG_PATH"
     preview_structure_test
-    verify_versions "$PREVIEW_APP"
     log "preview DMG: $PREVIEW_DMG_PATH"
     printf '%s\n' 'WARNING: This is an ad-hoc signed, unnotarized preview DMG.'
     printf '%s\n' 'It is for local packaging/artwork/widget validation only.'

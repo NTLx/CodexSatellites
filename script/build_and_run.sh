@@ -6,6 +6,8 @@ APP_NAME="CodexSatellites"
 BUNDLE_ID="io.github.ntlx.codexsatellites"
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# Keep the debug widget's identity trackable: same build number as release.sh.
+BUILD_NUMBER="${BUILD_NUMBER:-$(git -C "$ROOT_DIR" rev-list --count HEAD 2>/dev/null || echo 1)}"
 PROJECT="$ROOT_DIR/CodexSatellites.xcodeproj"
 DERIVED_DATA="$ROOT_DIR/build/DerivedData"
 APP_BUNDLE="$DERIVED_DATA/Build/Products/Debug/$APP_NAME.app"
@@ -21,6 +23,7 @@ xcodebuild \
   -configuration Debug \
   -derivedDataPath "$DERIVED_DATA" \
   CODE_SIGNING_ALLOWED=NO \
+  CURRENT_PROJECT_VERSION="$BUILD_NUMBER" \
   build
 
 # Debug builds are linker-signed only, which makes UNUserNotificationCenter
