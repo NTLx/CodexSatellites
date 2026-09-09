@@ -10,6 +10,7 @@ SCHEME="CodexSatellites"
 NOTARY_PROFILE="${NOTARY_PROFILE:-CodexSatellites-notary}"
 WIDGET_EXTENSION_NAME="CodexSatellitesWidget"
 WIDGET_BUNDLE_ID="$BUNDLE_ID.widget"
+APP_GROUP_ID="group.io.github.ntlx.codexsatellites"
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 DIST_DIR="$ROOT_DIR/dist"
@@ -206,6 +207,18 @@ build() {
     [[ -d "$APP_PATH" ]] || die "export did not produce $APP_PATH"
 }
 
+verify_widget_extension() {
+    local appex="$APP_PATH/Contents/PlugIns/$WIDGET_EXTENSION_NAME.appex"
+    local info="$appex/Contents/Info.plist"
+    [[ -d "$appex" ]] || die "widget extension missing: $appex"
+    codesign --verify --strict --verbose=4 "$appex"
+    [[ "$(plutil -extract CFBundleIdentifier raw -o - "$info")" == "$WIDGET_BUNDLE_ID" ]] || die "widget extension bundle ID mismatch"
+    codesign -d --entitlements :- "$appex" >"$LOG_DIR/appex-entitlements.plist" 2>&1
+    grep -q 'com.apple.security.app-sandbox' "$LOG_DIR/appex-entitlements.plist" || die "widget extension is not sandboxed"
+    grep -q "$APP_GROUP_ID" "$LOG_DIR/appex-entitlements.plist" || die "widget extension lacks the App Group entitlement"
+    log "widget extension verification passed"
+}
+
 verify_signed_app() {
     [[ -d "$APP_PATH" ]] || die "signed app missing"
     mkdir -p "$LOG_DIR"
@@ -219,6 +232,7 @@ verify_signed_app() {
     grep -q 'Timestamp=' "$LOG_DIR/app-codesign.txt" || die "signed app has no trusted timestamp"
     grep -q 'Runtime Version=' "$LOG_DIR/app-codesign.txt" || die "Hardened Runtime is not present"
     [[ "$(lipo -archs "$APP_PATH/Contents/MacOS/$APP_NAME")" == *arm64* ]] || die "app binary does not contain arm64"
+    verify_widget_extension
     log "signed app verification passed"
 }
 

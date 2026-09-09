@@ -35,6 +35,7 @@
 		G00000000000000000000007 /* MediumCodexWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = H00000000000000000000006 /* MediumCodexWidgetView.swift */; };
 		G00000000000000000000008 /* WidgetQuotaGauge.swift in Sources */ = {isa = PBXBuildFile; fileRef = H00000000000000000000007 /* WidgetQuotaGauge.swift */; };
 		G00000000000000000000010 /* CodexSatellitesWidget.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = H00000000000000000000012 /* CodexSatellitesWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		G00000000000000000000011 /* WidgetSnapshotStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = H00000000000000000000013 /* WidgetSnapshotStoreTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -79,6 +80,7 @@
 		H00000000000000000000010 /* CodexSatellitesWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CodexSatellitesWidget.entitlements; sourceTree = "<group>"; };
 		H00000000000000000000011 /* CodexSatellites.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CodexSatellites.entitlements; sourceTree = "<group>"; };
 		H00000000000000000000012 /* CodexSatellitesWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = CodexSatellitesWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		H00000000000000000000013 /* WidgetSnapshotStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetSnapshotStoreTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -94,7 +96,7 @@
 		D00000000000000000000004 /* Services */ = {isa = PBXGroup; children = (B00000000000000000000003, B00000000000000000000004, B00000000000000000000011, B00000000000000000000017, B00000000000000000000020, ); path = Services; sourceTree = "<group>"; };
 		D00000000000000000000005 /* Views */ = {isa = PBXGroup; children = (B00000000000000000000005, B00000000000000000000012, ); path = Views; sourceTree = "<group>"; };
 		D00000000000000000000006 /* Window */ = {isa = PBXGroup; children = (B00000000000000000000006, ); path = Window; sourceTree = "<group>"; };
-		D00000000000000000000007 /* Tests */ = {isa = PBXGroup; children = (B00000000000000000000007, B00000000000000000000008, B00000000000000000000013, B00000000000000000000018, B00000000000000000000021, ); path = Tests; sourceTree = "<group>"; };
+		D00000000000000000000007 /* Tests */ = {isa = PBXGroup; children = (B00000000000000000000007, B00000000000000000000008, B00000000000000000000013, B00000000000000000000018, B00000000000000000000021, H00000000000000000000013, ); path = Tests; sourceTree = "<group>"; };
 		D00000000000000000000008 /* Products */ = {isa = PBXGroup; children = (B00000000000000000000009, B00000000000000000000010, H00000000000000000000012, ); name = Products; sourceTree = "<group>"; };
 		I00000000000000000000001 /* Shared */ = {isa = PBXGroup; children = (H00000000000000000000001, ); path = Shared; sourceTree = "<group>"; };
 		I00000000000000000000002 /* CodexSatellitesWidget */ = {isa = PBXGroup; children = (H00000000000000000000002, H00000000000000000000003, H00000000000000000000004, H00000000000000000000005, H00000000000000000000006, H00000000000000000000007, H00000000000000000000009, H00000000000000000000010, ); path = CodexSatellitesWidget; sourceTree = "<group>"; };
@@ -118,7 +120,7 @@
 
 /* Begin PBXSourcesBuildPhase section */
 		C00000000000000000000003 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (A00000000000000000000001, A00000000000000000000002, A00000000000000000000003, A00000000000000000000004, A00000000000000000000005, A00000000000000000000006, A00000000000000000000009, A00000000000000000000010, A00000000000000000000014, A00000000000000000000015, A00000000000000000000017, A00000000000000000000018, G00000000000000000000001, ); runOnlyForDeploymentPostprocessing = 0; };
-		C00000000000000000000005 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (A00000000000000000000007, A00000000000000000000008, A00000000000000000000011, A00000000000000000000016, A00000000000000000000019, ); runOnlyForDeploymentPostprocessing = 0; };
+		C00000000000000000000005 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (A00000000000000000000007, A00000000000000000000008, A00000000000000000000011, A00000000000000000000016, A00000000000000000000019, G00000000000000000000011, ); runOnlyForDeploymentPostprocessing = 0; };
 		J00000000000000000000001 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (G00000000000000000000002, G00000000000000000000003, G00000000000000000000004, G00000000000000000000005, G00000000000000000000006, G00000000000000000000007, G00000000000000000000008, ); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXSourcesBuildPhase section */
 

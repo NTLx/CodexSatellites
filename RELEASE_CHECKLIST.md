@@ -167,16 +167,25 @@ Use a stable installed app path such as `/Applications/CodexSatellites.app`.
 
 ## 13. Widget
 
+Ad-hoc widget transport (`widgetContainer`):
+
 - [ ] `CodexSatellites.app/Contents/PlugIns/CodexSatellitesWidget.appex` exists.
 - [ ] `pluginkit -m -p com.apple.widgetkit-extension -v` lists `io.github.ntlx.codexsatellites.widget`.
-- [ ] App writes `quota-snapshot.json` to the App Group container after a successful fetch.
+- [ ] App writes `quota-snapshot.json` to the widget extension's container after a successful fetch.
+- [ ] Widget process loads the same snapshot (`snapshot operation=load transport=widgetContainer result=success`).
 - [ ] Small widget shows 5-hour and weekly gauges plus a last-updated time.
 - [ ] Medium widget shows both gauges plus reset times and a last-updated time.
 - [ ] Widget follows Light/Dark automatically.
 - [ ] Stale data shows reduced emphasis without an error state.
 - [ ] Unavailable data shows `—` instead of stale numbers.
 - [ ] Widget never reads Codex auth or calls the usage endpoint.
+- [ ] No Codex credentials are copied into the snapshot.
+- [ ] No TCC prompt appears and no `SystemPolicyAppData` denial is logged for the primary transport.
 - [ ] App Sandbox absent on the app; App Sandbox present on the widget extension.
+
+App Group transport (Developer ID builds only):
+
+- [ ] `BLOCKED` — ad-hoc signing has no authorized App Group identity or provisioning. Re-test after switching `WidgetSnapshotStore.activeTransport` to `.appGroup` on a provisioned build.
 
 ## 14. Final install
 

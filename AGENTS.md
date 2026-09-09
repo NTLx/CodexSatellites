@@ -192,8 +192,11 @@ The app embeds one WidgetKit extension (`CodexSatellitesWidget`, bundle ID `io.g
 Data flow is one-way:
 
 - the app is the only writer of quota state; the widget is a read-only presentation layer;
-- sharing is implemented in `Shared/WidgetQuotaSnapshot.swift`; the primary hand-off is the widget extension's own sandbox container (`~/Library/Containers/io.github.ntlx.codexsatellites.widget/Data/Documents/quota-snapshot.json`) because App Group containers are TCC-protected unless the group ID is team-prefixed, which ad-hoc signing cannot provide — a widget read of the group container is denied by `kTCCServiceSystemPolicyAppData`;
-- the App Group `group.io.github.ntlx.codexsatellites` is still written and read as a fallback so a future Developer ID build with a team-prefixed group keeps working;
+- sharing is implemented in `Shared/WidgetQuotaSnapshot.swift` with an explicit `WidgetSnapshotTransport`; `activeTransport` is `widgetContainer` for ad-hoc/preview builds and switches to `appGroup` once a Developer ID build provisions the App Group;
+- on macOS 15+ App Group containers are protected and membership must be authorized by the code-signing/provisioning model; an ad-hoc build has neither a provisioning profile authorizing the registered `group.*` App Group nor a Developer Team ID for a team-prefixed macOS group, so the widget's group-container read is denied by TCC (`kTCCServiceSystemPolicyAppData`);
+- for ad-hoc builds the non-sandboxed app writes `~/Library/Containers/io.github.ntlx.codexsatellites.widget/Data/Documents/quota-snapshot.json` and the widget reads its own container; this is a development compatibility workaround, not the production sharing architecture;
+- `load()` reads every transport and takes the newest `fetchedAt`, so a stale file can never shadow fresh data during a migration;
+- snapshot reads/writes log `operation`/`transport`/`result` only — never quota values, tokens, or paths;
 - the app publishes the snapshot after every successful fetch (`fresh`) and after a failure that retains last-good data (`stale`), then calls `WidgetCenter.reloadTimelines`;
 - the widget must never read Codex auth, call the usage endpoint, or perform OAuth.
 
