@@ -9,7 +9,8 @@ It shows:
 - left satellite → Codex 5-hour remaining quota;
 - right satellite → Codex weekly remaining quota;
 - hover → remaining percentages;
-- click → compact icon-only Settings Bar.
+- click → compact icon-only Settings Bar;
+- WidgetKit widget (Small/Medium) → the same two quotas on the desktop and in Notification Center.
 
 Current Settings Bar controls:
 
@@ -168,6 +169,8 @@ Do not change colors/geometry/animation as incidental cleanup.
 
 The panel frame animation and the SwiftUI orb content animation must share the single `OverlayMetrics.orbAnimationDuration` value. Mismatched durations let the content grow wider than the panel and clip the orb at the panel's fixed edge.
 
+The percentage text deliberately slides in and out from the notch edge (`.move(edge: .trailing)` for the left orb, `.move(edge: .leading)` for the right), so it is transiently clipped at the panel edge during the ~0.2s transition. That is intended and is not the duration-mismatch clipping above.
+
 Hover exit collapses the orbs immediately. Orb expansion is coupled to Settings Bar visibility through `effectiveExpanded`, so hiding the bar — including its 3-second auto-dismiss — also retracts the orbs whenever the cursor is not over them. That coupling is intended; do not decouple it.
 
 ## Freshness invariant
@@ -181,6 +184,34 @@ States:
 Quota percentages may display last-good data in stale state with reduced opacity.
 
 Reset count displays `—` when not fresh.
+
+## Widget invariant
+
+The app embeds one WidgetKit extension (`CodexSatellitesWidget`, bundle ID `io.github.ntlx.codexsatellites.widget`) exposing `.systemSmall` and `.systemMedium`.
+
+Data flow is one-way:
+
+- the app is the only writer of quota state; the widget is a read-only presentation layer;
+- sharing is implemented in `Shared/WidgetQuotaSnapshot.swift`; the primary hand-off is the widget extension's own sandbox container (`~/Library/Containers/io.github.ntlx.codexsatellites.widget/Data/Documents/quota-snapshot.json`) because App Group containers are TCC-protected unless the group ID is team-prefixed, which ad-hoc signing cannot provide — a widget read of the group container is denied by `kTCCServiceSystemPolicyAppData`;
+- the App Group `group.io.github.ntlx.codexsatellites` is still written and read as a fallback so a future Developer ID build with a team-prefixed group keeps working;
+- the app publishes the snapshot after every successful fetch (`fresh`) and after a failure that retains last-good data (`stale`), then calls `WidgetCenter.reloadTimelines`;
+- the widget must never read Codex auth, call the usage endpoint, or perform OAuth.
+
+Signing/entitlements:
+
+- the widget extension is sandboxed (`com.apple.security.app-sandbox`); macOS rejects unsandboxed extensions in PlugInKit;
+- the containing app stays non-sandboxed because it must read `~/.codex/auth.json`; this asymmetry is intended;
+- both targets carry the App Group entitlement; `script/build_and_run.sh` and `script/release.sh preview` ad-hoc sign the appex first (own identifier + entitlements) and the app second — do not collapse this into `--deep`;
+- formal Developer ID signing requires the App Group to be registered in the developer account; local ad-hoc signing does not.
+
+Presentation:
+
+- the widget keeps its own presentation layer; do not port `QuotaOrbView`'s fixed-white notch styling;
+- use system `Gauge` (`.accessoryCircularCapacity`), SF Pro text styles, and semantic `.primary`/`.secondary`/`.tertiary` foreground styles;
+- use `containerBackground(for: .widget)` and system content margins; do not hand-draw corners, glass, shadows, or gradients;
+- no quota threshold colors and no continuous animation; animate only data changes;
+- widget strings are English-only and are not localized; relative dates use a pinned `en_US` locale so they never follow the system language;
+- each quota metric sits in an equal-width, center-aligned column so the small and medium layouts stay symmetric.
 
 ## Notifications invariant
 
@@ -204,7 +235,9 @@ Rules:
 - denied or unavailable authorization is a silent no-op;
 - no in-app notification toggle — macOS System Settings owns that;
 - notification delivery requires a signed build and a running app;
-- Debug builds are linker-signed only, so `UNUserNotificationCenter` refuses authorization (`UNErrorDomain Code=1`); `script/build_and_run.sh` ad-hoc re-signs the built bundle for local testing and that step must stay;
+- authorization requires the sealed code-signing identifier to match `CFBundleIdentifier`; a linker-signed build seals `Identifier=CodexSatellites` (mismatch), so `UNUserNotificationCenter` refuses authorization on every launch (`UNErrorDomain Code=1`) and delivery is a silent no-op;
+- `script/build_and_run.sh` and `script/release.sh preview` both ad-hoc re-sign with `--identifier "$BUNDLE_ID"`, which is what makes local notification and widget testing possible; those steps must stay;
+- notifications cannot be verified on an un-re-signed build — only on a locally ad-hoc signed or Developer ID–signed build;
 - real quota changes cannot force every trigger, so verify delivery by temporarily forcing a detector event and reverting it.
 
 ## Persistence invariant
@@ -229,12 +262,14 @@ Do not add third-party runtime dependencies without explicit owner approval.
 Current release identity:
 
 - Bundle ID: `io.github.ntlx.codexsatellites`
-- version: `0.2.0`
+- version: `0.3.0`
 - build: `1`
 - license: MIT
 - minimum macOS: 15+
-- App Sandbox: OFF
+- App Sandbox: OFF (the widget extension is sandboxed — WidgetKit requires it)
 - Hardened Runtime: ON
+- widget extension bundle ID: `io.github.ntlx.codexsatellites.widget`
+- App Group: `group.io.github.ntlx.codexsatellites`
 
 Do not change release identity casually.
 
@@ -255,6 +290,26 @@ xcodebuild \
   -destination 'platform=macOS' \
   test
 ```
+
+### Verifying the overlay manually
+
+CodexSatellites is an accessory app with non-activating panels, so the computer-use plugin cannot list or drive it. Use raw APIs instead:
+
+- drive: `CGEvent(mouseEventSource:mouseType:mouseCursorPosition:mouseButton:)` posted to `.cghidEventTap` (needs Accessibility permission); `CGWarpMouseCursorPosition` alone moves the cursor but emits no `mouseMoved`, so it cannot trigger hover;
+- measure: poll `CGWindowListCopyWindowInfo` for panel bounds/alpha — no Screen Recording needed, and accurate enough to time the animation frame by frame;
+- capture: `screencapture -R` or `SCScreenshotManager.captureImage`; `CGWindowListCreateImage` is obsoleted on macOS 15+.
+
+Reference measurements (v0.2.0, built-in display): hover enter → first frame change ≈40ms, hover exit ≈54ms (no debounce timer); orb 24→60pt ≈200ms with ~27 distinct intermediate widths; Settings Bar show ≈0.15s, hide ≈0.12s, auto-dismiss ≈3.2–3.4s. Both panels must change with identical timestamps.
+
+### Verifying the widget manually
+
+The widget extension is a separate process; the widget gallery is not scriptable.
+
+- registration: `pluginkit -m -p com.apple.widgetkit-extension -v | grep codex` after launching the app;
+- shared data: the app writes `~/Library/Group Containers/group.io.github.ntlx.codexsatellites/quota-snapshot.json`;
+- layout: render the real views offscreen with `ImageRenderer` at `.systemSmall` 158×158 and `.systemMedium` 338×158, including ~16pt content margins;
+- if PlugInKit rejects the appex, `log show --predicate 'process == "pkd"'` reports `plug-ins must be sandboxed`;
+- placing the widget on the desktop/gallery is a manual user action; report `NOT TESTED` unless actually observed.
 
 Preview DMG:
 

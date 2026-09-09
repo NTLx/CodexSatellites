@@ -10,6 +10,8 @@ PROJECT="$ROOT_DIR/CodexSatellites.xcodeproj"
 DERIVED_DATA="$ROOT_DIR/build/DerivedData"
 APP_BUNDLE="$DERIVED_DATA/Build/Products/Debug/$APP_NAME.app"
 APP_BINARY="$APP_BUNDLE/Contents/MacOS/$APP_NAME"
+APPEX_BUNDLE="$APP_BUNDLE/Contents/PlugIns/CodexSatellitesWidget.appex"
+APPEX_BUNDLE_ID="$BUNDLE_ID.widget"
 
 pkill -x "$APP_NAME" >/dev/null 2>&1 || true
 
@@ -24,7 +26,22 @@ xcodebuild \
 # Debug builds are linker-signed only, which makes UNUserNotificationCenter
 # refuse authorization. Ad-hoc sign the bundle so the Info.plist is sealed
 # under the real bundle identifier and notifications can be tested locally.
-if ! codesign --force --deep --sign - --identifier "$BUNDLE_ID" "$APP_BUNDLE"; then
+# The widget extension is signed first with its own identifier and App Group
+# entitlement so it can read the shared snapshot; signing the app afterwards
+# seals the already-signed appex by reference.
+if [[ -d "$APPEX_BUNDLE" ]]; then
+  if ! codesign --force --sign - \
+    --identifier "$APPEX_BUNDLE_ID" \
+    --entitlements "$ROOT_DIR/CodexSatellitesWidget/CodexSatellitesWidget.entitlements" \
+    "$APPEX_BUNDLE"; then
+    printf 'warning: ad-hoc signing of the widget extension failed; the widget will be unavailable\n' >&2
+  fi
+fi
+
+if ! codesign --force --sign - \
+  --identifier "$BUNDLE_ID" \
+  --entitlements "$ROOT_DIR/CodexSatellites.entitlements" \
+  "$APP_BUNDLE"; then
   printf 'warning: ad-hoc signing failed; notifications will be unavailable\n' >&2
 fi
 

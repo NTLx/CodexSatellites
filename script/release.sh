@@ -3,11 +3,13 @@ set -euo pipefail
 
 APP_NAME="CodexSatellites"
 BUNDLE_ID="io.github.ntlx.codexsatellites"
-VERSION="0.2.0"
+VERSION="0.3.0"
 BUILD_NUMBER="1"
 PROJECT_NAME="CodexSatellites.xcodeproj"
 SCHEME="CodexSatellites"
 NOTARY_PROFILE="${NOTARY_PROFILE:-CodexSatellites-notary}"
+WIDGET_EXTENSION_NAME="CodexSatellitesWidget"
+WIDGET_BUNDLE_ID="$BUNDLE_ID.widget"
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 DIST_DIR="$ROOT_DIR/dist"
@@ -27,7 +29,7 @@ PREVIEW_DERIVED="$WORK_DIR/preview-derived"
 PREVIEW_APP="$PREVIEW_DERIVED/Build/Products/Release/$APP_NAME.app"
 PREVIEW_RW_DMG="$WORK_DIR/$APP_NAME-$VERSION-preview-rw.dmg"
 PREVIEW_MOUNT_POINT="$WORK_DIR/preview-dmg-mount"
-PREVIEW_DMG_PATH="$DIST_DIR/$APP_NAME-$VERSION-preview-unsigned.dmg"
+PREVIEW_DMG_PATH="$DIST_DIR/$APP_NAME-$VERSION-preview-adhoc.dmg"
 DMG_BACKGROUND="$ROOT_DIR/Artwork/Release/DMG/dmg-background.png"
 
 SIGNING_IDENTITY="${SIGNING_IDENTITY:-}"
@@ -406,6 +408,23 @@ running_app_pids() {
     pgrep -x "$APP_NAME" 2>/dev/null | sort -n || true
 }
 
+ad_hoc_sign_preview_app() {
+    local app="$1"
+    local appex="$app/Contents/PlugIns/$WIDGET_EXTENSION_NAME.appex"
+
+    if [[ -d "$appex" ]]; then
+        codesign --force --sign - \
+            --identifier "$WIDGET_BUNDLE_ID" \
+            --entitlements "$ROOT_DIR/CodexSatellitesWidget/$WIDGET_EXTENSION_NAME.entitlements" \
+            "$appex" || die "failed to ad-hoc sign widget extension"
+    fi
+    codesign --force --sign - \
+        --identifier "$BUNDLE_ID" \
+        --entitlements "$ROOT_DIR/CodexSatellites.entitlements" \
+        "$app" || die "failed to ad-hoc sign preview app"
+    log "preview app and widget extension ad-hoc signed"
+}
+
 preview_smoke_test() {
     local mount_active=0
     local before_pids after_pids new_pids remaining_new_pids attempt pid
@@ -465,7 +484,7 @@ preview() {
     check_artwork || die "artwork is incomplete; preview cannot be built"
     mkdir -p "$DIST_DIR" "$WORK_DIR" "$LOG_DIR"
     rm -rf "$PREVIEW_DERIVED"
-    log "building unsigned Release preview app"
+    log "building Release preview app"
     xcodebuild \
         -project "$ROOT_DIR/$PROJECT_NAME" \
         -scheme "$SCHEME" \
@@ -474,12 +493,13 @@ preview() {
         CODE_SIGNING_ALLOWED=NO \
         build
     [[ -d "$PREVIEW_APP" ]] || die "preview build did not produce $PREVIEW_APP"
+    ad_hoc_sign_preview_app "$PREVIEW_APP"
     create_styled_dmg "$PREVIEW_APP" "$PREVIEW_DMG_PATH" "$PREVIEW_RW_DMG" "$MOUNT_POINT"
     hdiutil verify "$PREVIEW_DMG_PATH"
     preview_smoke_test
     log "preview DMG: $PREVIEW_DMG_PATH"
-    printf '%s\n' 'WARNING: This is an unsigned, unnotarized preview DMG.'
-    printf '%s\n' 'It is for local packaging/artwork validation only.'
+    printf '%s\n' 'WARNING: This is an ad-hoc signed, unnotarized preview DMG.'
+    printf '%s\n' 'It is for local packaging/artwork/widget validation only.'
     printf '%s\n' 'Do not publish it.'
 }
 

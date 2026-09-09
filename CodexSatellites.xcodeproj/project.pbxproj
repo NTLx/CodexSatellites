@@ -26,7 +26,25 @@
 		A00000000000000000000017 /* QuotaChangeDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000019 /* QuotaChangeDetector.swift */; };
 		A00000000000000000000018 /* QuotaNotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000020 /* QuotaNotificationService.swift */; };
 		A00000000000000000000019 /* QuotaChangeDetectorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B00000000000000000000021 /* QuotaChangeDetectorTests.swift */; };
+		G00000000000000000000001 /* WidgetQuotaSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = H00000000000000000000001 /* WidgetQuotaSnapshot.swift */; };
+		G00000000000000000000002 /* WidgetQuotaSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = H00000000000000000000001 /* WidgetQuotaSnapshot.swift */; };
+		G00000000000000000000003 /* CodexSatellitesWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = H00000000000000000000002 /* CodexSatellitesWidget.swift */; };
+		G00000000000000000000004 /* CodexWidgetProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = H00000000000000000000003 /* CodexWidgetProvider.swift */; };
+		G00000000000000000000005 /* CodexWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = H00000000000000000000004 /* CodexWidgetView.swift */; };
+		G00000000000000000000006 /* SmallCodexWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = H00000000000000000000005 /* SmallCodexWidgetView.swift */; };
+		G00000000000000000000007 /* MediumCodexWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = H00000000000000000000006 /* MediumCodexWidgetView.swift */; };
+		G00000000000000000000008 /* WidgetQuotaGauge.swift in Sources */ = {isa = PBXBuildFile; fileRef = H00000000000000000000007 /* WidgetQuotaGauge.swift */; };
+		G00000000000000000000010 /* CodexSatellitesWidget.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = H00000000000000000000012 /* CodexSatellitesWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		E00000000000000000000004 /* PBXContainerItemProxy */ = {isa = PBXContainerItemProxy; containerPortal = E00000000000000000000000 /* Project object */; proxyType = 1; remoteGlobalIDString = E00000000000000000000001; remoteInfo = CodexSatellites; };
+		N00000000000000000000002 /* PBXContainerItemProxy */ = {isa = PBXContainerItemProxy; containerPortal = E00000000000000000000000 /* Project object */; proxyType = 1; remoteGlobalIDString = K00000000000000000000001; remoteInfo = CodexSatellitesWidget; };
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		J00000000000000000000004 /* Embed App Extensions */ = {isa = PBXCopyFilesBuildPhase; buildActionMask = 2147483647; dstPath = ""; dstSubfolderSpec = 13; files = (G00000000000000000000010, ); name = "Embed App Extensions"; runOnlyForDeploymentPostprocessing = 0; };
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		B00000000000000000000001 /* CodexSatellitesApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexSatellitesApp.swift; sourceTree = "<group>"; };
@@ -50,64 +68,81 @@
 		B00000000000000000000019 /* QuotaChangeDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuotaChangeDetector.swift; sourceTree = "<group>"; };
 		B00000000000000000000020 /* QuotaNotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuotaNotificationService.swift; sourceTree = "<group>"; };
 		B00000000000000000000021 /* QuotaChangeDetectorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuotaChangeDetectorTests.swift; sourceTree = "<group>"; };
+		H00000000000000000000001 /* WidgetQuotaSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetQuotaSnapshot.swift; sourceTree = "<group>"; };
+		H00000000000000000000002 /* CodexSatellitesWidget.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexSatellitesWidget.swift; sourceTree = "<group>"; };
+		H00000000000000000000003 /* CodexWidgetProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexWidgetProvider.swift; sourceTree = "<group>"; };
+		H00000000000000000000004 /* CodexWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexWidgetView.swift; sourceTree = "<group>"; };
+		H00000000000000000000005 /* SmallCodexWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SmallCodexWidgetView.swift; sourceTree = "<group>"; };
+		H00000000000000000000006 /* MediumCodexWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MediumCodexWidgetView.swift; sourceTree = "<group>"; };
+		H00000000000000000000007 /* WidgetQuotaGauge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetQuotaGauge.swift; sourceTree = "<group>"; };
+		H00000000000000000000009 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		H00000000000000000000010 /* CodexSatellitesWidget.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CodexSatellitesWidget.entitlements; sourceTree = "<group>"; };
+		H00000000000000000000011 /* CodexSatellites.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CodexSatellites.entitlements; sourceTree = "<group>"; };
+		H00000000000000000000012 /* CodexSatellitesWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = CodexSatellitesWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		C00000000000000000000001 /* Frameworks */ = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
 		C00000000000000000000002 /* Frameworks */ = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+		J00000000000000000000002 /* Frameworks */ = {isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		D00000000000000000000001 = {isa = PBXGroup; children = (D00000000000000000000002, D00000000000000000000003, D00000000000000000000004, D00000000000000000000005, D00000000000000000000006, D00000000000000000000007, D00000000000000000000008, B00000000000000000000015, ); sourceTree = "<group>"; };
+		D00000000000000000000001 = {isa = PBXGroup; children = (D00000000000000000000002, D00000000000000000000003, D00000000000000000000004, D00000000000000000000005, D00000000000000000000006, I00000000000000000000001, I00000000000000000000002, D00000000000000000000007, D00000000000000000000008, B00000000000000000000015, H00000000000000000000011, ); sourceTree = "<group>"; };
 		D00000000000000000000002 /* App */ = {isa = PBXGroup; children = (B00000000000000000000001, ); path = App; sourceTree = "<group>"; };
 		D00000000000000000000003 /* Models */ = {isa = PBXGroup; children = (B00000000000000000000002, B00000000000000000000016, B00000000000000000000019, ); path = Models; sourceTree = "<group>"; };
 		D00000000000000000000004 /* Services */ = {isa = PBXGroup; children = (B00000000000000000000003, B00000000000000000000004, B00000000000000000000011, B00000000000000000000017, B00000000000000000000020, ); path = Services; sourceTree = "<group>"; };
 		D00000000000000000000005 /* Views */ = {isa = PBXGroup; children = (B00000000000000000000005, B00000000000000000000012, ); path = Views; sourceTree = "<group>"; };
 		D00000000000000000000006 /* Window */ = {isa = PBXGroup; children = (B00000000000000000000006, ); path = Window; sourceTree = "<group>"; };
 		D00000000000000000000007 /* Tests */ = {isa = PBXGroup; children = (B00000000000000000000007, B00000000000000000000008, B00000000000000000000013, B00000000000000000000018, B00000000000000000000021, ); path = Tests; sourceTree = "<group>"; };
-		D00000000000000000000008 /* Products */ = {isa = PBXGroup; children = (B00000000000000000000009, B00000000000000000000010, ); name = Products; sourceTree = "<group>"; };
+		D00000000000000000000008 /* Products */ = {isa = PBXGroup; children = (B00000000000000000000009, B00000000000000000000010, H00000000000000000000012, ); name = Products; sourceTree = "<group>"; };
+		I00000000000000000000001 /* Shared */ = {isa = PBXGroup; children = (H00000000000000000000001, ); path = Shared; sourceTree = "<group>"; };
+		I00000000000000000000002 /* CodexSatellitesWidget */ = {isa = PBXGroup; children = (H00000000000000000000002, H00000000000000000000003, H00000000000000000000004, H00000000000000000000005, H00000000000000000000006, H00000000000000000000007, H00000000000000000000009, H00000000000000000000010, ); path = CodexSatellitesWidget; sourceTree = "<group>"; };
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		E00000000000000000000001 /* CodexSatellites */ = {isa = PBXNativeTarget; buildConfigurationList = F00000000000000000000001 /* Build configuration list for PBXNativeTarget "CodexSatellites" */; buildPhases = (C00000000000000000000003, C00000000000000000000001, C00000000000000000000004, ); buildRules = (); dependencies = (); name = CodexSatellites; productName = CodexSatellites; productReference = B00000000000000000000009 /* CodexSatellites.app */; productType = "com.apple.product-type.application"; };
+		E00000000000000000000001 /* CodexSatellites */ = {isa = PBXNativeTarget; buildConfigurationList = F00000000000000000000001 /* Build configuration list for PBXNativeTarget "CodexSatellites" */; buildPhases = (C00000000000000000000003, C00000000000000000000001, C00000000000000000000004, J00000000000000000000004, ); buildRules = (); dependencies = (N00000000000000000000001, ); name = CodexSatellites; productName = CodexSatellites; productReference = B00000000000000000000009 /* CodexSatellites.app */; productType = "com.apple.product-type.application"; };
 		E00000000000000000000002 /* CodexSatellitesTests */ = {isa = PBXNativeTarget; buildConfigurationList = F00000000000000000000002 /* Build configuration list for PBXNativeTarget "CodexSatellitesTests" */; buildPhases = (C00000000000000000000005, C00000000000000000000002, C00000000000000000000006, ); buildRules = (); dependencies = (E00000000000000000000003, ); name = CodexSatellitesTests; productName = CodexSatellitesTests; productReference = B00000000000000000000010 /* CodexSatellitesTests.xctest */; productType = "com.apple.product-type.bundle.unit-test"; };
+		K00000000000000000000001 /* CodexSatellitesWidget */ = {isa = PBXNativeTarget; buildConfigurationList = M00000000000000000000001 /* Build configuration list for PBXNativeTarget "CodexSatellitesWidget" */; buildPhases = (J00000000000000000000001, J00000000000000000000002, J00000000000000000000003, ); buildRules = (); dependencies = (); name = CodexSatellitesWidget; productName = CodexSatellitesWidget; productReference = H00000000000000000000012 /* CodexSatellitesWidget.appex */; productType = "com.apple.product-type.app-extension"; };
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
-		E00000000000000000000000 /* Project object */ = {isa = PBXProject; attributes = {LastSwiftUpdateCheck = 2600; LastUpgradeCheck = 2600; TargetAttributes = {E00000000000000000000001 = {CreatedOnToolsVersion = 26.0; }; E00000000000000000000002 = {CreatedOnToolsVersion = 26.0; TestTargetID = E00000000000000000000001; }; }; }; buildConfigurationList = F00000000000000000000000 /* Build configuration list for PBXProject "CodexSatellites" */; compatibilityVersion = "Xcode 16.0"; developmentRegion = en; hasScannedForEncodings = 0; knownRegions = (en, Base, zh-Hans, ); mainGroup = D00000000000000000000001; productRefGroup = D00000000000000000000008 /* Products */; projectDirPath = ""; projectRoot = ""; targets = (E00000000000000000000001, E00000000000000000000002, ); };
+		E00000000000000000000000 /* Project object */ = {isa = PBXProject; attributes = {LastSwiftUpdateCheck = 2600; LastUpgradeCheck = 2600; TargetAttributes = {E00000000000000000000001 = {CreatedOnToolsVersion = 26.0; }; E00000000000000000000002 = {CreatedOnToolsVersion = 26.0; TestTargetID = E00000000000000000000001; }; K00000000000000000000001 = {CreatedOnToolsVersion = 26.0; }; }; }; buildConfigurationList = F00000000000000000000000 /* Build configuration list for PBXProject "CodexSatellites" */; compatibilityVersion = "Xcode 16.0"; developmentRegion = en; hasScannedForEncodings = 0; knownRegions = (en, Base, zh-Hans, ); mainGroup = D00000000000000000000001; productRefGroup = D00000000000000000000008 /* Products */; projectDirPath = ""; projectRoot = ""; targets = (E00000000000000000000001, E00000000000000000000002, K00000000000000000000001, ); };
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		C00000000000000000000004 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (A00000000000000000000012, A00000000000000000000013, ); runOnlyForDeploymentPostprocessing = 0; };
 		C00000000000000000000006 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
+		J00000000000000000000003 /* Resources */ = {isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		C00000000000000000000003 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (A00000000000000000000001, A00000000000000000000002, A00000000000000000000003, A00000000000000000000004, A00000000000000000000005, A00000000000000000000006, A00000000000000000000009, A00000000000000000000010, A00000000000000000000014, A00000000000000000000015, A00000000000000000000017, A00000000000000000000018, ); runOnlyForDeploymentPostprocessing = 0; };
+		C00000000000000000000003 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (A00000000000000000000001, A00000000000000000000002, A00000000000000000000003, A00000000000000000000004, A00000000000000000000005, A00000000000000000000006, A00000000000000000000009, A00000000000000000000010, A00000000000000000000014, A00000000000000000000015, A00000000000000000000017, A00000000000000000000018, G00000000000000000000001, ); runOnlyForDeploymentPostprocessing = 0; };
 		C00000000000000000000005 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (A00000000000000000000007, A00000000000000000000008, A00000000000000000000011, A00000000000000000000016, A00000000000000000000019, ); runOnlyForDeploymentPostprocessing = 0; };
+		J00000000000000000000001 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (G00000000000000000000002, G00000000000000000000003, G00000000000000000000004, G00000000000000000000005, G00000000000000000000006, G00000000000000000000007, G00000000000000000000008, ); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
 		E00000000000000000000003 /* PBXTargetDependency */ = {isa = PBXTargetDependency; target = E00000000000000000000001 /* CodexSatellites */; targetProxy = E00000000000000000000004 /* PBXContainerItemProxy */; };
+		N00000000000000000000001 /* PBXTargetDependency */ = {isa = PBXTargetDependency; target = K00000000000000000000001 /* CodexSatellitesWidget */; targetProxy = N00000000000000000000002 /* PBXContainerItemProxy */; };
 /* End PBXTargetDependency section */
-
-/* Begin PBXContainerItemProxy section */
-		E00000000000000000000004 /* PBXContainerItemProxy */ = {isa = PBXContainerItemProxy; containerPortal = E00000000000000000000000 /* Project object */; proxyType = 1; remoteGlobalIDString = E00000000000000000000001; remoteInfo = CodexSatellites; };
-/* End PBXContainerItemProxy section */
 
 /* Begin XCBuildConfiguration section */
 		F00000000000000000000003 /* Debug */ = {isa = XCBuildConfiguration; buildSettings = { ALWAYS_SEARCH_USER_PATHS = NO; CLANG_ENABLE_MODULES = YES; CLANG_ENABLE_OBJC_ARC = YES; MACOSX_DEPLOYMENT_TARGET = 15.0; SWIFT_VERSION = 5.10; }; name = Debug; };
 		F00000000000000000000004 /* Release */ = {isa = XCBuildConfiguration; buildSettings = { ALWAYS_SEARCH_USER_PATHS = NO; CLANG_ENABLE_MODULES = YES; CLANG_ENABLE_OBJC_ARC = YES; MACOSX_DEPLOYMENT_TARGET = 15.0; SWIFT_VERSION = 5.10; }; name = Release; };
-		F00000000000000000000005 /* Debug */ = {isa = XCBuildConfiguration; buildSettings = { CODE_SIGNING_ALLOWED = NO; CODE_SIGN_STYLE = Automatic; CURRENT_PROJECT_VERSION = 1; DEBUG_INFORMATION_FORMAT = dwarf; ENABLE_HARDENED_RUNTIME = YES; ENABLE_TESTABILITY = YES; GENERATE_INFOPLIST_FILE = YES; INFOPLIST_KEY_CFBundleDisplayName = CodexSatellites; INFOPLIST_KEY_LSUIElement = YES; INFOPLIST_KEY_NSHighResolutionCapable = YES; MACOSX_DEPLOYMENT_TARGET = 15.0; PRODUCT_BUNDLE_IDENTIFIER = io.github.ntlx.codexsatellites; PRODUCT_NAME = CodexSatellites; SWIFT_VERSION = 5.10; VERSIONING_SYSTEM = apple-generic; MARKETING_VERSION = 0.2.0; ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon; }; name = Debug; };
-		F00000000000000000000006 /* Release */ = {isa = XCBuildConfiguration; buildSettings = { CODE_SIGN_STYLE = Automatic; CURRENT_PROJECT_VERSION = 1; ENABLE_HARDENED_RUNTIME = YES; GENERATE_INFOPLIST_FILE = YES; INFOPLIST_KEY_CFBundleDisplayName = CodexSatellites; INFOPLIST_KEY_LSUIElement = YES; INFOPLIST_KEY_NSHighResolutionCapable = YES; MACOSX_DEPLOYMENT_TARGET = 15.0; PRODUCT_BUNDLE_IDENTIFIER = io.github.ntlx.codexsatellites; PRODUCT_NAME = CodexSatellites; SWIFT_VERSION = 5.10; VERSIONING_SYSTEM = apple-generic; MARKETING_VERSION = 0.2.0; ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon; }; name = Release; };
+		F00000000000000000000005 /* Debug */ = {isa = XCBuildConfiguration; buildSettings = { CODE_SIGNING_ALLOWED = NO; CODE_SIGN_ENTITLEMENTS = CodexSatellites.entitlements; CODE_SIGN_STYLE = Automatic; CURRENT_PROJECT_VERSION = 1; DEBUG_INFORMATION_FORMAT = dwarf; ENABLE_HARDENED_RUNTIME = YES; ENABLE_TESTABILITY = YES; GENERATE_INFOPLIST_FILE = YES; INFOPLIST_KEY_CFBundleDisplayName = CodexSatellites; INFOPLIST_KEY_LSUIElement = YES; INFOPLIST_KEY_NSHighResolutionCapable = YES; MACOSX_DEPLOYMENT_TARGET = 15.0; PRODUCT_BUNDLE_IDENTIFIER = io.github.ntlx.codexsatellites; PRODUCT_NAME = CodexSatellites; SWIFT_VERSION = 5.10; VERSIONING_SYSTEM = apple-generic; MARKETING_VERSION = 0.3.0; ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon; }; name = Debug; };
+		F00000000000000000000006 /* Release */ = {isa = XCBuildConfiguration; buildSettings = { CODE_SIGN_ENTITLEMENTS = CodexSatellites.entitlements; CODE_SIGN_STYLE = Automatic; CURRENT_PROJECT_VERSION = 1; ENABLE_HARDENED_RUNTIME = YES; GENERATE_INFOPLIST_FILE = YES; INFOPLIST_KEY_CFBundleDisplayName = CodexSatellites; INFOPLIST_KEY_LSUIElement = YES; INFOPLIST_KEY_NSHighResolutionCapable = YES; MACOSX_DEPLOYMENT_TARGET = 15.0; PRODUCT_BUNDLE_IDENTIFIER = io.github.ntlx.codexsatellites; PRODUCT_NAME = CodexSatellites; SWIFT_VERSION = 5.10; VERSIONING_SYSTEM = apple-generic; MARKETING_VERSION = 0.3.0; ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon; }; name = Release; };
 		F00000000000000000000007 /* Debug */ = {isa = XCBuildConfiguration; buildSettings = { BUNDLE_LOADER = "$(TEST_HOST)"; CODE_SIGNING_ALLOWED = NO; CODE_SIGN_STYLE = Automatic; CURRENT_PROJECT_VERSION = 1; GENERATE_INFOPLIST_FILE = YES; MACOSX_DEPLOYMENT_TARGET = 15.0; PRODUCT_BUNDLE_IDENTIFIER = io.github.ntlx.codexsatellites.tests; PRODUCT_NAME = CodexSatellitesTests; SWIFT_VERSION = 5.10; TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CodexSatellites.app/Contents/MacOS/CodexSatellites"; }; name = Debug; };
 		F00000000000000000000008 /* Release */ = {isa = XCBuildConfiguration; buildSettings = { BUNDLE_LOADER = "$(TEST_HOST)"; CODE_SIGNING_ALLOWED = NO; CODE_SIGN_STYLE = Automatic; CURRENT_PROJECT_VERSION = 1; GENERATE_INFOPLIST_FILE = YES; MACOSX_DEPLOYMENT_TARGET = 15.0; PRODUCT_BUNDLE_IDENTIFIER = io.github.ntlx.codexsatellites.tests; PRODUCT_NAME = CodexSatellitesTests; SWIFT_VERSION = 5.10; TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CodexSatellites.app/Contents/MacOS/CodexSatellites"; }; name = Release; };
+		L00000000000000000000001 /* Debug */ = {isa = XCBuildConfiguration; buildSettings = { APPLICATION_EXTENSION_API_ONLY = YES; CODE_SIGNING_ALLOWED = NO; CODE_SIGN_ENTITLEMENTS = CodexSatellitesWidget/CodexSatellitesWidget.entitlements; CODE_SIGN_STYLE = Automatic; CURRENT_PROJECT_VERSION = 1; DEBUG_INFORMATION_FORMAT = dwarf; ENABLE_HARDENED_RUNTIME = YES; GENERATE_INFOPLIST_FILE = NO; INFOPLIST_FILE = CodexSatellitesWidget/Info.plist; LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/../Frameworks", "@executable_path/../../../../Frameworks"); MACOSX_DEPLOYMENT_TARGET = 15.0; MARKETING_VERSION = 0.3.0; PRODUCT_BUNDLE_IDENTIFIER = io.github.ntlx.codexsatellites.widget; PRODUCT_NAME = CodexSatellitesWidget; SKIP_INSTALL = YES; SWIFT_VERSION = 5.10; VERSIONING_SYSTEM = apple-generic; }; name = Debug; };
+		L00000000000000000000002 /* Release */ = {isa = XCBuildConfiguration; buildSettings = { APPLICATION_EXTENSION_API_ONLY = YES; CODE_SIGN_ENTITLEMENTS = CodexSatellitesWidget/CodexSatellitesWidget.entitlements; CODE_SIGN_STYLE = Automatic; CURRENT_PROJECT_VERSION = 1; ENABLE_HARDENED_RUNTIME = YES; GENERATE_INFOPLIST_FILE = NO; INFOPLIST_FILE = CodexSatellitesWidget/Info.plist; LD_RUNPATH_SEARCH_PATHS = ("$(inherited)", "@executable_path/../Frameworks", "@executable_path/../../../../Frameworks"); MACOSX_DEPLOYMENT_TARGET = 15.0; MARKETING_VERSION = 0.3.0; PRODUCT_BUNDLE_IDENTIFIER = io.github.ntlx.codexsatellites.widget; PRODUCT_NAME = CodexSatellitesWidget; SKIP_INSTALL = YES; SWIFT_VERSION = 5.10; VERSIONING_SYSTEM = apple-generic; }; name = Release; };
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
 		F00000000000000000000000 /* Build configuration list for PBXProject "CodexSatellites" */ = {isa = XCConfigurationList; buildConfigurations = (F00000000000000000000003, F00000000000000000000004, ); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
 		F00000000000000000000001 /* Build configuration list for PBXNativeTarget "CodexSatellites" */ = {isa = XCConfigurationList; buildConfigurations = (F00000000000000000000005, F00000000000000000000006, ); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
 		F00000000000000000000002 /* Build configuration list for PBXNativeTarget "CodexSatellitesTests" */ = {isa = XCConfigurationList; buildConfigurations = (F00000000000000000000007, F00000000000000000000008, ); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
+		M00000000000000000000001 /* Build configuration list for PBXNativeTarget "CodexSatellitesWidget" */ = {isa = XCConfigurationList; buildConfigurations = (L00000000000000000000001, L00000000000000000000002, ); defaultConfigurationIsVisible = 0; defaultConfigurationName = Release; };
 /* End XCConfigurationList section */
 	};
 	rootObject = E00000000000000000000000 /* Project object */;

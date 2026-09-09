@@ -12,6 +12,18 @@ CodexSatellites is an independent community utility and is not affiliated with o
 
 - Left satellite → Codex 5h remaining
 - Right satellite → Codex weekly remaining
+- Desktop / Notification Center widget → the same two quotas at a glance
+
+## Widget
+
+CodexSatellites ships a WidgetKit widget in two sizes:
+
+- **Small** → 5-hour and weekly remaining gauges with a last-updated time.
+- **Medium** → both gauges plus reset times and a last-updated time.
+
+Add it from the desktop: right-click the desktop → **Edit Widgets…** → **CodexSatellites**. macOS does not allow an app to place a widget for you.
+
+The widget is a read-only presentation layer. The app remains the only component that reads Codex authentication and requests usage; it publishes a small snapshot that the widget reads. The widget works on any Mac — including Mac mini, Mac Studio, and external displays — even though the notch satellites require a built-in notched display.
 
 ## Interaction
 
@@ -24,7 +36,7 @@ CodexSatellites is an independent community utility and is not affiliated with o
 ## Requirements
 
 - macOS 15+
-- MacBook with a hardware notch
+- MacBook with a hardware notch (notch satellites only; the widget works on any Mac)
 - Existing local Codex CLI authentication
 
 ## How it works
@@ -52,7 +64,7 @@ Use `./script/build_and_run.sh --verify` to build, launch, and verify the proces
 
 ## Current status
 
-v0.2.0 release engineering
+v0.3.0 release engineering
 
 ## Release engineering
 
@@ -71,8 +83,10 @@ The release script reads signing and notarization identity from the local enviro
 - Codex usage currently depends on an undocumented ChatGPT usage endpoint.
 - Full-screen Space behavior is a v0.1 compatibility limitation unless explicitly validated.
 - The app assumes an existing local Codex login and does not manage authentication.
-- Notifications require a signed build and the app to be running; the unsigned preview DMG cannot deliver them.
+- Notifications require a signed build and the app to be running.
 - Notifications are English-only and have no in-app toggle — use macOS System Settings → Notifications.
+- The widget requires a code-signed build to be registered by macOS; both `./script/build_and_run.sh` and `./script/release.sh preview` ad-hoc sign locally, so the widget can be tested without a Developer ID.
+- The widget extension is sandboxed (a macOS requirement) and reads only the snapshot the app publishes; it never reads Codex auth or calls the usage endpoint.
 
 ## License
 

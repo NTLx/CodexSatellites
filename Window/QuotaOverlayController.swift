@@ -3,6 +3,7 @@ import OSLog
 import QuartzCore
 import ServiceManagement
 import SwiftUI
+import WidgetKit
 
 @MainActor
 final class QuotaOverlayController {
@@ -595,6 +596,23 @@ final class QuotaOverlayController {
         started && refreshLoopGeneration == generation && !Task.isCancelled
     }
 
+    private func publishWidgetSnapshot(_ snapshot: CodexQuotaSnapshot, freshness: WidgetSnapshotFreshness) {
+        WidgetSnapshotStore.save(WidgetQuotaSnapshot(
+            fiveHourRemainingPercent: snapshot.fiveHour?.remainingPercent,
+            weeklyRemainingPercent: snapshot.weekly?.remainingPercent,
+            fiveHourResetsAt: snapshot.fiveHour?.resetsAt,
+            weeklyResetsAt: snapshot.weekly?.resetsAt,
+            fetchedAt: snapshot.fetchedAt,
+            freshness: freshness
+        ))
+        WidgetCenter.shared.reloadTimelines(ofKind: WidgetSnapshotStore.widgetKind)
+    }
+
+    private func clearWidgetSnapshot() {
+        WidgetSnapshotStore.clear()
+        WidgetCenter.shared.reloadTimelines(ofKind: WidgetSnapshotStore.widgetKind)
+    }
+
     private func requestRefresh() async {
         guard started, !Task.isCancelled else { return }
         if refreshInFlight {
@@ -625,11 +643,17 @@ final class QuotaOverlayController {
             for event in events {
                 await notifier.deliver(event, at: snapshot.fetchedAt)
             }
+            publishWidgetSnapshot(snapshot, freshness: .fresh)
             render()
             logger.info("usage state=fresh events=\(events.count, privacy: .public)")
         } catch {
             guard started, !Task.isCancelled else { return }
             state.applyFailure()
+            if let lastGood = state.freshness.snapshot {
+                publishWidgetSnapshot(lastGood, freshness: .stale)
+            } else {
+                clearWidgetSnapshot()
+            }
             render()
             switch state.freshness {
             case .unavailable:

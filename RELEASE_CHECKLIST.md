@@ -165,7 +165,20 @@ Use a stable installed app path such as `/Applications/CodexSatellites.app`.
 - [ ] `SHA256SUMS` verifies.
 - [ ] `SHA256SUMS` contains only DMG basename.
 
-## 13. Final install
+## 13. Widget
+
+- [ ] `CodexSatellites.app/Contents/PlugIns/CodexSatellitesWidget.appex` exists.
+- [ ] `pluginkit -m -p com.apple.widgetkit-extension -v` lists `io.github.ntlx.codexsatellites.widget`.
+- [ ] App writes `quota-snapshot.json` to the App Group container after a successful fetch.
+- [ ] Small widget shows 5-hour and weekly gauges plus a last-updated time.
+- [ ] Medium widget shows both gauges plus reset times and a last-updated time.
+- [ ] Widget follows Light/Dark automatically.
+- [ ] Stale data shows reduced emphasis without an error state.
+- [ ] Unavailable data shows `—` instead of stale numbers.
+- [ ] Widget never reads Codex auth or calls the usage endpoint.
+- [ ] App Sandbox absent on the app; App Sandbox present on the widget extension.
+
+## 14. Final install
 
 - [ ] Install from final signed/notarized DMG.
 - [ ] Launch from `/Applications`.
@@ -175,15 +188,15 @@ Use a stable installed app path such as `/Applications/CodexSatellites.app`.
 - [ ] Refresh preference works.
 - [ ] Launch at Login E2E passes.
 
-## 14. Publication
+## 15. Publication
 
 - [ ] Source tree is final.
-- [ ] Version `0.2.0`, build `1`.
-- [ ] `ReleaseNotes/v0.2.0.md` accurate.
+- [ ] Version `0.3.0`, build `1`.
+- [ ] `ReleaseNotes/v0.3.0.md` accurate.
 - [ ] MIT License present.
 - [ ] Final DMG + `SHA256SUMS` ready.
 - [ ] Owner approves publication.
-- [ ] Tag `v0.2.0`.
+- [ ] Tag `v0.3.0`.
 - [ ] Publish GitHub Release.
 
 ## Final classification
