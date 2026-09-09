@@ -5,10 +5,14 @@ struct SmallCodexWidgetView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Text(verbatim: "Codex")
-                .font(.caption)
-                .fontWeight(.semibold)
-                .foregroundStyle(.secondary)
+            HStack(alignment: .firstTextBaseline, spacing: 8) {
+                Text(verbatim: "Codex")
+                    .font(.caption)
+                    .fontWeight(.semibold)
+                    .foregroundStyle(.secondary)
+                Spacer(minLength: 8)
+                WidgetStaleLabel(freshness: snapshot?.freshness)
+            }
 
             Spacer(minLength: 8)
 
@@ -19,9 +23,7 @@ struct SmallCodexWidgetView: View {
             .frame(maxWidth: .infinity)
             .opacity(quotaOpacity)
 
-            Spacer(minLength: 6)
-
-            WidgetStaleLabel(freshness: snapshot?.freshness)
+            Spacer(minLength: 8)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
     }

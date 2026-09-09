@@ -8,6 +8,10 @@ struct CodexWidgetEntry: TimelineEntry {
 }
 
 struct CodexWidgetProvider: TimelineProvider {
+    private static let buildNumber = Bundle.main.object(
+        forInfoDictionaryKey: "CFBundleVersion"
+    ) as? String ?? "unknown"
+
     private let logger = Logger(
         subsystem: "io.github.ntlx.codexsatellites.widget",
         category: "timeline"
@@ -24,7 +28,7 @@ struct CodexWidgetProvider: TimelineProvider {
 
     func getTimeline(in context: Context, completion: @escaping (Timeline<CodexWidgetEntry>) -> Void) {
         let snapshot = WidgetSnapshotStore.load()
-        logger.info("timeline snapshot=\(snapshot == nil ? "missing" : "loaded", privacy: .public) freshness=\(snapshot?.freshness.rawValue ?? "none", privacy: .public)")
+        logger.info("timeline build=\(Self.buildNumber, privacy: .public) snapshot=\(snapshot == nil ? "missing" : "loaded", privacy: .public) freshness=\(snapshot?.freshness.rawValue ?? "none", privacy: .public)")
         let entry = CodexWidgetEntry(date: Date(), snapshot: snapshot)
         let next = Date().addingTimeInterval(15 * 60)
         completion(Timeline(entries: [entry], policy: .after(next)))

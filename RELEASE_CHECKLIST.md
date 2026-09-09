@@ -175,8 +175,8 @@ Ad-hoc widget transport (`widgetContainer`):
 - [ ] Widget process loads the same snapshot (`snapshot operation=load transport=widgetContainer result=success`).
 - [ ] Both Small and Medium added together; opening and closing Notification Center repeatedly stays responsive.
 - [ ] Runtime logs contain no `transport=appGroup` and no `kTCCServiceSystemPolicyAppData`.
-- [ ] Small widget shows 5-hour and weekly gauges plus a last-updated time.
-- [ ] Medium widget shows both gauges plus reset times and a last-updated time.
+- [ ] Small widget shows the 5-hour and weekly gauges.
+- [ ] Medium widget shows both gauges plus reset times.
 - [ ] Widget follows Light/Dark automatically.
 - [ ] Stale data shows reduced emphasis without an error state.
 - [ ] Unavailable data shows `—` instead of stale numbers.

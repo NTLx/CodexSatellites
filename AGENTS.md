@@ -205,7 +205,9 @@ Signing/entitlements:
 - the widget extension is sandboxed (`com.apple.security.app-sandbox`); macOS rejects unsandboxed extensions in PlugInKit;
 - the containing app stays non-sandboxed because it must read `~/.codex/auth.json`; this asymmetry is intended;
 - both targets carry the App Group entitlement; `script/build_and_run.sh` and `script/release.sh preview` ad-hoc sign the appex first (own identifier + entitlements) and the app second — do not collapse this into `--deep`;
-- formal Developer ID signing requires the App Group to be registered in the developer account; local ad-hoc signing does not.
+- formal Developer ID signing requires the App Group to be registered in the developer account; local ad-hoc signing does not;
+- every installable DMG must carry a new `CFBundleVersion`; the app and appex share one build number, and `script/release.sh` derives it from the git commit count and verifies it on both bundles;
+- `script/release.sh preview` must never launch the app from the mounted image — that registers a widget-extension path that disappears on detach; install to `/Applications` before launching.
 
 Presentation:
 
@@ -267,7 +269,7 @@ Current release identity:
 
 - Bundle ID: `io.github.ntlx.codexsatellites`
 - version: `0.3.0`
-- build: `1`
+- build: derived from `git rev-list --count HEAD` and passed as `CURRENT_PROJECT_VERSION`
 - license: MIT
 - minimum macOS: 15+
 - App Sandbox: OFF (the widget extension is sandboxed — WidgetKit requires it)

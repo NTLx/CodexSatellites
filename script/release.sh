@@ -4,7 +4,7 @@ set -euo pipefail
 APP_NAME="CodexSatellites"
 BUNDLE_ID="io.github.ntlx.codexsatellites"
 VERSION="0.3.0"
-BUILD_NUMBER="1"
+BUILD_NUMBER="${BUILD_NUMBER:-}"
 PROJECT_NAME="CodexSatellites.xcodeproj"
 SCHEME="CodexSatellites"
 NOTARY_PROFILE="${NOTARY_PROFILE:-CodexSatellites-notary}"
@@ -13,6 +13,9 @@ WIDGET_BUNDLE_ID="$BUNDLE_ID.widget"
 APP_GROUP_ID="group.io.github.ntlx.codexsatellites"
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# Every installable DMG must carry a new CFBundleVersion so PlugInKit/WidgetKit
+# can tell an updated extension from the one it is already running.
+BUILD_NUMBER="${BUILD_NUMBER:-$(git -C "$ROOT_DIR" rev-list --count HEAD 2>/dev/null || echo 1)}"
 DIST_DIR="$ROOT_DIR/dist"
 WORK_DIR="$DIST_DIR/work"
 LOG_DIR="$DIST_DIR/logs"
@@ -197,6 +200,7 @@ build() {
         DEVELOPMENT_TEAM="$TEAM_ID" \
         CODE_SIGN_STYLE=Automatic \
         CODE_SIGN_IDENTITY="$SIGNING_IDENTITY" \
+        CURRENT_PROJECT_VERSION="$BUILD_NUMBER" \
         archive
     log "exporting Developer ID app"
     xcodebuild \
@@ -219,6 +223,22 @@ verify_widget_extension() {
     log "widget extension verification passed"
 }
 
+verify_versions() {
+    local app="$1"
+    local app_info="$app/Contents/Info.plist"
+    local appex_info="$app/Contents/PlugIns/$WIDGET_EXTENSION_NAME.appex/Contents/Info.plist"
+    local app_version app_build appex_version appex_build
+    app_version="$(plutil -extract CFBundleShortVersionString raw -o - "$app_info")"
+    app_build="$(plutil -extract CFBundleVersion raw -o - "$app_info")"
+    appex_version="$(plutil -extract CFBundleShortVersionString raw -o - "$appex_info")"
+    appex_build="$(plutil -extract CFBundleVersion raw -o - "$appex_info")"
+    [[ "$app_version" == "$VERSION" ]] || die "app version $app_version != $VERSION"
+    [[ "$app_build" == "$BUILD_NUMBER" ]] || die "app build $app_build != $BUILD_NUMBER"
+    [[ "$appex_version" == "$app_version" ]] || die "widget version $appex_version != app version $app_version"
+    [[ "$appex_build" == "$app_build" ]] || die "widget build $appex_build != app build $app_build"
+    log "version/build verified: $VERSION build $app_build"
+}
+
 verify_signed_app() {
     [[ -d "$APP_PATH" ]] || die "signed app missing"
     mkdir -p "$LOG_DIR"
@@ -233,6 +253,7 @@ verify_signed_app() {
     grep -q 'Runtime Version=' "$LOG_DIR/app-codesign.txt" || die "Hardened Runtime is not present"
     [[ "$(lipo -archs "$APP_PATH/Contents/MacOS/$APP_NAME")" == *arm64* ]] || die "app binary does not contain arm64"
     verify_widget_extension
+    verify_versions "$APP_PATH"
     log "signed app verification passed"
 }
 
@@ -418,10 +439,6 @@ write_checksum() {
     )
 }
 
-running_app_pids() {
-    pgrep -x "$APP_NAME" 2>/dev/null | sort -n || true
-}
-
 ad_hoc_sign_preview_app() {
     local app="$1"
     local appex="$app/Contents/PlugIns/$WIDGET_EXTENSION_NAME.appex"
@@ -439,9 +456,8 @@ ad_hoc_sign_preview_app() {
     log "preview app and widget extension ad-hoc signed"
 }
 
-preview_smoke_test() {
+preview_structure_test() {
     local mount_active=0
-    local before_pids after_pids new_pids remaining_new_pids attempt pid
     rm -rf "$PREVIEW_MOUNT_POINT"
     mkdir -p "$PREVIEW_MOUNT_POINT"
     cleanup_preview_mount() {
@@ -452,45 +468,18 @@ preview_smoke_test() {
     trap cleanup_preview_mount EXIT
     hdiutil attach -readonly -noverify -noautoopen -mountpoint "$PREVIEW_MOUNT_POINT" "$PREVIEW_DMG_PATH" >/dev/null
     mount_active=1
-    [[ -d "$PREVIEW_MOUNT_POINT/$APP_NAME.app" ]] || die "preview DMG is missing the app"
+    local app="$PREVIEW_MOUNT_POINT/$APP_NAME.app"
+    [[ -d "$app" ]] || die "preview DMG is missing the app"
     [[ -L "$PREVIEW_MOUNT_POINT/Applications" ]] || die "preview DMG is missing Applications alias"
-    before_pids="$(running_app_pids)"
-    /usr/bin/open -n "$PREVIEW_MOUNT_POINT/$APP_NAME.app"
-    for attempt in {1..20}; do
-        sleep 0.25
-        after_pids="$(running_app_pids)"
-        new_pids="$(
-            comm -13 \
-                <(printf '%s\n' "$before_pids" | sed '/^$/d' | sort -n) \
-                <(printf '%s\n' "$after_pids" | sed '/^$/d' | sort -n)
-        )"
-        [[ -n "$new_pids" ]] && break
-    done
-    [[ -n "$new_pids" ]] || die "preview app launch smoke test failed: no new process"
-    while IFS= read -r pid; do
-        [[ -n "$pid" ]] || continue
-        kill "$pid" >/dev/null 2>&1 || true
-    done <<<"$new_pids"
-    for attempt in {1..20}; do
-        remaining_new_pids=""
-        while IFS= read -r pid; do
-            [[ -n "$pid" ]] || continue
-            if kill -0 "$pid" >/dev/null 2>&1; then
-                remaining_new_pids+="$pid"$'\n'
-            fi
-        done <<<"$new_pids"
-        [[ -z "$remaining_new_pids" ]] && break
-        sleep 0.25
-    done
-    [[ -z "$remaining_new_pids" ]] || die "preview app did not exit after smoke test"
-    while IFS= read -r pid; do
-        [[ -n "$pid" ]] || continue
-        kill -0 "$pid" >/dev/null 2>&1 || die "preview smoke test altered existing process $pid"
-    done <<<"$before_pids"
+    [[ -f "$PREVIEW_MOUNT_POINT/LICENSE.txt" ]] || die "preview DMG is missing LICENSE.txt"
+    [[ -d "$app/Contents/PlugIns/$WIDGET_EXTENSION_NAME.appex" ]] || die "preview app is missing the widget extension"
+    codesign --verify --deep --strict --verbose=2 "$app"
     detach_mount "$PREVIEW_MOUNT_POINT" || die "could not detach preview DMG volume cleanly"
     mount_active=0
     trap - EXIT
-    log "preview app launch smoke test passed"
+    # Never launch the app from the mounted image: that registers a widget
+    # extension path which disappears on detach. Install to /Applications first.
+    log "preview DMG structure verified (not launched from the mount)"
 }
 
 preview() {
@@ -505,12 +494,14 @@ preview() {
         -configuration Release \
         -derivedDataPath "$PREVIEW_DERIVED" \
         CODE_SIGNING_ALLOWED=NO \
+        CURRENT_PROJECT_VERSION="$BUILD_NUMBER" \
         build
     [[ -d "$PREVIEW_APP" ]] || die "preview build did not produce $PREVIEW_APP"
     ad_hoc_sign_preview_app "$PREVIEW_APP"
     create_styled_dmg "$PREVIEW_APP" "$PREVIEW_DMG_PATH" "$PREVIEW_RW_DMG" "$MOUNT_POINT"
     hdiutil verify "$PREVIEW_DMG_PATH"
-    preview_smoke_test
+    preview_structure_test
+    verify_versions "$PREVIEW_APP"
     log "preview DMG: $PREVIEW_DMG_PATH"
     printf '%s\n' 'WARNING: This is an ad-hoc signed, unnotarized preview DMG.'
     printf '%s\n' 'It is for local packaging/artwork/widget validation only.'
