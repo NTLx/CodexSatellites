@@ -213,6 +213,7 @@ Presentation:
 - use system `Gauge` (`.accessoryCircularCapacity`), SF Pro text styles, and semantic `.primary`/`.secondary`/`.tertiary` foreground styles;
 - use `containerBackground(for: .widget)` and system content margins; do not hand-draw corners, glass, shadows, or gradients;
 - no quota threshold colors and no continuous animation; animate only data changes;
+- the fresh state shows no metadata; stale lowers the gauge opacity and adds a `Stale` label instead of a live timestamp;
 - widget strings are English-only and are not localized; relative dates use a pinned `en_US` locale so they never follow the system language;
 - each quota metric sits in an equal-width, center-aligned column so the small and medium layouts stay symmetric.
 

@@ -19,9 +19,9 @@ struct SmallCodexWidgetView: View {
             .frame(maxWidth: .infinity)
             .opacity(quotaOpacity)
 
-            Spacer(minLength: 8)
+            Spacer(minLength: 6)
 
-            WidgetUpdateLabel(fetchedAt: snapshot?.fetchedAt)
+            WidgetStaleLabel(freshness: snapshot?.freshness)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
     }
@@ -30,7 +30,7 @@ struct SmallCodexWidgetView: View {
         VStack(spacing: 4) {
             WidgetQuotaGauge(title: title, remainingPercent: remainingPercent)
             Text(verbatim: title)
-                .font(.caption2)
+                .font(.caption)
                 .foregroundStyle(.secondary)
                 .lineLimit(1)
         }
@@ -40,6 +40,6 @@ struct SmallCodexWidgetView: View {
     private var snapshot: WidgetQuotaSnapshot? { entry.snapshot }
 
     private var quotaOpacity: Double {
-        snapshot?.freshness == .stale ? 0.72 : 1
+        snapshot?.freshness == .stale ? 0.8 : 1
     }
 }

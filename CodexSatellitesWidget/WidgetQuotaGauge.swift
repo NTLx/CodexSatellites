@@ -4,7 +4,7 @@ struct WidgetQuotaGauge: View {
     let title: String
     let remainingPercent: Double?
 
-    private let diameter: CGFloat = 48
+    private let diameter: CGFloat = 52
 
     var body: some View {
         Group {
@@ -17,6 +17,7 @@ struct WidgetQuotaGauge: View {
                 } currentValueLabel: {
                     Text("\(Int(remainingPercent.rounded()))%")
                         .monospacedDigit()
+                        .contentTransition(.numericText(value: remainingPercent))
                 }
                 .gaugeStyle(.accessoryCircularCapacity)
                 .tint(.primary)

@@ -22,23 +22,15 @@ struct CodexWidgetView: View {
     }
 }
 
-struct WidgetUpdateLabel: View {
-    let fetchedAt: Date?
+struct WidgetStaleLabel: View {
+    let freshness: WidgetSnapshotFreshness?
 
     var body: some View {
-        if let fetchedAt {
-            HStack(spacing: 3) {
-                Text(verbatim: "Updated")
-                Text(verbatim: Date.RelativeFormatStyle.widgetRelative.format(fetchedAt))
-            }
-            .font(.caption2)
-            .foregroundStyle(.tertiary)
-            .lineLimit(1)
-            .minimumScaleFactor(0.8)
-        } else {
-            Text(verbatim: "—")
-                .font(.caption2)
+        if freshness == .stale {
+            Text(verbatim: "Stale")
+                .font(.caption)
                 .foregroundStyle(.tertiary)
+                .lineLimit(1)
         }
     }
 }

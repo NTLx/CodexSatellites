@@ -11,7 +11,7 @@ struct MediumCodexWidgetView: View {
                     .fontWeight(.semibold)
                     .foregroundStyle(.secondary)
                 Spacer(minLength: 8)
-                WidgetUpdateLabel(fetchedAt: snapshot?.fetchedAt)
+                WidgetStaleLabel(freshness: snapshot?.freshness)
             }
 
             Spacer(minLength: 10)
@@ -60,13 +60,13 @@ struct MediumCodexWidgetView: View {
                 Text(verbatim: "Reset")
                 Text(verbatim: Date.RelativeFormatStyle.widgetRelative.format(resetsAt))
             }
-            .font(.caption2)
+            .font(.caption)
             .foregroundStyle(.tertiary)
             .lineLimit(1)
             .minimumScaleFactor(0.8)
         } else {
             Text(verbatim: "—")
-                .font(.caption2)
+                .font(.caption)
                 .foregroundStyle(.tertiary)
         }
     }
@@ -74,6 +74,6 @@ struct MediumCodexWidgetView: View {
     private var snapshot: WidgetQuotaSnapshot? { entry.snapshot }
 
     private var quotaOpacity: Double {
-        snapshot?.freshness == .stale ? 0.72 : 1
+        snapshot?.freshness == .stale ? 0.8 : 1
     }
 }
