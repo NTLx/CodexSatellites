@@ -203,13 +203,14 @@ Widget click to reload:
 - [ ] The click adds no visible affordance: no icon, spinner, label, timestamp, toast, or pressed overlay.
 - [ ] With no snapshot on disk the widget keeps showing `—` after a click.
 
-Observed 2026-09-10 (ad-hoc, build 27, Small widget, built-in display):
+Observed 2026-09-10 (ad-hoc, built-in display, Small + Medium, builds 27 and 28):
 
-- `PASS` — `intent operation=refresh result=noop`, then `snapshot operation=load transport=widgetContainer result=success`, then `timeline build=27`, 30ms apart in one widget process.
-- `PASS` — cached snapshot swapped to 55/66 while the app was not running: the widget kept showing the previous 100/87 until it was clicked, then rendered 55/66, and `CodexSatellites` was still not running afterwards.
+- `PASS` — `intent operation=refresh result=noop`, then `snapshot operation=load transport=widgetContainer result=success`, then `timeline build=<n>`, about 30ms apart in one widget process; seen on build 27 and on build 28, for both families.
+- `PASS` — cached snapshot swapped to 55/66 with the weekly reset moved to 3 days while the app was not running: both widgets kept their previous 98/86 until clicked, then rendered 55/66 and the new reset time in the Medium's reset label, and `CodexSatellites` was still not running afterwards.
+- `PASS` — render latency after a click is not deterministic: Medium showed the new values within ~2.5s, Small within ~1s on one click and only by ~25s on another, so treat the `timeline build=` line as the evidence, not a screenshot deadline.
 - `PASS` — clicks on the empty top-left content area do not reload: probing a 180pt Small widget puts the intent's hit boundary about 24pt in from the visual edge.
 - `PASS` — a click in that margin band launched `CodexSatellites`; the 0.3.0 build with no intent did the same from a centre click, so the app-launch band is the platform's default widget tap, not a regression.
-- `NOT TESTED` — Medium family, Light appearance, other display configurations.
+- `NOT TESTED` — Light appearance, other display configurations, Developer ID builds.
 
 App Group transport (Developer ID builds only):
 
