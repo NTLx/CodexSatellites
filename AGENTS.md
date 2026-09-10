@@ -207,6 +207,19 @@ Data flow is one-way:
 - do not implement visibility/`onAppear`-based refresh hacks, timers, background tasks, push refresh, or private lifecycle workarounds;
 - the widget must never read Codex auth, call the usage endpoint, or perform OAuth.
 
+The widget has exactly one interaction, and it is the only widget-driven reload:
+
+- clicking anywhere in the widget's content area runs `RefreshCachedQuotaIntent` (`CodexSatellitesWidget/RefreshCachedQuotaIntent.swift`), whose `perform()` deliberately does nothing: no network request, no Codex auth read, no app launch, no snapshot write, no `WidgetCenter.reloadTimelines`;
+- the reload comes from WidgetKit itself: "interactions with a toggle or button always guarantee a timeline reload", and the reload re-runs `CodexWidgetProvider.getTimeline`, which re-reads the app's cached snapshot — so a click shows data the app cached, it never fetches from OpenAI;
+- this exists because a widget whose timeline policy is `.never` has no other guaranteed way to pick up a snapshot the app cached after that widget was last rendered; it is the reason the widget can stay `.never` and needs no scheduled refresh;
+- the whole content area of both families is the interactive surface: `Button(intent:)` + `.buttonStyle(.plain)` + `.frame(maxWidth: .infinity, maxHeight: .infinity)` + `.contentShape(Rectangle())` in `CodexWidgetView`; the button stays a presentation-free wrapper;
+- add no refresh affordance: no icon, spinner, label, timestamp, toast, or pressed overlay;
+- the reload surface is the content area, not the widget's full face: on a 180pt Small widget the hit boundary sits about 24pt in from the visual edge (measured 2026-09-10), so the content margin is a band the intent does not cover; a tap there falls through to the platform's default widget tap, which opens the containing app — the same behaviour a tap anywhere on the widget had before this intent existed. Document it as a platform default, do not claim the whole widget reloads, and do not hide the app-launch band behind hand-rolled padding;
+- do not add `widgetURL`: it would compete with the full-area button for the same interaction;
+- the intent keeps `isDiscoverable = false`, must not set `openAppWhenRun`, and carries an English accessibility label and hint, because the visible widget text is not a meaningful VoiceOver label for the action;
+- with no snapshot on disk a click keeps rendering `—`; the intent must never create a snapshot or start the app to work around a missing cache;
+- the intent logs `operation`/`result` only — never quota values or tokens.
+
 Signing/entitlements:
 
 - the widget extension is sandboxed (`com.apple.security.app-sandbox`); macOS rejects unsandboxed extensions in PlugInKit;

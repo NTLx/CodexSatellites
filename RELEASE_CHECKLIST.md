@@ -194,6 +194,23 @@ Widget refresh model:
 - [ ] Widget performs no Timer or background refresh.
 - [ ] When WidgetKit requests a new timeline, it reads the latest available snapshot.
 
+Widget click to reload:
+
+- [ ] Clicking anywhere inside the widget's content area — gauge, label, or the empty space between them — logs `intent operation=refresh result=noop` followed by a new `timeline build=<n>` line.
+- [ ] The reload shows a snapshot the app cached after the widget was last rendered; a click never triggers a Codex usage request.
+- [ ] A content-area click does not launch or activate CodexSatellites.
+- [ ] A click in the content margin does not reload; the platform's default widget tap opens the app there, which is how a tap anywhere on the widget behaved before this intent existed.
+- [ ] The click adds no visible affordance: no icon, spinner, label, timestamp, toast, or pressed overlay.
+- [ ] With no snapshot on disk the widget keeps showing `—` after a click.
+
+Observed 2026-09-10 (ad-hoc, build 27, Small widget, built-in display):
+
+- `PASS` — `intent operation=refresh result=noop`, then `snapshot operation=load transport=widgetContainer result=success`, then `timeline build=27`, 30ms apart in one widget process.
+- `PASS` — cached snapshot swapped to 55/66 while the app was not running: the widget kept showing the previous 100/87 until it was clicked, then rendered 55/66, and `CodexSatellites` was still not running afterwards.
+- `PASS` — clicks on the empty top-left content area do not reload: probing a 180pt Small widget puts the intent's hit boundary about 24pt in from the visual edge.
+- `PASS` — a click in that margin band launched `CodexSatellites`; the 0.3.0 build with no intent did the same from a centre click, so the app-launch band is the platform's default widget tap, not a regression.
+- `NOT TESTED` — Medium family, Light appearance, other display configurations.
+
 App Group transport (Developer ID builds only):
 
 - [ ] `BLOCKED` — ad-hoc signing has no authorized App Group identity or provisioning. Re-test after switching `WidgetSnapshotStore.activeTransport` to `.appGroup` on a provisioned build.
@@ -225,12 +242,12 @@ Known limitation (non-blocking): macOS does not guarantee hot replacement of an 
 ## 15. Publication
 
 - [ ] Source tree is final.
-- [ ] Version `0.3.0`; app and widget `CFBundleVersion` match the release build number.
-- [ ] `ReleaseNotes/v0.3.0.md` accurate.
+- [ ] Version `0.3.1`; app and widget `CFBundleVersion` match the release build number.
+- [ ] `ReleaseNotes/v0.3.1.md` accurate.
 - [ ] MIT License present.
 - [ ] Final DMG + `SHA256SUMS` ready.
 - [ ] Owner approves publication.
-- [ ] Tag `v0.3.0`.
+- [ ] Tag `v0.3.1`.
 - [ ] Publish GitHub Release.
 
 ## Final classification

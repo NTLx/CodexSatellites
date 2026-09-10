@@ -3,7 +3,7 @@ set -euo pipefail
 
 APP_NAME="CodexSatellites"
 BUNDLE_ID="io.github.ntlx.codexsatellites"
-VERSION="0.3.0"
+VERSION="0.3.1"
 BUILD_NUMBER="${BUILD_NUMBER:-}"
 PROJECT_NAME="CodexSatellites.xcodeproj"
 SCHEME="CodexSatellites"

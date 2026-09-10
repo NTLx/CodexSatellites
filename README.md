@@ -25,10 +25,13 @@ Add it from the desktop: right-click the desktop → **Edit Widgets…** → **C
 
 The widget is a read-only presentation layer. The app remains the only component that reads Codex authentication and requests usage; it publishes a small snapshot that the widget reads. The `1m` / `5m` / `15m` setting controls quota polling by the app, not widget rendering. The widget performs no scheduled background refresh and reads the latest snapshot whenever WidgetKit requests a new timeline. WidgetKit decides when a widget timeline is requested. The widget works on any Mac — including Mac mini, Mac Studio, and external displays — even though the notch satellites require a built-in notched display.
 
+Clicking the widget's content area reloads the latest snapshot the app has cached — useful after the app has polled, before macOS asks for a new widget timeline. The click never fetches from OpenAI, never starts or activates the app, and never writes the snapshot: it only asks WidgetKit for a fresh timeline, which re-reads the cache. The system content margin around the content (roughly the outer 24pt of a Small widget) is not part of that click area; tapping there uses the system's default widget tap, which opens CodexSatellites — the same thing a tap anywhere on the widget did before. If the app has never run and no snapshot exists, the widget keeps showing `—`.
+
 ## Interaction
 
 - Hover → both satellites expand and show remaining percentages.
 - Click either satellite → a compact icon-only Settings Bar appears.
+- Click the widget's content area → reloads the latest quota snapshot the app cached, with no network request and no app launch.
 - Settings Bar → icon-only Launch at Login, refresh frequency, available reset count, and Quit controls.
 - Quota check interval → `1m`, `5m`, or `15m`.
 - Notifications → native macOS alerts when a quota window resets to 100%, crosses below 10%, or the available reset count changes.
