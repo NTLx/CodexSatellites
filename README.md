@@ -4,6 +4,8 @@ Minimal Codex quota satellites for the MacBook notch.
 
 ![CodexSatellites](Artwork/README/README-hero-1600x900.png)
 
+Website: [ntlx.github.io/CodexSatellites](https://ntlx.github.io/CodexSatellites/)
+
 ## What it does
 
 CodexSatellites is a native macOS ambient HUD for the built-in display of a notched MacBook. It keeps the hardware notch untouched and shows two small quota orbs beside it:

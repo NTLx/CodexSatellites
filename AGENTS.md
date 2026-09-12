@@ -398,6 +398,20 @@ Update:
 - `README.md` for user-facing behavior;
 - `AGENTS.md` only when a long-lived engineering invariant changes;
 - `RELEASE_CHECKLIST.md` only when a real release gate changes;
-- `ReleaseNotes/*` for release-specific changes.
+- `ReleaseNotes/*` for release-specific changes;
+- `docs/` for the published website (see the Website invariant).
 
 Do not recreate large canonical Product/Architecture/Test specs by default.
+
+## Website invariant
+
+`docs/` is the published GitHub Pages site, served at `https://ntlx.github.io/CodexSatellites/` with Pages configured as `main` branch → `/docs` folder.
+
+Rules:
+
+- hand-written static HTML/CSS only: no build step, no JavaScript, no generator or framework, no CI workflow for the site;
+- `docs/.nojekyll` disables Jekyll processing and must stay;
+- `docs/assets/` holds copies of the canonical brand files in `Artwork/` and `Resources/Assets.xcassets/`; when a brand file changes, re-copy it rather than editing the copy;
+- the site is a presentation surface and must not contradict this file — quota-window semantics, widget click behaviour, privacy, authentication, and supported macOS versions all stay as documented here;
+- it must not claim a notarized, formal, or "latest stable" release while only pre-releases exist; the download entry points at the Releases page and states the ad-hoc / not-notarized status;
+- the site is English-only, matching the widget and notification strings.
