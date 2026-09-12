@@ -3,23 +3,23 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CodexSatellites — Codex quota beside the MacBook notch</title>
-<meta name="description" content="CodexSatellites is a native macOS ambient HUD for notched MacBooks: Codex 5-hour and weekly remaining quota beside the hardware notch, plus a WidgetKit widget for the desktop and Notification Center. Free, open source, no login.">
+<title>CodexSatellites: Codex quota beside the MacBook notch</title>
+<meta name="description" content="A native macOS ambient HUD for notched MacBooks. Codex 5-hour and weekly remaining quota sits beside the hardware notch, with a WidgetKit widget for the desktop and Notification Center. Free, open source, no login.">
 <link rel="canonical" href="https://ntlx.github.io/CodexSatellites/">
 <meta name="theme-color" content="#05070e">
 <link rel="icon" href="assets/img/mark.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="CodexSatellites">
-<meta property="og:title" content="CodexSatellites — Codex quota beside the MacBook notch">
-<meta property="og:description" content="A native macOS ambient HUD for notched MacBooks: 5-hour and weekly Codex remaining quota beside the hardware notch, plus a WidgetKit widget. Free and open source.">
+<meta property="og:title" content="CodexSatellites: Codex quota beside the MacBook notch">
+<meta property="og:description" content="Codex 5-hour and weekly remaining quota beside the hardware notch, plus a WidgetKit widget. Free and open source.">
 <meta property="og:url" content="https://ntlx.github.io/CodexSatellites/">
 <meta property="og:image" content="https://ntlx.github.io/CodexSatellites/assets/img/social-preview.png">
 <meta property="og:image:width" content="1280">
 <meta property="og:image:height" content="640">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="CodexSatellites — Codex quota beside the MacBook notch">
-<meta name="twitter:description" content="A native macOS ambient HUD for notched MacBooks: 5-hour and weekly Codex remaining quota beside the hardware notch, plus a WidgetKit widget.">
+<meta name="twitter:title" content="CodexSatellites: Codex quota beside the MacBook notch">
+<meta name="twitter:description" content="Codex 5-hour and weekly remaining quota beside the hardware notch, plus a WidgetKit widget.">
 <meta name="twitter:image" content="https://ntlx.github.io/CodexSatellites/assets/img/social-preview.png">
 <link rel="stylesheet" href="assets/css/site.css">
 <script>
@@ -51,11 +51,7 @@
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
 
-<div class="bg" aria-hidden="true">
-  <span class="b1"></span>
-  <span class="b2"></span>
-  <span class="b3"></span>
-</div>
+<div class="bg" aria-hidden="true"></div>
 <div class="spotlight" aria-hidden="true"></div>
 <div class="progress" aria-hidden="true"></div>
 
@@ -78,22 +74,22 @@
 <main id="main">
   <section class="hero" id="top">
     <div class="wrap">
-      <p class="eyebrow" data-reveal><span class="dot" aria-hidden="true"></span>macOS 15+ · Free and open source · MIT</p>
-      <h1 data-reveal data-delay="60">Codex quota, <span class="grad">ambient in the notch</span>.</h1>
-      <p class="lede" data-reveal data-delay="120">Two small satellites beside your MacBook's hardware notch show the 5-hour and weekly Codex remaining quota at a glance. Hover to read the percentages, click for a compact settings bar, and let them retract when you look away.</p>
-      <div class="cta-row" data-reveal data-delay="180">
-        <a class="btn btn-primary" href="https://github.com/NTLx/CodexSatellites/releases">
-          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v8"/><path d="M4.6 6.8 8 10.2l3.4-3.4"/><path d="M3 13.4h10"/></svg>
-          Download for macOS
-        </a>
-        <a class="btn btn-ghost" href="https://github.com/NTLx/CodexSatellites" rel="noopener">
-          <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
-          View source
-        </a>
+      <div class="hero-copy">
+        <h1 data-reveal>Codex quota, <span class="grad">ambient in the notch</span>.</h1>
+        <p class="hero-sub" data-reveal data-delay="70">Two satellites beside the notch show your 5-hour and weekly Codex quota. Hover to read them, click to configure.</p>
+        <div class="hero-cta" data-reveal data-delay="140">
+          <a class="btn btn-primary" href="https://github.com/NTLx/CodexSatellites/releases">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v8"/><path d="M4.6 6.8 8 10.2l3.4-3.4"/><path d="M3 13.4h10"/></svg>
+            Download
+          </a>
+          <a class="btn btn-ghost" href="https://github.com/NTLx/CodexSatellites" rel="noopener">
+            <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+            View source
+          </a>
+        </div>
       </div>
-      <p class="hero-note" data-reveal data-delay="220">Independent community utility. Not affiliated with or endorsed by OpenAI.</p>
 
-      <div class="demo" data-demo data-reveal data-delay="260">
+      <div class="demo" data-demo data-reveal data-delay="210">
         <div class="demo-stage">
           <div class="demo-notch" aria-hidden="true"></div>
           <button class="sat sat-left" type="button" aria-expanded="false" aria-controls="demo-bar" aria-label="5-hour quota, simulated at 62% remaining. Opens the settings bar.">
@@ -115,11 +111,20 @@
             </button>
           </div>
         </div>
-        <p class="demo-caption">
-          <span class="pill">Interactive demo</span>
-          <span>A browser replica of the satellites, using simulated values. Hover the stage to expand them, click a satellite to open the settings bar, and leave it for three seconds to watch it dismiss itself — the same behaviour the app has.</span>
-          <span class="demo-hint">The real app reads your own Codex login; nothing here is live data.</span>
-        </p>
+        <p class="demo-caption">A working replica of the app's satellites, using simulated values. <span class="try">Hover the stage to expand them, click a satellite for the settings bar, and leave it alone for three seconds.</span></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="band">
+    <div class="wrap">
+      <figure data-reveal>
+        <img src="assets/img/notch-macro.jpg" alt="Macro photograph of the display bezel and camera housing on a dark laptop." width="1536" height="1024" loading="lazy" decoding="async">
+        <figcaption>This is the hardware the app is built around: the camera housing and the strip of bezel beside it. CodexSatellites anchors its two panels in that strip and never covers the housing.</figcaption>
+      </figure>
+      <div class="band-statement">
+        <p data-reveal><strong>Built for a glancing read.</strong> The notch is already where your eyes rest a hundred times a day. The satellites put both Codex quota windows there, so checking them costs you nothing and you never leave what you were doing.</p>
+        <p data-reveal data-delay="80"><strong>Two panels, never in the way.</strong> They do not take keyboard focus and they do not activate the app when the cursor crosses them. Move the pointer away and they retract immediately.</p>
       </div>
     </div>
   </section>
@@ -127,205 +132,183 @@
   <section class="section" id="satellites">
     <div class="wrap">
       <div class="section-head" data-reveal>
-        <span class="tag">The satellites</span>
         <h2>Two satellites, one notch</h2>
-        <p>CodexSatellites leaves the camera housing alone. Two non-activating panels are anchored beside it, so they never steal keyboard focus and never activate the app when you hover.</p>
+        <p>Each satellite is a 24 point panel that grows to 60 point when you look at it. One carries the short window Codex reports, the other the weekly window.</p>
       </div>
-      <div class="grid">
-        <article class="card" data-reveal>
-          <div class="orb" aria-hidden="true"></div>
-          <span class="tag">Left satellite</span>
-          <h3>5-hour quota</h3>
-          <p>The remaining percentage of the short Codex window, shown next to the notch so it is readable without moving your eyes off your work.</p>
-        </article>
-        <article class="card" data-reveal data-delay="80">
-          <div class="orb orb-weekly" aria-hidden="true"></div>
-          <span class="tag">Right satellite</span>
-          <h3>Weekly quota</h3>
-          <p>The remaining percentage of the weekly Codex window. Windows are classified by the duration the server reports, not by their order in the response.</p>
-        </article>
-        <article class="card card-accent" data-reveal data-delay="160">
-          <span class="tag">Click either satellite</span>
+      <div class="bento">
+        <figure class="bento-cell bento-cell--media" data-reveal>
+          <img src="assets/img/orbit-field.jpg" alt="Concentric arcs and dashed orbital marks on a dark surface." width="1920" height="810" loading="lazy" decoding="async">
+          <figcaption>Orbital marks: the motif behind the app icon and the two satellites.</figcaption>
+        </figure>
+        <div class="bento-cell" data-reveal data-delay="60">
+          <h3>Read at a glance</h3>
+          <p>Each window is drawn as an arc that starts at twelve o'clock and fills clockwise, so a complete circle is a full quota and a sliver means it is nearly spent.</p>
+        </div>
+        <div class="bento-cell" data-reveal data-delay="120">
+          <span class="mono-label">Simulated reading</span>
+          <div class="bento-readout"><span class="figure">62</span><span class="unit">percent left in the 5-hour window</span></div>
+          <p>Weekly would sit alongside it at 41 percent. A real install shows your own numbers, and they refresh on the interval you choose.</p>
+        </div>
+        <div class="bento-cell bento-cell--wide" data-reveal data-delay="60">
           <h3>A compact settings bar</h3>
-          <p>Icon-only controls for Launch at Login, quota check interval (<code>1m</code>, <code>5m</code>, <code>15m</code>), the read-only count of available reset credits, and Quit. It dismisses itself after three seconds of inactivity, and clicking either satellite closes it immediately.</p>
-        </article>
+          <p>Clicking either satellite opens four icon-only controls: Launch at Login, the quota check frequency, the read-only count of available reset credits, and Quit. Three seconds of inactivity dismisses the bar, and clicking a satellite again closes it at once. The frequency control cycles through one, five and fifteen minutes.</p>
+        </div>
+        <div class="bento-cell" data-reveal data-delay="120">
+          <h3>Stale data never pretends</h3>
+          <p>If a refresh fails, the satellites dim and keep the last good reading. The reset count shows an unknown marker rather than a guess.</p>
+        </div>
       </div>
     </div>
   </section>
 
   <section class="section" id="widget">
     <div class="wrap">
-      <div class="section-head" data-reveal>
-        <span class="tag">The widget</span>
-        <h2>The same quotas on your desktop</h2>
-        <p>A WidgetKit widget shows both windows in Small or Medium — on the desktop, in Notification Center, or on any Mac. The notch satellites need a built-in notched display; the widget does not.</p>
-      </div>
-      <div class="grid">
-        <article class="card" data-reveal>
-          <div class="segmented" role="tablist" aria-label="Widget size">
-            <button type="button" role="tab" id="tab-small" data-size="small" aria-controls="panel-small" aria-selected="true">Small</button>
-            <button type="button" role="tab" id="tab-medium" data-size="medium" aria-controls="panel-medium" aria-selected="false" tabindex="-1">Medium</button>
+      <div class="feature">
+        <div class="feature-copy" data-reveal>
+          <h2>The same two windows on your desktop</h2>
+          <p>A WidgetKit widget carries both quotas to the desktop and to Notification Center, so the numbers are there even when the notch is out of sight.</p>
+          <ul class="feature-list">
+            <li>
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5 6.3 12 13 4.5"/></svg>
+              <span>Small and Medium layouts, both with equal-width gauges.</span>
+            </li>
+            <li>
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5 6.3 12 13 4.5"/></svg>
+              <span>Clicking the widget re-reads the snapshot the app cached. No network request and no app launch.</span>
+            </li>
+            <li>
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8.5 6.3 12 13 4.5"/></svg>
+              <span>The widget never reads your Codex login and never calls the usage endpoint itself.</span>
+            </li>
+          </ul>
+        </div>
+        <div class="feature-visual" data-reveal data-delay="80">
+          <div class="widget-frame">
+            <div class="segmented" role="tablist" aria-label="Widget size">
+              <button type="button" role="tab" id="tab-small" data-size="small" aria-controls="panel-small" aria-selected="true">Small</button>
+              <button type="button" role="tab" id="tab-medium" data-size="medium" aria-controls="panel-medium" aria-selected="false" tabindex="-1">Medium</button>
+            </div>
+            <div class="mockup" id="panel-small" role="tabpanel" aria-labelledby="tab-small">
+              <div class="gauge gauge-5h">
+                <div class="gauge-ring"></div>
+                <div class="gauge-value">62%</div>
+              </div>
+              <div class="gauge gauge-weekly">
+                <div class="gauge-ring"></div>
+                <div class="gauge-value">41%</div>
+              </div>
+              <div class="gauge-caption">
+                <strong>Two gauges</strong>
+                Small layout
+              </div>
+            </div>
+            <div class="mockup" id="panel-medium" role="tabpanel" aria-labelledby="tab-medium" hidden>
+              <div class="gauge gauge-5h">
+                <div class="gauge-ring"></div>
+                <div class="gauge-value">62%</div>
+              </div>
+              <div class="gauge gauge-weekly">
+                <div class="gauge-ring"></div>
+                <div class="gauge-value">41%</div>
+              </div>
+              <div class="mockup-note">
+                Adds the reset time<br>for each window
+              </div>
+            </div>
           </div>
-          <div class="mockup" id="panel-small" role="tabpanel" aria-labelledby="tab-small">
-            <div class="gauge gauge-5h">
-              <div class="gauge-ring"></div>
-              <div class="gauge-value">62%</div>
-            </div>
-            <div class="gauge gauge-weekly">
-              <div class="gauge-ring"></div>
-              <div class="gauge-value">41%</div>
-            </div>
-            <div class="gauge-caption">
-              <strong>Layout</strong>
-              Small widget
-            </div>
-          </div>
-          <div class="mockup" id="panel-medium" role="tabpanel" aria-labelledby="tab-medium" hidden>
-            <div class="gauge gauge-5h">
-              <div class="gauge-ring"></div>
-              <div class="gauge-value">62%</div>
-            </div>
-            <div class="gauge gauge-weekly">
-              <div class="gauge-ring"></div>
-              <div class="gauge-value">41%</div>
-            </div>
-            <div class="mockup-note">
-              Reset times for<br>both windows
-            </div>
-          </div>
-          <h3>Two gauges, two sizes</h3>
-          <p>Small shows both percentages side by side in equal-width, centre-aligned columns. Medium adds when each window resets. Both layouts are illustrations, not live data.</p>
-        </article>
-        <article class="card" data-reveal data-delay="80">
-          <span class="tag">Click the widget</span>
-          <h3>Reload the cached snapshot</h3>
-          <p>Clicking the widget's content area asks macOS for a fresh widget timeline, which re-reads the last quota snapshot the app cached. The click never fetches from OpenAI, never reads your Codex login, never starts the app, and never writes data.</p>
-          <p>The system margin around the content — roughly the outer 24pt of a Small widget — is not part of that click area; tapping there uses the platform's default widget tap and opens CodexSatellites.</p>
-        </article>
-      </div>
-      <div class="grid">
-        <article class="card" data-reveal>
-          <span class="tag">Data flow</span>
-          <h3>How the widget stays current</h3>
-          <p>The app is the only writer: after every quota check it publishes a small snapshot, and the widget is a read-only presentation layer that renders it. The widget has no scheduled refresh, no background task, and no timer; it never reads your Codex login and never calls the usage endpoint. WidgetKit decides when a timeline is requested, and a click is the one interaction that guarantees a reload.</p>
-        </article>
-        <article class="card" data-reveal data-delay="80">
-          <span class="tag">Notifications</span>
-          <h3>Alerts that follow your quota</h3>
-          <p>Native macOS alerts when the 5-hour or weekly window resets to 100%, when either window falls below 10%, and when the available reset count changes. Detection is transition-based, so the first check after launch is a silent baseline. Notification text is English-only, and there is no in-app toggle — macOS System Settings owns that.</p>
-        </article>
-      </div>
-      <div class="grid">
-        <article class="card" data-reveal>
-          <span class="tag">Setup</span>
-          <h3>Add the widget</h3>
-          <ol class="steps">
-            <li>Right-click the desktop and choose <strong>Edit Widgets…</strong></li>
-            <li>Find <strong>CodexSatellites</strong> in the gallery</li>
-            <li>Pick <strong>Small</strong> or <strong>Medium</strong> and place it</li>
-          </ol>
-          <p>macOS does not let an app place its own widget, and CodexSatellites never tries to.</p>
-        </article>
-        <article class="card" data-reveal data-delay="80">
-          <span class="tag">Freshness</span>
-          <h3>Stale data never pretends</h3>
-          <p>Quota percentages may show the last good reading with reduced opacity, and the available reset count shows <code>—</code> whenever the snapshot is not fresh. A failed refresh keeps the last good data instead of inventing a number.</p>
-        </article>
+          <p class="demo-caption">Layout preview with simulated values.</p>
+        </div>
       </div>
     </div>
   </section>
 
   <section class="section" id="privacy">
     <div class="wrap">
-      <div class="section-head" data-reveal>
-        <span class="tag">Privacy</span>
-        <h2>It reads your Codex login. It never manages it.</h2>
-        <p>CodexSatellites only observes the Codex authentication you already have on this Mac, and uses it the same way the Codex CLI does.</p>
+      <div class="statement">
+        <p class="lead" data-reveal>It reads your Codex login. It never manages it.</p>
+        <div class="statement-grid">
+          <div data-reveal>
+            <h3>The login you already have</h3>
+            <p>Codex owns authentication. The app reads the local Codex state and uses that existing token for usage requests, the same way the CLI does.</p>
+          </div>
+          <div data-reveal data-delay="60">
+            <h3>No token handling</h3>
+            <p>No refresh exchange, no writes to your Codex auth files, and no stored credentials anywhere.</p>
+          </div>
+          <div data-reveal data-delay="120">
+            <h3>No login flow</h3>
+            <p>No OAuth, no device code, no browser window. If Codex is not already signed in, the app has nothing to read.</p>
+          </div>
+          <div data-reveal data-delay="180">
+            <h3>Nothing leaves the Mac</h3>
+            <p>No telemetry, no analytics, no cloud sync, and no third-party runtime dependencies.</p>
+          </div>
+        </div>
       </div>
-      <div class="grid">
-        <article class="card" data-reveal>
-          <h3>What it does</h3>
-          <ul class="checklist">
-            <li>Reads the existing local Codex authentication state</li>
-            <li>Uses that existing token to request current usage</li>
-            <li>Runs entirely on-device with native macOS frameworks</li>
-          </ul>
-        </article>
-        <article class="card" data-reveal data-delay="80">
-          <h3>What it never does</h3>
-          <ul class="checklist">
-            <li>No OAuth, device-code, or browser login</li>
-            <li>No refresh-token exchange, and no writing your Codex auth files</li>
-            <li>No credential storage, telemetry, analytics, or cloud sync</li>
-            <li>No third-party runtime dependencies</li>
-          </ul>
-        </article>
-      </div>
-      <p class="note" data-reveal><strong>Honest about unknowns.</strong> Codex usage currently comes from an undocumented endpoint, so the app parses every response defensively. When a value is missing, malformed, or stale, the app shows <code>—</code> instead of guessing, and quota windows are never discarded because of an unrelated parsing failure.</p>
     </div>
   </section>
 
   <section class="section" id="requirements">
     <div class="wrap">
       <div class="section-head" data-reveal>
-        <span class="tag">Requirements</span>
-        <h2>What you need</h2>
+        <h2>What it needs</h2>
       </div>
-      <div class="grid">
-        <article class="card" data-reveal>
-          <dl class="specs">
-            <div>
-              <dt>macOS</dt>
-              <dd>15 or later</dd>
-            </div>
-            <div>
-              <dt>Display</dt>
-              <dd>A MacBook with a hardware notch for the satellites. The widget works on any Mac, including Mac mini, Mac Studio, and external displays.</dd>
-            </div>
-            <div>
-              <dt>Codex</dt>
-              <dd>An existing local Codex login. CodexSatellites never creates one for you.</dd>
-            </div>
-            <div>
-              <dt>Price</dt>
-              <dd>Free, MIT licensed, source available on GitHub.</dd>
-            </div>
-          </dl>
-        </article>
-        <article class="card" data-reveal data-delay="80">
-          <h3>Deliberately not included</h3>
-          <p>CodexSatellites stays small on purpose. It has no menu bar item, no ordinary settings window, no quota history, no cost or token dashboard, no reset countdown, no reset-credit spending, and no other providers. Available reset credits are shown read-only.</p>
-        </article>
+      <div class="specs-grid">
+        <div class="spec" data-reveal>
+          <div class="value">macOS 15</div>
+          <div class="label mono-label">System</div>
+          <p>Or later, on a Mac with a notch for the satellites. Native frameworks only.</p>
+        </div>
+        <div class="spec" data-reveal data-delay="60">
+          <div class="value">Any Mac</div>
+          <div class="label mono-label">Widget</div>
+          <p>The widget runs everywhere, including Mac mini, Mac Studio and external displays.</p>
+        </div>
+        <div class="spec" data-reveal data-delay="120">
+          <div class="value">Local Codex login</div>
+          <div class="label mono-label">Account</div>
+          <p>An existing sign-in on this Mac. CodexSatellites never creates one for you.</p>
+        </div>
+        <div class="spec" data-reveal data-delay="180">
+          <div class="value">MIT</div>
+          <div class="label mono-label">Licence</div>
+          <p>Free and open source, with the source and release notes on GitHub.</p>
+        </div>
       </div>
     </div>
   </section>
 
   <section class="section" id="install">
     <div class="wrap">
-      <div class="install" data-reveal>
-        <div class="install-copy">
-          <div class="install-head">
-            <img src="assets/img/app-icon-256.png" alt="" width="256" height="256">
-            <h2>Download and install</h2>
-          </div>
-          <p>Download the DMG from GitHub Releases, drag CodexSatellites into Applications, and launch it. On first launch it looks for your existing Codex login and starts polling.</p>
-          <a class="btn btn-primary" href="https://github.com/NTLx/CodexSatellites/releases">
-            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v8"/><path d="M4.6 6.8 8 10.2l3.4-3.4"/><path d="M3 13.4h10"/></svg>
-            Get the latest release
-          </a>
-          <ul class="meta-row">
-            <li>DMG for macOS 15+</li>
-            <li>Native app, no third-party dependencies</li>
-            <li>MIT licensed</li>
-          </ul>
+      <div class="install-head" data-reveal>
+        <img src="assets/img/app-icon-256.png" alt="" width="256" height="256">
+        <h2>Download and install</h2>
+      </div>
+      <div class="steps-row" data-reveal data-delay="60">
+        <div class="step">
+          <h3>Download</h3>
+          <p>Take the DMG from the Releases page.</p>
         </div>
-        <div>
-          <ol class="steps">
-            <li>Download the DMG from the <strong>Releases</strong> page.</li>
-            <li>Open it and drag <strong>CodexSatellites</strong> into <strong>Applications</strong>. Install there before launching, so Launch at Login and the widget extension register from a stable path.</li>
-            <li>Launch the app. The satellites appear beside the notch, and the widget becomes available in the widget gallery.</li>
-          </ol>
-          <p class="note"><strong>Preview builds are not notarized yet.</strong> Published releases are currently ad-hoc signed, so macOS shows a Gatekeeper warning the first time you open the app. Right-click the app and choose <strong>Open</strong>, or allow it in <strong>System Settings → Privacy &amp; Security → Open Anyway</strong>. A notarized Developer ID build is not published yet.</p>
+        <div class="step">
+          <h3>Install</h3>
+          <p>Drag CodexSatellites into Applications before launching, so Launch at Login and the widget extension register from a stable path.</p>
+        </div>
+        <div class="step">
+          <h3>Launch</h3>
+          <p>The satellites appear beside the notch, and the widget joins the gallery.</p>
+        </div>
+      </div>
+      <div class="install-cta">
+        <div data-reveal>
+          <p class="hero-sub">CodexSatellites reads your existing Codex login on first launch and starts polling at the interval you choose.</p>
+          <div class="install-actions">
+            <a class="btn btn-primary" href="https://github.com/NTLx/CodexSatellites/releases">Download</a>
+          </div>
+        </div>
+        <div class="aside" data-reveal data-delay="80">
+          <span class="mono-label">Before you open it</span>
+          <p><strong>Published builds are ad-hoc signed and not notarized yet.</strong> macOS shows a Gatekeeper warning the first time you open the app. Right-click the app and choose Open, or allow it under System Settings, Privacy and Security, Open Anyway.</p>
+          <p>A notarized Developer ID build is not published yet.</p>
         </div>
       </div>
     </div>
@@ -334,12 +317,12 @@
 
 <footer class="site-footer">
   <div class="wrap">
-    <span>CodexSatellites · MIT licensed</span>
+    <span>CodexSatellites, MIT licensed</span>
     <nav aria-label="Project links">
       <a href="https://github.com/NTLx/CodexSatellites" rel="noopener">GitHub</a>
       <a href="https://github.com/NTLx/CodexSatellites/releases">Releases</a>
       <a href="https://github.com/NTLx/CodexSatellites/tree/main/ReleaseNotes">Release notes</a>
-      <a href="https://github.com/NTLx/CodexSatellites/blob/main/LICENSE">License</a>
+      <a href="https://github.com/NTLx/CodexSatellites/blob/main/LICENSE">Licence</a>
     </nav>
     <p class="footer-note">CodexSatellites is an independent community utility and is not affiliated with or endorsed by OpenAI. Codex usage depends on an undocumented endpoint and may change without notice.</p>
   </div>

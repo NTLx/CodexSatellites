@@ -95,19 +95,46 @@ window.__siteReady = true;
     window.addEventListener("pointermove", setSpotlight, { passive: true });
   }
 
-  /* ------------------------------------------------- card hover highlight */
+  /* ------------------------------------------------- surface highlight */
 
-  document.querySelectorAll(".card").forEach(function (card) {
-    card.addEventListener(
+  var surfaces = document.querySelectorAll(
+    ".bento-cell, .spec, .feature-visual"
+  );
+
+  surfaces.forEach(function (surface) {
+    surface.addEventListener(
       "pointermove",
       function (event) {
-        var box = card.getBoundingClientRect();
-        card.style.setProperty("--mx", event.clientX - box.left + "px");
-        card.style.setProperty("--my", event.clientY - box.top + "px");
+        var box = surface.getBoundingClientRect();
+        surface.style.setProperty("--mx", event.clientX - box.left + "px");
+        surface.style.setProperty("--my", event.clientY - box.top + "px");
       },
       { passive: true }
     );
   });
+
+  /* ------------------------------------------------- CTA pointer feedback */
+
+  /* Feedback only: the primary control leans a few pixels toward the cursor so
+     the press target reads as live. Capped at 3px so it never fights layout. */
+  if (finePointer.matches && !reduced.matches) {
+    document.querySelectorAll(".btn-primary").forEach(function (button) {
+      button.addEventListener(
+        "pointermove",
+        function (event) {
+          var box = button.getBoundingClientRect();
+          var dx = (event.clientX - (box.left + box.width / 2)) / (box.width / 2);
+          var dy = (event.clientY - (box.top + box.height / 2)) / (box.height / 2);
+          button.style.transform =
+            "translate(" + (dx * 3).toFixed(2) + "px," + (dy * 3).toFixed(2) + "px)";
+        },
+        { passive: true }
+      );
+      button.addEventListener("pointerleave", function () {
+        button.style.transform = "";
+      });
+    });
+  }
 
   /* ----------------------------------------------------- notch demo ----- */
 
