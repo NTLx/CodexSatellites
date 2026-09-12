@@ -188,20 +188,17 @@ window.__siteReady = true;
         });
       }
 
-      var frequency = Array.prototype.slice.call(
-        bar.querySelectorAll("[data-interval]")
-      );
-      frequency.forEach(function (button) {
-        button.addEventListener("click", function () {
-          frequency.forEach(function (other) {
-            other.setAttribute(
-              "aria-pressed",
-              other === button ? "true" : "false"
-            );
-          });
+      var frequency = bar.querySelector("[data-interval]");
+      if (frequency) {
+        var intervals = ["1m", "5m", "15m"];
+        frequency.addEventListener("click", function () {
+          var current = intervals.indexOf(frequency.textContent.trim());
+          var value = intervals[(current + 1) % intervals.length];
+          frequency.textContent = value;
+          frequency.setAttribute("aria-valuetext", value);
           restartIdle();
         });
-      });
+      }
 
       var quit = bar.querySelector("[data-quit]");
       if (quit) {

@@ -504,8 +504,9 @@ h1 {
 
 .demo-stage {
   --notch-w: clamp(148px, 24%, 194px);
+  --notch-h: 40px;
   position: relative;
-  height: clamp(196px, 20vw, 224px);
+  height: clamp(122px, 12vw, 150px);
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
   overflow: hidden;
@@ -532,7 +533,7 @@ h1 {
   left: 50%;
   transform: translateX(-50%);
   width: var(--notch-w);
-  height: 40px;
+  height: var(--notch-h);
   background: #000;
   border-radius: 0 0 20px 20px;
   box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.07);
@@ -561,202 +562,170 @@ h1 {
   gap: 20px;
 }
 
-/* spacer keeps the two satellites just outside the notch edges */
-.demo-gap {
-  width: var(--notch-w);
-  height: 1px;
-  flex: none;
-}
-
+/* Each satellite replicates the app's panel: 24pt collapsed -> 60pt expanded,
+   height 24, content hugging the notch-facing edge, and the percentage text
+   growing out of that edge so it pushes the orb outward — the app's own
+   behaviour (QuotaOrbView's HStack + panel growth). Anchoring is expressed as
+   the app expresses it: anchor - gap - width, so the inner edge stays pinned. */
 .sat {
-  --orb: 34px;
-  position: relative;
-  width: var(--orb);
-  height: var(--orb);
-  padding: 0;
-  flex: none;
-  display: grid;
-  place-items: center;
+  --notch-gap: 10px;
+  position: absolute;
+  top: calc(var(--notch-h) / 2);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 24px;
+  height: 24px;
+  padding: 0 1.25px;
   border: 0;
-  border-radius: 50%;
-  background: transparent;
-  color: var(--text);
+  background: none;
+  color: #fff;
   cursor: pointer;
   overflow: hidden;
-  transition: width 0.28s var(--ease), height 0.28s var(--ease);
-}
-
-/* remaining-quota arc */
-.sat::before {
-  --p: var(--target);
-  content: "";
-  position: absolute;
-  inset: 2px;
-  border-radius: 50%;
-  background: conic-gradient(from -90deg, var(--ring) 0 var(--p), var(--track) var(--p) 100%);
-  -webkit-mask: radial-gradient(farthest-side, transparent 72%, #000 74%);
-  mask: radial-gradient(farthest-side, transparent 72%, #000 74%);
-  transition: --p 1.1s var(--ease-out);
-}
-
-/* dashed orbit, echoes the app icon */
-.sat::after {
-  content: "";
-  position: absolute;
-  inset: -7px;
-  border-radius: 50%;
-  border: 1px dashed rgba(146, 170, 210, 0.3);
-  opacity: 0;
-  transition: opacity 0.3s var(--ease);
-}
-
-.sat-value {
-  position: relative;
-  font-size: 15px;
-  font-weight: 620;
-  letter-spacing: -0.02em;
-  opacity: 0;
-  transition: opacity 0.24s var(--ease), transform 0.28s var(--ease-out);
+  transform: translateY(-50%);
+  transition: width 0.2s ease-in-out;
 }
 
 .sat-left {
-  --ring: var(--cyan);
+  right: calc(50% + var(--notch-w) / 2 + var(--notch-gap));
+}
+
+.sat-right {
+  left: calc(50% + var(--notch-w) / 2 + var(--notch-gap));
+  justify-content: flex-start;
+}
+
+/* 14pt ring with a 2.5pt stroke, remaining quota drawn from 12 o'clock */
+.sat-orb {
+  --p: var(--target);
+  position: relative;
+  width: 14px;
+  height: 14px;
+  flex: none;
+  border-radius: 50%;
+  background: conic-gradient(#fff 0 var(--p), rgba(255, 255, 255, 0.18) var(--p) 100%);
+  -webkit-mask: radial-gradient(farthest-side, transparent 63%, #000 65%);
+  mask: radial-gradient(farthest-side, transparent 63%, #000 65%);
+  transition: --p 1.1s var(--ease-out);
+}
+
+.sat-value {
+  width: 0;
+  margin-inline-start: 0;
+  opacity: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-align: center;
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1;
+  transition: width 0.2s ease-in-out, margin-inline-start 0.2s ease-in-out,
+    opacity 0.2s ease-in-out;
+}
+
+.sat-left {
   --target: 62%;
 }
 
 .sat-right {
-  --ring: var(--violet);
   --target: 41%;
 }
 
 /* arcs fill in once the demo is on screen */
-html.js .demo:not(.is-visible) .sat::before {
+html.js .demo:not(.is-visible) .sat-orb {
   --p: 0%;
-}
-
-/* percentage slides in from the notch edge, and is clipped by the orb */
-.sat-left .sat-value {
-  transform: translateX(9px);
-}
-
-.sat-right .sat-value {
-  transform: translateX(-9px);
 }
 
 .demo-stage:hover .sat,
 .sat:focus-visible,
 .demo.is-hinting .sat,
 body.demo-open .sat {
-  --orb: 64px;
-}
-
-.demo-stage:hover .sat::after,
-.sat:focus-visible::after,
-.demo.is-hinting .sat::after,
-body.demo-open .sat::after {
-  opacity: 1;
+  width: 60px;
 }
 
 .demo-stage:hover .sat-value,
 .sat:focus-visible .sat-value,
 .demo.is-hinting .sat-value,
 body.demo-open .sat-value {
+  width: 3.2ch;
+  margin-inline-start: 4px;
   opacity: 1;
-  transform: none;
 }
 
-/* icon-only settings bar, mirrors the app */
+/* Icon-only settings bar, mirroring SettingsBarView: a 176 x 44 rounded rect
+   (radius 13) holding four 32pt circular controls at 8pt spacing, 12pt inline
+   padding. It appears 6pt below the notch's bottom edge, shows in 0.18s and
+   hides in 0.15s, sliding up 6pt — the app's own numbers. */
 .demo-bar {
   position: absolute;
-  bottom: 16px;
+  top: calc(var(--notch-h) + 6px);
   left: 50%;
   z-index: 2;
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  background: rgba(8, 12, 23, 0.86);
+  gap: 8px;
+  box-sizing: border-box;
+  width: 176px;
+  height: 44px;
+  padding: 0 12px;
+  border: 0.5px solid rgba(255, 255, 255, 0.12);
+  border-radius: 13px;
+  background: rgba(20, 26, 40, 0.72);
   backdrop-filter: var(--glass);
   -webkit-backdrop-filter: var(--glass);
-  box-shadow: 0 24px 50px -26px rgba(0, 0, 0, 0.9);
+  box-shadow: 0 20px 44px -24px rgba(0, 0, 0, 0.9);
   opacity: 0;
   visibility: hidden;
-  transform: translate(-50%, 8px) scale(0.97);
-  transition: opacity 0.22s var(--ease), transform 0.26s var(--ease-out),
-    visibility 0.22s;
+  transform: translate(-50%, 6px);
+  transition: opacity 0.15s ease-in-out, transform 0.15s ease-in-out,
+    visibility 0.15s;
 }
 
 body.demo-open .demo-bar {
   opacity: 1;
   visibility: visible;
-  transform: translate(-50%, 0) scale(1);
+  transform: translate(-50%, 0);
+  transition-duration: 0.18s;
 }
 
 .demo-bar .ctrl {
   display: grid;
   place-items: center;
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
+  flex: none;
   padding: 0;
   border: 0;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 0 0 0.5px rgba(255, 255, 255, 0.12);
   color: var(--text);
   cursor: pointer;
-  transition: background 0.2s var(--ease), color 0.2s var(--ease);
-}
-
-.demo-bar .ctrl:hover {
-  background: rgba(255, 255, 255, 0.12);
-}
-
-.demo-bar .ctrl[aria-pressed="true"] {
-  background: linear-gradient(120deg, rgba(73, 226, 239, 0.9), rgba(73, 160, 255, 0.9));
-  color: #04070f;
+  transition: background 0.2s var(--ease), color 0.2s var(--ease),
+    box-shadow 0.2s var(--ease);
 }
 
 .demo-bar .ctrl svg {
-  width: 16px;
-  height: 16px;
+  width: 15px;
+  height: 15px;
 }
 
-.demo-bar .seg {
-  display: flex;
-  gap: 2px;
-  padding: 2px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.04);
-}
-
-.demo-bar .seg button {
-  padding: 5px 9px;
-  border: 0;
-  border-radius: 999px;
-  background: transparent;
-  color: var(--muted);
+.demo-bar .ctrl-text {
   font-family: var(--mono);
-  font-size: 12px;
-  cursor: pointer;
-  transition: background 0.2s var(--ease), color 0.2s var(--ease);
+  font-size: 11px;
+  font-weight: 600;
 }
 
-.demo-bar .seg button[aria-pressed="true"] {
-  background: rgba(73, 160, 255, 0.22);
-  color: var(--text);
+.demo-bar button.ctrl:hover {
+  background: rgba(255, 255, 255, 0.14);
 }
 
-.demo-bar .count {
-  display: grid;
-  place-items: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--text);
-  font-family: var(--mono);
-  font-size: 13px;
+/* Launch at Login enabled takes the accent treatment, as the app does */
+.demo-bar .ctrl[aria-pressed="true"] {
+  background: rgba(73, 160, 255, 0.14);
+  box-shadow: inset 0 0 0 0.75px rgba(73, 160, 255, 0.36);
+  color: #6cb0ff;
 }
 
 .demo-caption {
@@ -1363,7 +1332,7 @@ html.reveal-fallback [data-reveal] {
   }
 
   .demo-stage {
-    height: clamp(190px, 34vw, 224px);
+    height: clamp(118px, 20vw, 150px);
   }
 }
 
@@ -1401,27 +1370,6 @@ html.reveal-fallback [data-reveal] {
     text-align: left;
   }
 
-  /* the settings bar must stay inside the stage on narrow screens */
-  .demo-bar {
-    gap: 4px;
-    padding: 5px;
-  }
-
-  .demo-bar .ctrl,
-  .demo-bar .count {
-    width: 30px;
-    height: 30px;
-  }
-
-  .demo-bar .seg button {
-    padding: 5px 7px;
-    font-size: 11px;
-  }
-
-  .demo-gap {
-    width: var(--notch-w);
-  }
-
   .demo-stage {
     --notch-w: clamp(120px, 34%, 194px);
   }
@@ -1436,14 +1384,14 @@ html.reveal-fallback [data-reveal] {
    settings bar (handled in site.js) */
 @media (hover: none) {
   .sat {
-    --orb: 64px;
+    width: 60px;
     transition: none;
   }
 
-  .sat::after,
   .sat-value {
+    width: 3.2ch;
+    margin-inline-start: 4px;
     opacity: 1;
-    transform: none;
   }
 
   .card:hover {
@@ -1473,16 +1421,8 @@ html.reveal-fallback [data-reveal] {
     font-size: 14px;
   }
 
-  .demo-bar .seg button {
-    padding: 5px 5px;
-    font-size: 10.5px;
-  }
-
   .demo-stage {
     --notch-w: 118px;
   }
 
-  .sat {
-    --orb: 56px;
-  }
 }

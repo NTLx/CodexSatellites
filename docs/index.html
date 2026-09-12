@@ -96,27 +96,22 @@
       <div class="demo" data-demo data-reveal data-delay="260">
         <div class="demo-stage">
           <div class="demo-notch" aria-hidden="true"></div>
-          <div class="demo-orbs">
-            <button class="sat sat-left" type="button" aria-expanded="false" aria-controls="demo-bar" aria-label="5-hour quota, simulated at 62% remaining. Opens the settings bar.">
-              <span class="sat-value">62%</span>
-            </button>
-            <span class="demo-gap" aria-hidden="true"></span>
-            <button class="sat sat-right" type="button" aria-expanded="false" aria-controls="demo-bar" aria-label="Weekly quota, simulated at 41% remaining. Opens the settings bar.">
-              <span class="sat-value">41%</span>
-            </button>
-          </div>
+          <button class="sat sat-left" type="button" aria-expanded="false" aria-controls="demo-bar" aria-label="5-hour quota, simulated at 62% remaining. Opens the settings bar.">
+            <span class="sat-orb" aria-hidden="true"></span>
+            <span class="sat-value">62%</span>
+          </button>
+          <button class="sat sat-right" type="button" aria-expanded="false" aria-controls="demo-bar" aria-label="Weekly quota, simulated at 41% remaining. Opens the settings bar.">
+            <span class="sat-value">41%</span>
+            <span class="sat-orb" aria-hidden="true"></span>
+          </button>
           <div class="demo-bar" id="demo-bar" role="group" aria-label="Simulated settings bar">
             <button class="ctrl" type="button" data-launch aria-pressed="false" aria-label="Launch at Login, simulated" title="Launch at Login (simulated)">
-              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M8 2.5v5.2"/><path d="M12.4 4.6a6 6 0 1 1-8.8 0"/></svg>
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13.2 6.7A5.6 5.6 0 0 0 3.5 4.9"/><path d="M2.8 9.3a5.6 5.6 0 0 0 9.7 1.8"/><path d="M13.4 3.3v3.4H10"/><path d="M2.6 12.7V9.3h3.4"/></svg>
             </button>
-            <div class="seg" role="group" aria-label="Quota check interval, simulated">
-              <button type="button" data-interval aria-pressed="true">1m</button>
-              <button type="button" data-interval aria-pressed="false">5m</button>
-              <button type="button" data-interval aria-pressed="false">15m</button>
-            </div>
-            <span class="count" role="img" aria-label="Available reset count, simulated: 2">2</span>
+            <button class="ctrl ctrl-text" type="button" data-interval aria-label="Quota check frequency, simulated" title="Quota Check Frequency (simulated)">1m</button>
+            <span class="ctrl ctrl-text" role="img" aria-label="Available reset count, simulated: 2">2</span>
             <button class="ctrl" type="button" data-quit aria-label="Quit, simulated" title="Quit (simulated)">
-              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><path d="M4.2 4.2l7.6 7.6"/><path d="M11.8 4.2l-7.6 7.6"/></svg>
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" aria-hidden="true"><path d="M8 2.4v5.2"/><path d="M12.4 4.6a6 6 0 1 1-8.8 0"/></svg>
             </button>
           </div>
         </div>
