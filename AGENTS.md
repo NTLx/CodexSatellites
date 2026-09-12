@@ -409,9 +409,14 @@ Do not recreate large canonical Product/Architecture/Test specs by default.
 
 Rules:
 
-- hand-written static HTML/CSS only: no build step, no JavaScript, no generator or framework, no CI workflow for the site;
-- `docs/.nojekyll` disables Jekyll processing and must stay;
-- `docs/assets/` holds copies of the canonical brand files in `Artwork/` and `Resources/Assets.xcassets/`; when a brand file changes, re-copy it rather than editing the copy;
+- no build step, no generator, no framework, no package manager, and no CI workflow: `docs/` is the finished artifact that Pages serves as-is;
+- `docs/.nojekyll` disables Jekyll processing and must stay; Pages serves `docs/404.html` for unknown paths, so keep its asset paths relative to the site root;
+- `docs/assets/` is organised as `css/`, `js/`, `img/`; `img/` holds copies of the canonical brand files in `Artwork/` and `Resources/Assets.xcassets/` — re-copy a brand file when it changes rather than editing the copy;
+- the only script is `docs/assets/js/site.js`: dependency-free, ES5-style vanilla JavaScript loaded with `defer` and kept under 10 KB. It must never fetch anything over the network and must add no analytics, tracking, fonts, or third-party requests;
+- scripting is strictly additive. With JavaScript disabled, blocked, or failing, every section still renders complete and readable. The `js` class and the `reveal-fallback` timer in the inline head script exist for exactly that reason — content must never depend on script execution to become visible;
+- animations must respect `prefers-reduced-motion: reduce` (reveals become instant, ambient background and shimmer stop) and glass surfaces must respect `prefers-reduced-transparency: reduce`. User-initiated interactions such as the notch demo stay functional under both;
+- scroll-linked effects are decoration only and must be wrapped in `@supports` so an unsupported engine drops them instead of losing content. The same applies to `@property`-driven ring fills;
+- anything presented as a screenshot, reading, or demo must be labelled as what it is. The notch replica and the widget layouts are simulations with invented values, and those numbers must never be presented as the owner's real usage;
 - the site is a presentation surface and must not contradict this file — quota-window semantics, widget click behaviour, privacy, authentication, and supported macOS versions all stay as documented here;
 - it must not claim a notarized, formal, or "latest stable" release while only pre-releases exist; the download entry points at the Releases page and states the ad-hoc / not-notarized status;
 - the site is English-only, matching the widget and notification strings.
