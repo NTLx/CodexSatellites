@@ -2,12 +2,9 @@
    No dependencies, no build step, no network calls. Every behaviour here is
    additive: with scripting disabled the page renders complete and readable. */
 
-window.__siteReady = true;
-
 (function () {
   "use strict";
 
-  var root = document.documentElement;
   var reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
   var finePointer = window.matchMedia("(hover: hover) and (pointer: fine)");
 
@@ -52,88 +49,6 @@ window.__siteReady = true;
         if (box.top < window.innerHeight) el.classList.add("is-visible");
       });
     }, 3000);
-  }
-
-  /* ------------------------------------------------------------- header */
-
-  var header = document.querySelector(".site-header");
-  var ticking = false;
-
-  function syncHeader() {
-    if (header) header.classList.toggle("is-scrolled", window.scrollY > 8);
-    ticking = false;
-  }
-
-  window.addEventListener(
-    "scroll",
-    function () {
-      if (ticking) return;
-      ticking = true;
-      window.requestAnimationFrame(syncHeader);
-    },
-    { passive: true }
-  );
-
-  syncHeader();
-
-  /* ---------------------------------------------------------- spotlight */
-
-  var spotlightVars = false;
-
-  function setSpotlight(event) {
-    if (spotlightVars) return;
-    spotlightVars = true;
-    window.requestAnimationFrame(function () {
-      root.style.setProperty("--gx", event.clientX + "px");
-      root.style.setProperty("--gy", event.clientY + "px");
-      spotlightVars = false;
-    });
-  }
-
-  if (finePointer.matches && !reduced.matches) {
-    document.body.classList.add("has-pointer");
-    window.addEventListener("pointermove", setSpotlight, { passive: true });
-  }
-
-  /* ------------------------------------------------- surface highlight */
-
-  var surfaces = document.querySelectorAll(
-    ".bento-cell, .spec, .feature-visual"
-  );
-
-  surfaces.forEach(function (surface) {
-    surface.addEventListener(
-      "pointermove",
-      function (event) {
-        var box = surface.getBoundingClientRect();
-        surface.style.setProperty("--mx", event.clientX - box.left + "px");
-        surface.style.setProperty("--my", event.clientY - box.top + "px");
-      },
-      { passive: true }
-    );
-  });
-
-  /* ------------------------------------------------- CTA pointer feedback */
-
-  /* Feedback only: the primary control leans a few pixels toward the cursor so
-     the press target reads as live. Capped at 3px so it never fights layout. */
-  if (finePointer.matches && !reduced.matches) {
-    document.querySelectorAll(".btn-primary").forEach(function (button) {
-      button.addEventListener(
-        "pointermove",
-        function (event) {
-          var box = button.getBoundingClientRect();
-          var dx = (event.clientX - (box.left + box.width / 2)) / (box.width / 2);
-          var dy = (event.clientY - (box.top + box.height / 2)) / (box.height / 2);
-          button.style.transform =
-            "translate(" + (dx * 3).toFixed(2) + "px," + (dy * 3).toFixed(2) + "px)";
-        },
-        { passive: true }
-      );
-      button.addEventListener("pointerleave", function () {
-        button.style.transform = "";
-      });
-    });
   }
 
   /* ----------------------------------------------------- notch demo ----- */
@@ -239,7 +154,11 @@ window.__siteReady = true;
 
     // One-time self-demonstration: expand the satellites briefly the first
     // time the demo is on screen, so the hover interaction is discoverable.
-    if (finePointer.matches && !reduced.matches && "IntersectionObserver" in window) {
+    if (
+      finePointer.matches &&
+      !reduced.matches &&
+      "IntersectionObserver" in window
+    ) {
       var hinted = false;
       var hintTimer = 0;
       var endHint = function () {
@@ -269,39 +188,6 @@ window.__siteReady = true;
       });
     }
   }
-
-  /* -------------------------------------------------- widget size toggle */
-
-  var sizes = Array.prototype.slice.call(
-    document.querySelectorAll("[data-size]")
-  );
-
-  sizes.forEach(function (button) {
-    button.addEventListener("click", function () {
-      var target = button.getAttribute("data-size");
-      sizes.forEach(function (other) {
-        var selected = other === button;
-        other.setAttribute("aria-selected", selected ? "true" : "false");
-        other.tabIndex = selected ? 0 : -1;
-        var panel = document.getElementById(
-          other.getAttribute("aria-controls")
-        );
-        if (panel) panel.hidden = !selected;
-      });
-      var shown = document.getElementById(button.getAttribute("aria-controls"));
-      if (shown) shown.classList.add("is-visible");
-    });
-  });
-
-  sizes.forEach(function (button, index) {
-    button.addEventListener("keydown", function (event) {
-      var step =
-        event.key === "ArrowRight" ? 1 : event.key === "ArrowLeft" ? -1 : 0;
-      if (!step) return;
-      event.preventDefault();
-      var next = sizes[(index + step + sizes.length) % sizes.length];
-      next.focus();
-      next.click();
-    });
-  });
 })();
+
+window.__siteReady = true;
