@@ -731,13 +731,14 @@ body.demo-open .demo-bar {
 
 .bento-cell--media {
   grid-column: span 2;
-  grid-row: span 2;
+  grid-row: span 3;
   padding: 0;
 }
 
 .bento-cell--media img {
   width: 100%;
-  height: clamp(260px, 30vw, 380px);
+  height: auto;
+  min-height: clamp(260px, 26vw, 340px);
   object-fit: cover;
   flex: 1;
 }
