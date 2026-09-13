@@ -691,49 +691,6 @@ body.demo-open .demo-bar {
   max-width: 54ch;
 }
 
-/* --- family 2: editorial band (one wide real photograph + statement pair) --- */
-
-.band {
-  padding: 104px 0 0;
-}
-
-.band figure {
-  margin: 0;
-}
-
-.band img {
-  width: 100%;
-  height: clamp(220px, 30vw, 372px);
-  object-fit: cover;
-  object-position: 50% 37%;
-  border-radius: var(--r-surface);
-  border: 1px solid var(--line);
-}
-
-.band figcaption {
-  margin-top: 16px;
-  font-size: 13.5px;
-  color: var(--faint);
-  max-width: 62ch;
-}
-
-.band-statement {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px 56px;
-  margin-top: 52px;
-}
-
-.band-statement p {
-  color: var(--muted);
-  max-width: 50ch;
-}
-
-.band-statement strong {
-  color: var(--text);
-  font-weight: 620;
-}
-
 /* --- family 3: asymmetric bento (5 cells, 3 x 3, no gaps) --- */
 
 .bento {
@@ -1335,11 +1292,6 @@ html.reveal-fallback [data-reveal] {
     padding-top: 84px;
   }
 
-  .band {
-    padding-top: 76px;
-  }
-
-  .band-statement,
   .statement-grid,
   .specs-grid,
   .bento,
