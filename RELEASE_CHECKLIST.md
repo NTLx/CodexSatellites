@@ -212,9 +212,9 @@ Observed 2026-09-10 (ad-hoc, built-in display, Small + Medium, builds 27 and 28)
 - `PASS` — a click in that margin band launched `CodexSatellites`; the 0.3.0 build with no intent did the same from a centre click, so the app-launch band is the platform's default widget tap, not a regression.
 - `NOT TESTED` — Light appearance, other display configurations, Developer ID builds.
 
-App Group transport (Developer ID builds only):
+App Group transport (implemented but inactive in the current source):
 
-- [ ] `BLOCKED` — ad-hoc signing has no authorized App Group identity or provisioning. Re-test after switching `WidgetSnapshotStore.activeTransport` to `.appGroup` on a provisioned build.
+- [ ] `BLOCKED` — `WidgetSnapshotStore.activeTransport` is currently fixed to `.widgetContainer`. Developer ID signing does not switch the transport. Re-test App Group only after source code explicitly selects `.appGroup` and the build is provisioned for the App Group.
 
 Widget upgrade (build N → N+1):
 
@@ -245,6 +245,9 @@ Known limitation (non-blocking): macOS does not guarantee hot replacement of an 
 - [ ] Source tree is final.
 - [ ] Version `0.3.1`; app and widget `CFBundleVersion` match the release build number.
 - [ ] `ReleaseNotes/v0.3.1.md` accurate.
+- [ ] README and website describe the runtime transport exactly as implemented; they do not claim Developer ID signing automatically activates App Group transport.
+- [ ] README and website keep Full-screen Space behavior marked unvalidated unless it was actually tested.
+- [ ] Preview artifacts from `./script/release.sh preview` are treated as local-validation artifacts; formal publication uses the signed/notarized `./script/release.sh all` output.
 - [ ] MIT License present.
 - [ ] Final DMG + `SHA256SUMS` ready.
 - [ ] Owner approves publication.

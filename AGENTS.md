@@ -21,11 +21,13 @@ Current Settings Bar controls:
 
 ## Source of truth
 
-Use this priority order:
+Production code is the sole source of truth for implemented runtime behavior. Automated tests are evidence of that behavior; `script/release.sh` is the source of truth for the release workflow. Documentation must describe those sources as they exist now and must not present planned, manual, or future states as implemented behavior.
+
+When documents disagree, resolve them in this order:
 
 1. production code;
 2. automated tests;
-3. `script/release.sh`;
+3. `script/release.sh` for release workflow;
 4. this file;
 5. `RELEASE_CHECKLIST.md`;
 6. `README.md`.
@@ -46,7 +48,7 @@ Do not add without explicit owner request:
 - Claude/Gemini/OpenRouter support;
 - OAuth/device-code login;
 - automatic updater;
-- analytics/telemetry;
+- analytics, remote telemetry, or usage tracking;
 - cloud sync.
 
 ## Authentication invariant
@@ -192,10 +194,10 @@ The app embeds one WidgetKit extension (`CodexSatellitesWidget`, bundle ID `io.g
 Data flow is one-way:
 
 - the app is the only writer of quota state; the widget is a read-only presentation layer;
-- sharing is implemented in `Shared/WidgetQuotaSnapshot.swift` with an explicit `WidgetSnapshotTransport`; `activeTransport` is `widgetContainer` for ad-hoc/preview builds and switches to `appGroup` once a Developer ID build provisions the App Group;
-- on macOS 15+ App Group containers are protected and membership must be authorized by the code-signing/provisioning model; an ad-hoc build has neither a provisioning profile authorizing the registered `group.*` App Group nor a Developer Team ID for a team-prefixed macOS group, so the widget's group-container read is denied by TCC (`kTCCServiceSystemPolicyAppData`);
-- for ad-hoc builds the non-sandboxed app writes `~/Library/Containers/io.github.ntlx.codexsatellites.widget/Data/Documents/quota-snapshot.json` and the widget reads its own container; this is a development compatibility workaround, not the production sharing architecture;
-- `activeTransport` is the single source of truth: `.widgetContainer` resolves, reads, and deletes only the widget's own container and must never touch the App Group; only a provisioned `.appGroup` build may fall back to `.widgetContainer` for legacy migration;
+- sharing is implemented in `Shared/WidgetQuotaSnapshot.swift` with an explicit `WidgetSnapshotTransport`; the current source fixes `WidgetSnapshotStore.activeTransport` to `.widgetContainer` for every build — Developer ID signing does not switch it automatically;
+- on macOS 15+ App Group containers are protected and membership must be authorized by the code-signing/provisioning model; an ad-hoc build has neither a provisioning profile authorizing the registered `group.*` App Group nor a Developer Team ID for a team-prefixed macOS group, so a widget App Group read would be denied by TCC (`kTCCServiceSystemPolicyAppData`);
+- with the current `.widgetContainer` transport, the non-sandboxed app writes `~/Library/Containers/io.github.ntlx.codexsatellites.widget/Data/Documents/quota-snapshot.json` and the widget reads its own container; this is the active runtime path in the current source;
+- `activeTransport` is the single source of truth: `.widgetContainer` resolves, reads, and deletes only the widget's own container and must never touch the App Group; the implemented `.appGroup` path may fall back to `.widgetContainer` for legacy migration only if source code explicitly selects `.appGroup` in the future;
 - the snapshot payload is a rolling-upgrade IPC contract: after an app update an older widget build may still be reading while the newer app writes, so new fields stay optional and existing fields are never removed, retyped, or repurposed; bump `WidgetQuotaSnapshot.currentSchemaVersion` only for a breaking change;
 - macOS may keep an already-running widget extension process on the previous binary after the app is replaced in place; no public WidgetKit API can force a reload. Treat this as a known platform limitation — do not add `killall chronod`, `pluginkit`, or `lsregister` workarounds to product code;
 - snapshot reads/writes log `operation`/`transport`/`result` only — never quota values, tokens, or paths;
@@ -225,7 +227,7 @@ Signing/entitlements:
 - the widget extension is sandboxed (`com.apple.security.app-sandbox`); macOS rejects unsandboxed extensions in PlugInKit;
 - the containing app stays non-sandboxed because it must read `~/.codex/auth.json`; this asymmetry is intended;
 - both targets carry the App Group entitlement; `script/build_and_run.sh` and `script/release.sh preview` ad-hoc sign the appex first (own identifier + entitlements) and the app second — do not collapse this into `--deep`;
-- formal Developer ID signing requires the App Group to be registered in the developer account; local ad-hoc signing does not;
+- both targets carry the App Group entitlement, but signing state does not select the runtime transport: the current source remains `.widgetContainer` even in a Developer ID build; using `.appGroup` requires an explicit source change plus provisioning and validation;
 - every installable DMG must carry a new `CFBundleVersion`; the app and appex share one build number, and `script/release.sh` derives it from the git commit count and verifies it on both bundles;
 - `script/release.sh preview` must never launch the app from the mounted image — that registers a widget-extension path that disappears on detach; install to `/Applications` before launching.
 
@@ -332,7 +334,7 @@ Reference measurements (built-in display): hover enter → first frame change �
 The widget extension is a separate process; the widget gallery is not scriptable.
 
 - registration: `pluginkit -m -p com.apple.widgetkit-extension -v | grep codex` after launching the app;
-- shared data (ad-hoc): the app writes `~/Library/Containers/io.github.ntlx.codexsatellites.widget/Data/Documents/quota-snapshot.json`; a Developer ID build uses the App Group container;
+- shared data (current source): the app writes `~/Library/Containers/io.github.ntlx.codexsatellites.widget/Data/Documents/quota-snapshot.json` and the widget reads that container for all builds; do not claim that Developer ID signing changes the transport unless `activeTransport` is actually changed and validated;
 - logs: `log show --info --predicate 'subsystem == "io.github.ntlx.codexsatellites.widget"'` must show only `transport=widgetContainer` for ad-hoc builds, with no App Group load and no `kTCCServiceSystemPolicyAppData` denial;
 - layout: render the real views offscreen with `ImageRenderer` at `.systemSmall` 158×158 and `.systemMedium` 338×158, including ~16pt content margins;
 - if PlugInKit rejects the appex, `log show --predicate 'process == "pkd"'` reports `plug-ins must be sandboxed`;

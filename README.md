@@ -25,7 +25,7 @@ CodexSatellites ships a WidgetKit widget in two sizes:
 
 Add it from the desktop: right-click the desktop → **Edit Widgets…** → **CodexSatellites**. macOS does not allow an app to place a widget for you.
 
-The widget is a read-only presentation layer. The app remains the only component that reads Codex authentication and requests usage; it publishes a small snapshot that the widget reads. The `1m` / `5m` / `15m` setting controls quota polling by the app, not widget rendering. The widget performs no scheduled background refresh and reads the latest snapshot whenever WidgetKit requests a new timeline. WidgetKit decides when a widget timeline is requested. The widget works on any Mac — including Mac mini, Mac Studio, and external displays — even though the notch satellites require a built-in notched display.
+The widget is a read-only presentation layer. The app remains the only component that reads Codex authentication and requests usage; it publishes a small snapshot that the widget reads. The `1m` / `5m` / `15m` setting controls quota polling by the app, not widget rendering. The widget performs no scheduled background refresh and reads the latest snapshot whenever WidgetKit requests a new timeline. WidgetKit decides when a widget timeline is requested. The widget can be used on Macs without a hardware notch, including Mac mini and Mac Studio, while the notch satellites require a usable built-in notched display. On a Mac where no notch satellites are created, the satellite Settings Bar is also unavailable: the current app has no alternate Settings window or menu bar item.
 
 Clicking the widget's content area reloads the latest snapshot the app has cached — useful after the app has polled, before macOS asks for a new widget timeline. The click never fetches from OpenAI, never starts or activates the app, and never writes the snapshot: it only asks WidgetKit for a fresh timeline, which re-reads the cache. The system content margin around the content (roughly the outer 24pt of a Small widget) is not part of that click area; tapping there uses the system's default widget tap, which opens CodexSatellites — the same thing a tap anywhere on the widget did before. If the app has never run and no snapshot exists, the widget keeps showing `—`.
 
@@ -77,12 +77,12 @@ The outside-Mac-App-Store release workflow uses Developer ID signing, Hardened R
 ./script/release.sh all
 ```
 
-The release script reads signing and notarization identity from the local environment and Keychain. It never stores credentials in the repository. Generated artifacts and release evidence live under the ignored `dist/` directory.
+The release script reads signing and notarization identity from the local environment and Keychain. It never stores credentials in the repository. Generated artifacts and release evidence live under the ignored `dist/` directory. `./script/release.sh preview` produces an ad-hoc signed, unnotarized artifact for local validation only; the formal distribution path is `./script/release.sh all`.
 
 ## Known limitations
 
 - Codex usage currently depends on an undocumented ChatGPT usage endpoint.
-- Full-screen Space behavior is a v0.1 compatibility limitation unless explicitly validated.
+- Full-screen Space behavior has not been explicitly validated and should be treated as a known limitation.
 - The app assumes an existing local Codex login and does not manage authentication.
 - Notifications require a signed build and the app to be running.
 - Notifications are English-only and have no in-app toggle — use macOS System Settings → Notifications.

@@ -91,7 +91,7 @@
           <a
             class="btn btn-primary btn-sm"
             href="https://github.com/NTLx/CodexSatellites/releases"
-            >Download</a
+            >Releases</a
           >
         </nav>
       </div>
@@ -110,7 +110,7 @@
             <a
               class="btn btn-primary"
               href="https://github.com/NTLx/CodexSatellites/releases"
-              >Download</a
+              >Releases</a
             ><a class="text-link" href="#satellites"
               >Try the satellites <span aria-hidden="true">↗</span></a
             >
@@ -260,7 +260,9 @@
           </p>
           <p class="muted">
             Click the widget’s content to show the app’s latest cached reading.
-            Clicking its outer margin opens the app.
+            Clicking its outer margin opens the app. On a Mac without usable
+            notch satellites, the widget still works while the app runs, but
+            there is no alternate in-app Settings window or menu bar item.
           </p>
         </div>
         <figure class="widget-art" data-reveal>
@@ -337,8 +339,8 @@
           <div>
             <h3>No extra audience</h3>
             <p>
-              No analytics, telemetry, or cloud sync. The widget reads the app’s
-              local cache and never contacts OpenAI itself.
+              No analytics, remote telemetry, usage tracking, or cloud sync. The
+              widget reads the app’s local cache and never contacts OpenAI itself.
             </p>
           </div>
         </div>
@@ -355,7 +357,7 @@
           <a
             class="btn btn-primary"
             href="https://github.com/NTLx/CodexSatellites/releases"
-            >Download</a
+            >Releases</a
           >
         </div>
         <div class="install-content" data-reveal>
@@ -363,23 +365,23 @@
             <h3>Before you install</h3>
             <p>
               macOS 15 or later and an existing local Codex sign-in. Satellites
-              need a notched MacBook; the widget also works on Macs without a
-              notch.
+              need a usable built-in MacBook notch; the widget also works on Macs
+              without one, but the satellite Settings Bar is unavailable there.
             </p>
           </div>
           <ol class="install-steps">
-            <li>Download the DMG from GitHub Releases.</li>
+            <li>Use a signed and notarized DMG from GitHub Releases when a formal release is available.</li>
             <li>Drag CodexSatellites into Applications, then launch it.</li>
             <li>
               Add the widget from the macOS widget gallery if you want it.
             </li>
           </ol>
           <aside>
-            <strong>Preview distribution</strong>
+            <strong>Preview builds</strong>
             <p>
-              Published builds are ad-hoc signed and not notarized. If macOS
-              blocks opening, review the app in System Settings → Privacy &amp;
-              Security → Open Anyway.
+              The preview artifact produced by the release script is ad-hoc
+              signed, not notarized, and intended for local validation only.
+              Formal distribution uses Developer ID signing and notarization.
             </p>
           </aside>
           <p class="license-note">Free and open source. MIT licensed.</p>
@@ -402,7 +404,7 @@
             >Release notes</a
           >
           <a href="https://github.com/NTLx/CodexSatellites/blob/main/LICENSE"
-            >Licence</a
+            >License</a
           >
         </nav>
         <p class="footer-note">

@@ -13,6 +13,14 @@ Prefer system-provided glass and adaptive materials over bespoke blur, opaque
 backgrounds, or custom toolbar/sidebar skins. Audit existing UI for extra fills,
 scrims, and clipping before adding more effects.
 
+Compatibility comes first. Before using any API in this reference, compare it
+with the project's actual deployment target. Never raise the deployment target
+or introduce unavailable APIs as incidental design cleanup. In CodexSatellites,
+the project settings and `AGENTS.md` require macOS 15+, so those constraints
+override examples in this skill; use only APIs valid for that target unless an
+explicitly requested change includes availability guards and a compatible
+fallback.
+
 ## Workflow
 
 1. Read the relevant scene or root view and identify the structural pattern:
