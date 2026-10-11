@@ -13,6 +13,7 @@ struct SmallCodexWidgetView: View {
                 Spacer(minLength: 8)
                 WidgetStaleLabel(freshness: snapshot?.freshness)
             }
+            .padding(.trailing, 32)
 
             Spacer(minLength: 8)
 

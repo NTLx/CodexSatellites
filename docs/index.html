@@ -6,7 +6,7 @@
     <title>CodexSatellites: Codex quota beside the MacBook notch</title>
     <meta
       name="description"
-      content="A native macOS ambient HUD for notched MacBooks. Codex 5-hour and weekly remaining quota sits beside the hardware notch, with a WidgetKit widget for the desktop and Notification Center. Free and open source. Uses your existing Codex sign-in."
+      content="A native macOS ambient HUD for Codex quota, with notch satellites and an interactive WidgetKit widget that includes Launch at Login, refresh frequency, reset count, and Quit controls."
     />
     <link rel="canonical" href="https://ntlx.github.io/CodexSatellites/" />
     <meta name="theme-color" content="#f4f5f7" />
@@ -20,7 +20,7 @@
     />
     <meta
       property="og:description"
-      content="Codex 5-hour and weekly remaining quota beside the hardware notch, plus a WidgetKit widget. Free and open source."
+      content="Codex quota beside the MacBook notch, plus an interactive WidgetKit widget with built-in settings. Free and open source."
     />
     <meta property="og:url" content="https://ntlx.github.io/CodexSatellites/" />
     <meta
@@ -36,7 +36,7 @@
     />
     <meta
       name="twitter:description"
-      content="Codex 5-hour and weekly remaining quota beside the hardware notch, plus a WidgetKit widget."
+      content="Codex quota beside the MacBook notch, plus an interactive WidgetKit widget with built-in settings."
     />
     <meta
       name="twitter:image"
@@ -60,7 +60,8 @@
         "name": "CodexSatellites",
         "applicationCategory": "UtilitiesApplication",
         "operatingSystem": "macOS 15 or later",
-        "description": "A native macOS ambient HUD for notched MacBooks that shows Codex 5-hour and weekly remaining quota beside the hardware notch, with a WidgetKit widget for the desktop and Notification Center.",
+        "description": "A native macOS ambient HUD that shows Codex quota beside the MacBook notch and in an interactive WidgetKit widget with built-in settings.",
+        "softwareVersion": "0.4.0",
         "url": "https://ntlx.github.io/CodexSatellites/",
         "downloadUrl": "https://github.com/NTLx/CodexSatellites/releases",
         "license": "https://github.com/NTLx/CodexSatellites/blob/main/LICENSE",
@@ -256,13 +257,16 @@
           <h2>At home on<br />your desktop, too.</h2>
           <p>
             Keep both quotas on your desktop or in Notification Center. Choose
-            Small for a glance, Medium for reset times too.
+            Small for a glance, Medium for reset times too. A gear flips either
+            size into the same four settings available beside the notch.
           </p>
           <p class="muted">
-            Click the widget’s content to show the app’s latest cached reading.
-            Clicking its outer margin opens the app. On a Mac without usable
-            notch satellites, the widget still works while the app runs, but
-            there is no alternate in-app Settings window or menu bar item.
+            Click non-gear quota content to re-read the app’s latest cached
+            snapshot; that action never contacts OpenAI or launches the app.
+            The settings face provides Launch at Login, refresh frequency,
+            read-only reset count, and Quit. On a Mac without usable notch
+            satellites, those settings remain reachable through the widget;
+            there is still no conventional Settings window or menu bar item.
           </p>
         </div>
         <figure class="widget-art" data-reveal>
@@ -279,6 +283,7 @@
           >
             <div class="widget-sample small">
               <strong>Codex</strong>
+              <span class="widget-gear" aria-hidden="true">⚙︎</span>
               <div class="metrics">
                 <div>
                   <span class="ring" style="--quota: 62%">62%</span
@@ -292,6 +297,7 @@
             </div>
             <div class="widget-sample medium">
               <strong>Codex</strong>
+              <span class="widget-gear" aria-hidden="true">⚙︎</span>
               <div class="metrics">
                 <div>
                   <span class="ring" style="--quota: 62%">62%</span
@@ -304,7 +310,7 @@
               </div>
             </div>
           </div>
-          <figcaption>Small + Medium · Simulated layouts and values</figcaption>
+          <figcaption>Small + Medium · Quota face shown; gear opens settings</figcaption>
         </figure>
       </section>
       <section class="section wrap reliability" data-reveal>
@@ -366,11 +372,11 @@
             <p>
               macOS 15 or later and an existing local Codex sign-in. Satellites
               need a usable built-in MacBook notch; the widget also works on Macs
-              without one, but the satellite Settings Bar is unavailable there.
+              without one and provides its own settings face there.
             </p>
           </div>
           <ol class="install-steps">
-            <li>Use a signed and notarized DMG from GitHub Releases when a formal release is available.</li>
+            <li>Download the v0.4.0 DMG from GitHub Releases.</li>
             <li>Drag CodexSatellites into Applications, then launch it.</li>
             <li>
               Add the widget from the macOS widget gallery if you want it.

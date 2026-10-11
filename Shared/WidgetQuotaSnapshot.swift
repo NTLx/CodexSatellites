@@ -7,7 +7,7 @@ enum WidgetSnapshotFreshness: String, Codable, Sendable {
 }
 
 /// Codable projection of the app's quota state shared with the widget extension.
-/// The main app is the only writer; the widget is a read-only presentation layer.
+/// The main app is the only writer; the widget is a read-only consumer of this quota payload.
 ///
 /// This payload is a rolling-upgrade IPC contract: after an app update, an older
 /// widget build may still be reading while the newer app writes. New fields must

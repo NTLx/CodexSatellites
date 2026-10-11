@@ -25,16 +25,19 @@ CodexSatellites ships a WidgetKit widget in two sizes:
 
 Add it from the desktop: right-click the desktop → **Edit Widgets…** → **CodexSatellites**. macOS does not allow an app to place a widget for you.
 
-The widget is a read-only presentation layer. The app remains the only component that reads Codex authentication and requests usage; it publishes a small snapshot that the widget reads. The `1m` / `5m` / `15m` setting controls quota polling by the app, not widget rendering. The widget performs no scheduled background refresh and reads the latest snapshot whenever WidgetKit requests a new timeline. WidgetKit decides when a widget timeline is requested. The widget can be used on Macs without a hardware notch, including Mac mini and Mac Studio, while the notch satellites require a usable built-in notched display. On a Mac where no notch satellites are created, the satellite Settings Bar is also unavailable: the current app has no alternate Settings window or menu bar item.
+The app remains the only component that reads Codex authentication and requests usage. It publishes separate quota and settings snapshots for the widget; the widget stores only its local quota/settings face selection. The `1m` / `5m` / `15m` setting controls quota polling by the app, not widget rendering. The widget performs no scheduled background refresh and its timeline policy remains `.never`.
 
-Clicking the widget's content area reloads the latest snapshot the app has cached — useful after the app has polled, before macOS asks for a new widget timeline. The click never fetches from OpenAI, never starts or activates the app, and never writes the snapshot: it only asks WidgetKit for a fresh timeline, which re-reads the cache. The system content margin around the content (roughly the outer 24pt of a Small widget) is not part of that click area; tapping there uses the system's default widget tap, which opens CodexSatellites — the same thing a tap anywhere on the widget did before. If the app has never run and no snapshot exists, the widget keeps showing `—`.
+Each Small and Medium widget has a gear control that flips between the quota face and a compact settings face. The settings face exposes the same four controls as the notch Settings Bar: Launch at Login, quota check frequency, read-only available reset count, and Quit. Launch/frequency/Quit actions route back to the app's existing behavior instead of duplicating settings logic in the extension. Macs without a hardware notch can therefore manage these settings from the widget even though CodexSatellites still has no conventional Settings window or menu bar item.
+
+Clicking the non-gear quota content reloads the latest snapshot the app has cached — useful after the app has polled, before macOS asks for a new widget timeline. That reload never fetches from OpenAI, never starts or activates the app, and never writes the snapshot: it only asks WidgetKit for a fresh timeline, which re-reads the cache. The system content margin around the content (roughly the outer 24pt of a Small widget) is not part of that click area; tapping there uses the system's default widget tap, which opens CodexSatellites. If the app has never run and no snapshot exists, the widget keeps showing `—`.
 
 ## Interaction
 
 - Hover → both satellites expand and show remaining percentages.
 - Click either satellite → a compact icon-only Settings Bar appears.
-- Click the widget's content area → reloads the latest quota snapshot the app cached, with no network request and no app launch.
-- Settings Bar → icon-only Launch at Login, refresh frequency, available reset count, and Quit controls.
+- Click the widget's non-gear quota content → reloads the latest quota snapshot the app cached, with no network request and no app launch.
+- Click the widget gear → flips between quota and settings faces; Reduce Motion uses a non-3D fallback.
+- Widget settings face and notch Settings Bar → Launch at Login, refresh frequency, read-only available reset count, and Quit controls.
 - Quota check interval → `1m`, `5m`, or `15m`.
 - Notifications → native macOS alerts when a quota window resets to 100%, crosses below 10%, or the available reset count changes.
 
@@ -87,7 +90,8 @@ The release script reads signing and notarization identity from the local enviro
 - Notifications require a signed build and the app to be running.
 - Notifications are English-only and have no in-app toggle — use macOS System Settings → Notifications.
 - The widget requires a code-signed build to be registered by macOS; both `./script/build_and_run.sh` and `./script/release.sh preview` ad-hoc sign locally, so the widget can be tested without a Developer ID.
-- The widget extension is sandboxed (a macOS requirement) and reads only the snapshot the app publishes; it never reads Codex auth or calls the usage endpoint.
+- The widget extension is sandboxed (a macOS requirement) and never reads Codex auth or calls the usage endpoint. App-owned quota/settings snapshots stay separate from widget-local presentation state.
+- Widget face state is stored per family, so multiple Small widgets share one face selection and multiple Medium widgets share one face selection.
 - On macOS, an already-running widget extension may keep using the previous widget code after CodexSatellites is updated, even though the installed app and widget extension report a newer build number. This was observed during local ad-hoc upgrade testing: widget data kept refreshing, but presentation changes did not appear until macOS recycled the widget extension process. There is no public API that guarantees recycling; restarting the WidgetKit host or logging out may create a fresh process. Developer ID upgrade behaviour remains to be verified.
 
 ## License

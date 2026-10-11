@@ -10,9 +10,9 @@ It shows:
 - right satellite → Codex weekly remaining quota;
 - hover → remaining percentages;
 - click → compact icon-only Settings Bar;
-- WidgetKit widget (Small/Medium) → the same two quotas on the desktop and in Notification Center.
+- WidgetKit widget (Small/Medium) → quota face plus an interactive settings face on the desktop and in Notification Center.
 
-Current Settings Bar controls:
+Current Settings Bar / widget settings controls:
 
 1. Launch at Login;
 2. quota check frequency (`1m → 5m → 15m → 1m`);
@@ -191,36 +191,41 @@ Reset count displays `—` when not fresh.
 
 The app embeds one WidgetKit extension (`CodexSatellitesWidget`, bundle ID `io.github.ntlx.codexsatellites.widget`) exposing `.systemSmall` and `.systemMedium`.
 
-Data flow is one-way:
+State flow is deliberately split:
 
-- the app is the only writer of quota state; the widget is a read-only presentation layer;
-- sharing is implemented in `Shared/WidgetQuotaSnapshot.swift` with an explicit `WidgetSnapshotTransport`; the current source fixes `WidgetSnapshotStore.activeTransport` to `.widgetContainer` for every build — Developer ID signing does not switch it automatically;
+- the app is the only writer of quota and app-settings state; the widget only reads those two app-owned snapshots;
+- quota sharing is implemented in `Shared/WidgetQuotaSnapshot.swift`; settings sharing is implemented independently in `Shared/WidgetSettingsSnapshot.swift` as `settings-snapshot.json`;
+- both snapshot stores use the explicit `WidgetSnapshotTransport`; the current source fixes the active transport to `.widgetContainer` for every build — Developer ID signing does not switch it automatically;
 - on macOS 15+ App Group containers are protected and membership must be authorized by the code-signing/provisioning model; an ad-hoc build has neither a provisioning profile authorizing the registered `group.*` App Group nor a Developer Team ID for a team-prefixed macOS group, so a widget App Group read would be denied by TCC (`kTCCServiceSystemPolicyAppData`);
-- with the current `.widgetContainer` transport, the non-sandboxed app writes `~/Library/Containers/io.github.ntlx.codexsatellites.widget/Data/Documents/quota-snapshot.json` and the widget reads its own container; this is the active runtime path in the current source;
-- `activeTransport` is the single source of truth: `.widgetContainer` resolves, reads, and deletes only the widget's own container and must never touch the App Group; the implemented `.appGroup` path may fall back to `.widgetContainer` for legacy migration only if source code explicitly selects `.appGroup` in the future;
-- the snapshot payload is a rolling-upgrade IPC contract: after an app update an older widget build may still be reading while the newer app writes, so new fields stay optional and existing fields are never removed, retyped, or repurposed; bump `WidgetQuotaSnapshot.currentSchemaVersion` only for a breaking change;
+- with the current `.widgetContainer` transport, the non-sandboxed app writes both snapshot files into the widget extension's Documents container and the sandboxed widget reads them there;
+- `activeTransport` is the single source of truth: `.widgetContainer` must never touch the App Group; the implemented `.appGroup` path may fall back to `.widgetContainer` for legacy migration only if source code explicitly selects `.appGroup` in the future;
+- quota/settings snapshot payloads are rolling-upgrade IPC contracts: new fields stay optional and existing fields are never removed, retyped, or repurposed without a schema-version change;
+- the app publishes settings state at controller start, after quota refresh success/failure, and after Launch/frequency/review-login-items actions; reset count is included only while quota state is fresh;
+- the widget may write only its own presentation state (`quota` or `settings`) through `WidgetPresentationStore`; Small and Medium are stored independently, so multiple instances of the same family share one face selection;
 - macOS may keep an already-running widget extension process on the previous binary after the app is replaced in place; no public WidgetKit API can force a reload. Treat this as a known platform limitation — do not add `killall chronod`, `pluginkit`, or `lsregister` workarounds to product code;
-- snapshot reads/writes log `operation`/`transport`/`result` only — never quota values, tokens, or paths;
+- snapshot reads/writes log operation/transport/result only — never quota values, tokens, or paths;
 - app polling frequency and WidgetKit rendering are deliberately decoupled;
-- the app writes the latest `WidgetQuotaSnapshot` after every quota fetch, including a `stale` snapshot when a failed fetch retains last-good data;
+- the app writes the latest `WidgetQuotaSnapshot` after every quota fetch, including a stale snapshot when a failed fetch retains last-good data;
 - the widget has no scheduled refresh and its timeline policy is `.never`;
-- normal quota changes and snapshot clearing do not call `WidgetCenter.reloadTimelines`;
-- the widget never polls Codex directly; WidgetKit is the sole owner of when the next widget timeline is requested;
-- do not implement visibility/`onAppear`-based refresh hacks, timers, background tasks, push refresh, or private lifecycle workarounds;
-- the widget must never read Codex auth, call the usage endpoint, or perform OAuth.
+- normal quota/settings publication does not call `WidgetCenter.reloadTimelines`;
+- the widget never polls Codex directly; do not add visibility/`onAppear` refresh hacks, timers, background tasks, push refresh, private lifecycle workarounds, auth access, OAuth, or usage-endpoint calls.
 
-The widget has exactly one interaction, and it is the only widget-driven reload:
+Widget interactions:
 
-- clicking anywhere in the widget's content area runs `RefreshCachedQuotaIntent` (`CodexSatellitesWidget/RefreshCachedQuotaIntent.swift`), whose `perform()` deliberately does nothing: no network request, no Codex auth read, no app launch, no snapshot write, no `WidgetCenter.reloadTimelines`;
-- the reload comes from WidgetKit itself: "interactions with a toggle or button always guarantee a timeline reload", and the reload re-runs `CodexWidgetProvider.getTimeline`, which re-reads the app's cached snapshot — so a click shows data the app cached, it never fetches from OpenAI;
-- this exists because a widget whose timeline policy is `.never` has no other guaranteed way to pick up a snapshot the app cached after that widget was last rendered; it is the reason the widget can stay `.never` and needs no scheduled refresh;
-- the whole content area of both families is the interactive surface: `Button(intent:)` + `.buttonStyle(.plain)` + `.frame(maxWidth: .infinity, maxHeight: .infinity)` + `.contentShape(Rectangle())` in `CodexWidgetView`; the button stays a presentation-free wrapper;
-- add no refresh affordance: no icon, spinner, label, timestamp, toast, or pressed overlay;
-- the reload surface is the content area, not the widget's full face: on a 180pt Small widget the hit boundary sits about 24pt in from the visual edge (measured 2026-09-10), so the content margin is a band the intent does not cover; a tap there falls through to the platform's default widget tap, which opens the containing app — the same behaviour a tap anywhere on the widget had before this intent existed. Document it as a platform default, do not claim the whole widget reloads, and do not hide the app-launch band behind hand-rolled padding;
-- do not add `widgetURL`: it would compete with the full-area button for the same interaction;
-- the intent keeps `isDiscoverable = false`, must not set `openAppWhenRun`, and carries an English accessibility label and hint, because the visible widget text is not a meaningful VoiceOver label for the action;
-- with no snapshot on disk a click keeps rendering `—`; the intent must never create a snapshot or start the app to work around a missing cache;
-- the intent logs `operation`/`result` only — never quota values or tokens.
+- the quota face keeps `RefreshCachedQuotaIntent` as a full-content background action and adds a sibling top-right gear button; never nest interactive buttons;
+- `RefreshCachedQuotaIntent.perform()` deliberately does nothing: no network request, Codex auth read, app launch, snapshot write, or `WidgetCenter.reloadTimelines`; WidgetKit's guaranteed post-interaction reload re-runs the provider and re-reads the app cache;
+- the gear uses `SetWidgetFaceIntent` to change only widget-local presentation state; it must not launch the app, access auth, or perform network work;
+- quota ↔ settings uses the Y-axis flip transition in `CodexWidgetView` (~0.35 s); Reduce Motion falls back to opacity;
+- the settings face exposes Launch at Login, refresh frequency, read-only available reset count, and Quit, plus the gear/back control;
+- `WidgetSettingsActionIntent` is non-discoverable and uses `openAppWhenRun = true` for the macOS 15 main-app execution path; it routes through `WidgetSettingsActionRouter.shared` into `QuotaOverlayController.handleWidgetSettingsAction(_:)` so Launch/frequency/review/Quit behavior has one implementation;
+- the router holds cold-launch actions until the app installs its controller-backed handler; do not replace this with polling, file watchers, or duplicate widget-side behavior;
+- Launch state mirrors `SMAppService.mainApp`: enabled/disabled toggle, `requiresApproval` opens Login Items, unavailable is noninteractive;
+- frequency cycles exactly `1m → 5m → 15m → 1m`; changing it replaces the existing refresh loop without an immediate quota fetch;
+- reset count has no button/action and shows `—` unless the app-published quota state is fresh; `0` remains valid;
+- Quit terminates the current app and must not unregister Launch at Login;
+- the quota reload surface is the content area, not the widget's full face: the system content-margin band may retain WidgetKit's default app-launch behavior; do not add `widgetURL` or hand-built padding to suppress it;
+- all widget strings remain English-only; every actionable control has an explicit English accessibility label/hint and reset count exposes label + value;
+- with no quota snapshot on disk, quota reload keeps rendering `—`; never create a fake snapshot or start the app to work around a missing cache.
 
 Signing/entitlements:
 
@@ -270,13 +275,14 @@ Rules:
 
 ## Persistence invariant
 
-`UserDefaults` is allowed only for quota refresh frequency.
+In the main app, `UserDefaults` is allowed only for quota refresh frequency. In the widget extension, it is also allowed for the local Small/Medium face selection.
 
-Do not use it for:
+Do not use `UserDefaults` for:
 
 - Launch at Login;
 - auth;
 - quota snapshots;
+- settings snapshots;
 - reset credits.
 
 ## Dependencies
@@ -297,7 +303,7 @@ Current release identity:
 - Hardened Runtime: ON
 - widget extension bundle ID: `io.github.ntlx.codexsatellites.widget`
 - App Group: `group.io.github.ntlx.codexsatellites`
-- GitHub Release titles use the version tag directly, such as `v0.3.0`; do not prefix the product name.
+- GitHub Release titles use the version tag directly, such as `v0.4.0`; do not prefix the product name.
 
 Do not change release identity casually.
 

@@ -554,6 +554,7 @@ body.demo-open .demo-bar {
   padding: 32px 24px 66px;
 }
 .widget-sample {
+  position: relative;
   background: #33373de8;
   border: 1px solid #ffffff24;
   border-radius: 22px;
@@ -566,6 +567,21 @@ body.demo-open .demo-bar {
   font-size: 12px;
   line-height: 1.2;
   color: #c5cbd4;
+}
+.widget-gear {
+  position: absolute;
+  top: 13px;
+  right: 13px;
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #ffffff1f;
+  border-radius: 50%;
+  background: #ffffff14;
+  color: #eef0f3;
+  font-size: 13px;
+  line-height: 1;
 }
 .small {
   width: 170px;

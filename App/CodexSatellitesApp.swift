@@ -19,11 +19,16 @@ final class CodexSatellitesApp: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         logger.info("application launched")
         NSApp.setActivationPolicy(.accessory)
-        overlayController = QuotaOverlayController()
-        overlayController?.start()
+        let controller = QuotaOverlayController()
+        overlayController = controller
+        controller.start()
+        WidgetSettingsActionRouter.shared.install { [weak controller] action in
+            controller?.handleWidgetSettingsAction(action)
+        }
     }
 
     func applicationWillTerminate(_ notification: Notification) {
+        WidgetSettingsActionRouter.shared.reset()
         overlayController?.stop()
         overlayController = nil
     }

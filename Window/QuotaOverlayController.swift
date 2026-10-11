@@ -103,6 +103,7 @@ final class QuotaOverlayController {
         updateGeometry()
         updateHoverState(at: NSEvent.mouseLocation)
         Task { await notifier.requestAuthorizationIfNeeded() }
+        publishWidgetSettingsSnapshot()
         startRefreshLoop(immediately: true)
     }
 
@@ -462,6 +463,20 @@ final class QuotaOverlayController {
         }
     }
 
+    func handleWidgetSettingsAction(_ action: WidgetSettingsAction) {
+        logger.info("widget settings action=\(action.rawValue, privacy: .public)")
+        switch action {
+        case .toggleLaunchAtLogin:
+            setLaunchAtLogin(launchAtLoginService.state() != .enabled)
+        case .advanceRefreshInterval:
+            advanceRefreshInterval()
+        case .reviewLoginItems:
+            reviewLoginItems()
+        case .quit:
+            quit()
+        }
+    }
+
     private func setLaunchAtLogin(_ enabled: Bool) {
         do {
             try launchAtLoginService.setEnabled(enabled)
@@ -469,12 +484,14 @@ final class QuotaOverlayController {
             logger.error("login item update failed error=\(String(describing: error), privacy: .public)")
         }
         render()
+        publishWidgetSettingsSnapshot()
         scheduleSettingsAutoHide()
     }
 
     private func reviewLoginItems() {
         hideSettingsBar(animated: true)
         SMAppService.openSystemSettingsLoginItems()
+        publishWidgetSettingsSnapshot()
     }
 
     private func advanceRefreshInterval() {
@@ -483,6 +500,7 @@ final class QuotaOverlayController {
         refreshInterval = nextInterval
         startRefreshLoop(immediately: false)
         render()
+        publishWidgetSettingsSnapshot()
         scheduleSettingsAutoHide()
     }
 
@@ -611,6 +629,35 @@ final class QuotaOverlayController {
         WidgetSnapshotStore.clear()
     }
 
+    static func widgetResetCount(for freshness: SnapshotFreshness) -> Int? {
+        guard case let .fresh(snapshot) = freshness else { return nil }
+        return snapshot.availableResetCount
+    }
+
+    private func publishWidgetSettingsSnapshot() {
+        let resetCount = Self.widgetResetCount(for: state.freshness)
+
+        let launchState: WidgetLaunchAtLoginState
+        switch launchAtLoginService.state() {
+        case .enabled:
+            launchState = .enabled
+        case .disabled:
+            launchState = .disabled
+        case .requiresApproval:
+            launchState = .requiresApproval
+        case .unavailable:
+            launchState = .unavailable
+        }
+
+        WidgetSettingsSnapshotStore.save(
+            WidgetSettingsSnapshot(
+                launchAtLoginState: launchState,
+                refreshIntervalMinutes: refreshInterval.rawValue,
+                availableResetCount: resetCount
+            )
+        )
+    }
+
     private func requestRefresh() async {
         guard started, !Task.isCancelled else { return }
         if refreshInFlight {
@@ -642,6 +689,7 @@ final class QuotaOverlayController {
                 await notifier.deliver(event, at: snapshot.fetchedAt)
             }
             publishWidgetSnapshot(snapshot, freshness: .fresh)
+            publishWidgetSettingsSnapshot()
             render()
             logger.info("usage state=fresh events=\(events.count, privacy: .public)")
         } catch {
@@ -652,6 +700,7 @@ final class QuotaOverlayController {
             } else {
                 clearWidgetSnapshot()
             }
+            publishWidgetSettingsSnapshot()
             render()
             switch state.freshness {
             case .unavailable:
