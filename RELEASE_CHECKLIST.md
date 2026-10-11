@@ -251,8 +251,8 @@ Known limitation (non-blocking): macOS does not guarantee hot replacement of an 
 Observed 2026-10-11 for v0.4.0 release preparation:
 
 - `PASS` — clean rebuild + full macOS test suite: 63/63 tests passed.
-- `PASS` — `./script/build_and_run.sh --verify`; app and embedded widget both reported `0.4.0` with matching build 37 and passed ad-hoc `codesign --verify`.
-- `PASS` — `./script/release.sh preview` produced `CodexSatellites-0.4.0-preview-adhoc.dmg`; `hdiutil verify` and preview codesign validation passed; app/widget metadata inside the DMG matched `0.4.0 (37)`.
+- `PASS` — `./script/build_and_run.sh --verify`; app and embedded widget both reported `0.4.0` with matching HEAD-derived build numbers and passed ad-hoc `codesign --verify`.
+- `PASS` — `./script/release.sh preview` produced `CodexSatellites-0.4.0-preview-adhoc.dmg`; `hdiutil verify` and preview codesign validation passed; app/widget metadata inside the DMG matched `0.4.0` with the same HEAD-derived build number.
 - `NOT TESTED` — v0.4.0 live widget clicks and visual flip/Reduce Motion observation: macOS Accessibility automation was unavailable (`AXIsProcessTrusted=false`) and screen-capture preflight was denied; system privacy settings were intentionally not changed for testing.
 - `NOT TESTED` — no-notch Mac/VM-equivalent E2E; this Mac exposed only its built-in notched display and no no-notch environment was available.
 - `NOT TESTED` — the complete 158×158 / 338×158 offscreen layout matrix was not completed before the live-E2E run was stopped.
