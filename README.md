@@ -55,6 +55,12 @@ The WidgetKit widget does **not** require a notch.
 
 ### Notch satellites
 
+<p align="center">
+  <img src="Artwork/README/README-notch-simulation-2048x320.png" alt="CodexSatellites notch satellites and compact Settings Bar" width="1200" />
+</p>
+
+<p align="center"><sub>Reference render captured from the project website. It preserves the physical notch silhouette that a normal macOS screenshot cannot capture.</sub></p>
+
 | Interaction | Behavior |
 | --- | --- |
 | Idle | Two compact satellites sit beside the hardware notch. |
