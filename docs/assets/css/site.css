@@ -550,81 +550,22 @@ body.demo-open .demo-bar {
   display: flex;
   align-items: center;
   flex-direction: column;
-  gap: 20px;
-  padding: 32px 24px 66px;
+  gap: 12px;
+  padding: 24px 20px 58px;
 }
-.widget-sample {
-  position: relative;
-  background: #33373de8;
-  border: 1px solid #ffffff24;
-  border-radius: 22px;
-  padding: 17px;
-  color: #eef0f3;
-  box-shadow: 0 14px 30px #11151b35;
-}
-.widget-sample > strong {
+.widget-reference {
   display: block;
-  font-size: 12px;
-  line-height: 1.2;
-  color: #c5cbd4;
+  height: auto;
 }
-.widget-status {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  margin-top: 10px;
-  color: #aeb6c1;
-  font-size: 9px;
-  line-height: 1.2;
-}
-.small {
-  width: 170px;
-  height: 166px;
+.widget-reference-small {
+  width: 187px;
   align-self: flex-start;
-  margin-left: 20px;
+  margin-left: 4px;
 }
-.medium {
-  width: 320px;
+.widget-reference-medium {
+  width: 376px;
   max-width: 100%;
-  height: 166px;
   align-self: flex-end;
-}
-.metrics {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-top: 17px;
-  text-align: center;
-}
-.metrics > div {
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  gap: 5px;
-  font-size: 11px;
-}
-.ring {
-  position: relative;
-  isolation: isolate;
-  width: 51px;
-  height: 51px;
-  display: grid;
-  place-items: center;
-  font-size: 13px;
-  font-weight: 600;
-}
-.ring:before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  border-radius: 50%;
-  background: conic-gradient(#eef0f3 var(--quota), #ffffff25 0);
-  mask: radial-gradient(farthest-side, transparent 78%, #000 80%);
-}
-.metrics small {
-  color: #b9c0ca;
-  font-size: 10px;
 }
 .widget-art figcaption {
   position: absolute;
@@ -760,9 +701,6 @@ body.demo-open .demo-bar {
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
   }
-  .widget-sample {
-    background: #33373d;
-  }
 }
 @media (prefers-reduced-motion: reduce) {
   html {
@@ -858,7 +796,10 @@ body.demo-open .demo-bar {
   .widget-art {
     min-height: 410px;
   }
-  .small {
+  .widget-examples {
+    padding-inline: 14px;
+  }
+  .widget-reference-small {
     margin-left: 0;
   }
   .reliability {
