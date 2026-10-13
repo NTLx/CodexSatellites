@@ -1,3 +1,4 @@
+import AppKit
 import OSLog
 import SwiftUI
 import WidgetKit
@@ -6,10 +7,11 @@ struct CodexWidgetEntry: TimelineEntry {
     let date: Date
     let snapshot: WidgetQuotaSnapshot?
     let settingsSnapshot: WidgetSettingsSnapshot?
-    let face: WidgetFace
+    let isAppRunning: Bool?
 }
 
-struct CodexWidgetProvider: TimelineProvider {
+struct CodexWidgetProvider: AppIntentTimelineProvider {
+    typealias Intent = CodexWidgetConfigurationIntent
     private static let buildNumber = Bundle.main.object(
         forInfoDictionaryKey: "CFBundleVersion"
     ) as? String ?? "unknown"
@@ -24,40 +26,39 @@ struct CodexWidgetProvider: TimelineProvider {
             date: Date(),
             snapshot: .placeholder,
             settingsSnapshot: .placeholder,
-            face: .quota
+            isAppRunning: nil
         )
     }
 
-    func getSnapshot(in context: Context, completion: @escaping (CodexWidgetEntry) -> Void) {
-        completion(makeEntry(for: context, quotaFallback: .placeholder, settingsFallback: .placeholder))
+    func snapshot(for configuration: Intent, in context: Context) async -> CodexWidgetEntry {
+        makeEntry(configuration: configuration, quotaFallback: .placeholder, settingsFallback: .placeholder)
     }
 
-    func getTimeline(in context: Context, completion: @escaping (Timeline<CodexWidgetEntry>) -> Void) {
-        let entry = makeEntry(for: context)
-        logger.info("timeline build=\(Self.buildNumber, privacy: .public) snapshot=\(entry.snapshot == nil ? "missing" : "loaded", privacy: .public) freshness=\(entry.snapshot?.freshness.rawValue ?? "none", privacy: .public) face=\(entry.face.rawValue, privacy: .public)")
-        completion(Timeline(entries: [entry], policy: .never))
+    func timeline(for configuration: Intent, in context: Context) async -> Timeline<CodexWidgetEntry> {
+        let entry = makeEntry(configuration: configuration)
+        logger.info("timeline build=\(Self.buildNumber, privacy: .public) snapshot=\(entry.snapshot == nil ? "missing" : "loaded", privacy: .public) freshness=\(entry.snapshot?.freshness.rawValue ?? "none", privacy: .public) app=\(entry.isAppRunning == true ? "running" : "stopped", privacy: .public)")
+        if !context.isPreview {
+            WidgetConfigurationSignal.post()
+        }
+        return Timeline(entries: [entry], policy: .never)
     }
 
     private func makeEntry(
-        for context: Context,
+        configuration: Intent,
         quotaFallback: WidgetQuotaSnapshot? = nil,
         settingsFallback: WidgetSettingsSnapshot? = nil
     ) -> CodexWidgetEntry {
-        let family = presentationFamily(for: context.family)
         return CodexWidgetEntry(
             date: Date(),
             snapshot: WidgetSnapshotStore.load() ?? quotaFallback,
             settingsSnapshot: WidgetSettingsSnapshotStore.load() ?? settingsFallback,
-            face: WidgetPresentationStore.face(for: family)
+            isAppRunning: Self.isMainAppRunning
         )
     }
 
-    private func presentationFamily(for family: WidgetFamily) -> WidgetPresentationFamily {
-        switch family {
-        case .systemMedium:
-            return .medium
-        default:
-            return .small
-        }
+    private static var isMainAppRunning: Bool {
+        NSRunningApplication
+            .runningApplications(withBundleIdentifier: WidgetSnapshotStore.appBundleIdentifier)
+            .contains { !$0.isTerminated }
     }
 }

@@ -52,70 +52,93 @@ final class WidgetSettingsSnapshotTests: XCTestCase {
     }
 }
 
-final class WidgetPresentationStoreTests: XCTestCase {
-    func testDefaultFaceIsQuota() {
-        withDefaults { defaults in
-            XCTAssertEqual(WidgetPresentationStore.face(for: .small, defaults: defaults), .quota)
-            XCTAssertEqual(WidgetPresentationStore.face(for: .medium, defaults: defaults), .quota)
-        }
+final class WidgetConfigurationReconcilerTests: XCTestCase {
+    func testEqualConfigurationsProduceNoDeltaRegardlessOfOrder() {
+        let small = fingerprint(.small, launchAtLogin: true, minutes: 5)
+        let medium = fingerprint(.medium, launchAtLogin: false, minutes: 15)
+
+        XCTAssertNil(
+            WidgetConfigurationReconciler.delta(
+                previous: [small, medium],
+                current: [medium, small]
+            )
+        )
     }
 
-    func testSmallAndMediumFacesAreIndependent() {
-        withDefaults { defaults in
-            WidgetPresentationStore.setFace(.settings, for: .small, defaults: defaults)
-            XCTAssertEqual(WidgetPresentationStore.face(for: .small, defaults: defaults), .settings)
-            XCTAssertEqual(WidgetPresentationStore.face(for: .medium, defaults: defaults), .quota)
+    func testSingleLaunchEditChangesOnlyLaunchAtLogin() {
+        let old = fingerprint(.small, launchAtLogin: false, minutes: 5)
+        let new = fingerprint(.small, launchAtLogin: true, minutes: 5)
 
-            WidgetPresentationStore.setFace(.settings, for: .medium, defaults: defaults)
-            WidgetPresentationStore.setFace(.quota, for: .small, defaults: defaults)
-            XCTAssertEqual(WidgetPresentationStore.face(for: .small, defaults: defaults), .quota)
-            XCTAssertEqual(WidgetPresentationStore.face(for: .medium, defaults: defaults), .settings)
-        }
+        XCTAssertEqual(
+            WidgetConfigurationReconciler.delta(previous: [old], current: [new]),
+            WidgetConfigurationDelta(launchAtLogin: true, refreshIntervalMinutes: nil)
+        )
     }
 
-    private func withDefaults(_ body: (UserDefaults) -> Void) {
-        let suite = "WidgetPresentationStoreTests.\(UUID().uuidString)"
-        guard let defaults = UserDefaults(suiteName: suite) else {
-            return XCTFail("failed to create UserDefaults suite")
-        }
-        defaults.removePersistentDomain(forName: suite)
-        defer { defaults.removePersistentDomain(forName: suite) }
-        body(defaults)
-    }
-}
+    func testSingleFrequencyEditChangesOnlyFrequency() {
+        let old = fingerprint(.medium, launchAtLogin: true, minutes: 1)
+        let new = fingerprint(.medium, launchAtLogin: true, minutes: 15)
 
-@MainActor
-private final class WidgetSettingsActionRecorder {
-    var actions: [WidgetSettingsAction] = []
-}
-
-@MainActor
-final class WidgetSettingsActionRouterTests: XCTestCase {
-    func testInstalledHandlerReceivesExactAction() async {
-        let router = WidgetSettingsActionRouter()
-        let recorder = WidgetSettingsActionRecorder()
-        router.install { recorder.actions.append($0) }
-
-        await router.dispatch(.advanceRefreshInterval)
-
-        XCTAssertEqual(recorder.actions, [.advanceRefreshInterval])
+        XCTAssertEqual(
+            WidgetConfigurationReconciler.delta(previous: [old], current: [new]),
+            WidgetConfigurationDelta(launchAtLogin: nil, refreshIntervalMinutes: 15)
+        )
     }
 
-    func testColdLaunchPendingActionDrainsExactlyOnce() async {
-        let router = WidgetSettingsActionRouter()
-        let dispatchTask = Task { @MainActor in
-            await router.dispatch(.toggleLaunchAtLogin)
-        }
-        try? await Task.sleep(for: .milliseconds(10))
-        XCTAssertEqual(router.pendingActionCount, 1)
+    func testUnchangedStaleFieldDoesNotOverwriteOtherGlobalSetting() {
+        let old = fingerprint(.small, launchAtLogin: false, minutes: 1)
+        let new = fingerprint(.small, launchAtLogin: false, minutes: 5)
 
-        let firstRecorder = WidgetSettingsActionRecorder()
-        router.install { firstRecorder.actions.append($0) }
-        await dispatchTask.value
-        XCTAssertEqual(firstRecorder.actions, [.toggleLaunchAtLogin])
+        let delta = WidgetConfigurationReconciler.delta(previous: [old], current: [new])
+        XCTAssertNil(delta?.launchAtLogin)
+        XCTAssertEqual(delta?.refreshIntervalMinutes, 5)
+    }
 
-        let secondRecorder = WidgetSettingsActionRecorder()
-        router.install { secondRecorder.actions.append($0) }
-        XCTAssertTrue(secondRecorder.actions.isEmpty)
+    func testAddOrRemoveOnlyDoesNotChangeGlobalSettings() {
+        let small = fingerprint(.small, launchAtLogin: false, minutes: 1)
+        let medium = fingerprint(.medium, launchAtLogin: false, minutes: 1)
+
+        XCTAssertNil(WidgetConfigurationReconciler.delta(previous: [small], current: [small, medium]))
+        XCTAssertNil(WidgetConfigurationReconciler.delta(previous: [small, medium], current: [small]))
+    }
+
+    func testFamilyResizeDoesNotChangeGlobalSettings() {
+        let old = fingerprint(.small, launchAtLogin: false, minutes: 1)
+        let resized = fingerprint(.medium, launchAtLogin: true, minutes: 5)
+
+        XCTAssertNil(WidgetConfigurationReconciler.delta(previous: [old], current: [resized]))
+    }
+
+    func testAmbiguousMultipleEditsDoNotChangeGlobalSettings() {
+        let previous = [
+            fingerprint(.small, launchAtLogin: false, minutes: 1),
+            fingerprint(.medium, launchAtLogin: false, minutes: 1)
+        ]
+        let current = [
+            fingerprint(.small, launchAtLogin: true, minutes: 1),
+            fingerprint(.medium, launchAtLogin: false, minutes: 15)
+        ]
+
+        XCTAssertNil(WidgetConfigurationReconciler.delta(previous: previous, current: current))
+    }
+
+    func testRefreshIntervalOptionMapsSupportedMinutesExactly() {
+        XCTAssertEqual(WidgetRefreshIntervalOption(minutes: 1), .oneMinute)
+        XCTAssertEqual(WidgetRefreshIntervalOption(minutes: 5), .fiveMinutes)
+        XCTAssertEqual(WidgetRefreshIntervalOption(minutes: 15), .fifteenMinutes)
+        XCTAssertNil(WidgetRefreshIntervalOption(minutes: 2))
+        XCTAssertEqual(WidgetRefreshIntervalOption.fiveMinutes.minutes, 5)
+    }
+
+    private func fingerprint(
+        _ family: WidgetConfigurationFingerprint.Family,
+        launchAtLogin: Bool,
+        minutes: Int
+    ) -> WidgetConfigurationFingerprint {
+        WidgetConfigurationFingerprint(
+            family: family,
+            launchAtLogin: launchAtLogin,
+            refreshIntervalMinutes: minutes
+        )
     }
 }

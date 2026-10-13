@@ -111,6 +111,7 @@ enum WidgetSnapshotError: Error {
 /// hot path can never trigger the TCC denial. Only a provisioned `.appGroup`
 /// build may fall back to the legacy preview snapshot for migration.
 enum WidgetSnapshotStore {
+    static let appBundleIdentifier = "io.github.ntlx.codexsatellites"
     static let appGroupIdentifier = "group.io.github.ntlx.codexsatellites"
     static let widgetBundleIdentifier = "io.github.ntlx.codexsatellites.widget"
     static let widgetKind = "CodexSatellitesWidget"

@@ -13,9 +13,8 @@ struct SmallCodexWidgetView: View {
                 Spacer(minLength: 8)
                 WidgetStaleLabel(freshness: snapshot?.freshness)
             }
-            .padding(.trailing, 32)
 
-            Spacer(minLength: 8)
+            Spacer(minLength: 6)
 
             HStack(alignment: .top, spacing: 0) {
                 quotaColumn(title: "5-hour", remainingPercent: snapshot?.fiveHourRemainingPercent)
@@ -24,7 +23,12 @@ struct SmallCodexWidgetView: View {
             .frame(maxWidth: .infinity)
             .opacity(quotaOpacity)
 
-            Spacer(minLength: 8)
+            Spacer(minLength: 6)
+
+            WidgetStatusRow(
+                availableResetCount: entry.settingsSnapshot?.availableResetCount,
+                isAppRunning: entry.isAppRunning
+            )
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
     }

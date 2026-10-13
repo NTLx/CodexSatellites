@@ -13,9 +13,8 @@ struct MediumCodexWidgetView: View {
                 Spacer(minLength: 8)
                 WidgetStaleLabel(freshness: snapshot?.freshness)
             }
-            .padding(.trailing, 32)
 
-            Spacer(minLength: 10)
+            Spacer(minLength: 8)
 
             HStack(alignment: .top, spacing: 0) {
                 metricColumn(
@@ -32,7 +31,12 @@ struct MediumCodexWidgetView: View {
             .frame(maxWidth: .infinity)
             .opacity(quotaOpacity)
 
-            Spacer(minLength: 0)
+            Spacer(minLength: 6)
+
+            WidgetStatusRow(
+                availableResetCount: entry.settingsSnapshot?.availableResetCount,
+                isAppRunning: entry.isAppRunning
+            )
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
     }

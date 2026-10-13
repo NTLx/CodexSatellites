@@ -4,57 +4,26 @@ import WidgetKit
 
 struct CodexWidgetView: View {
     @Environment(\.widgetFamily) private var family
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     let entry: CodexWidgetEntry
 
     var body: some View {
-        face
+        quotaFace
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .animation(.easeInOut(duration: reduceMotion ? 0.18 : 0.35), value: entry.face)
             .containerBackground(for: .widget) {
                 Color(nsColor: .windowBackgroundColor)
             }
     }
 
-    @ViewBuilder
-    private var face: some View {
-        switch entry.face {
-        case .quota:
-            quotaFace
-                .transition(quotaTransition)
-        case .settings:
-            WidgetSettingsFaceView(entry: entry, family: presentationFamily)
-                .transition(settingsTransition)
-        }
-    }
-
     private var quotaFace: some View {
-        ZStack(alignment: .topTrailing) {
-            Button(intent: RefreshCachedQuotaIntent()) {
-                quotaContent
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel(Text(verbatim: "Refresh Codex quota"))
-            .accessibilityHint(Text(verbatim: "Reloads the quota snapshot cached by the CodexSatellites app."))
-
-            Button(intent: SetWidgetFaceIntent(family: presentationFamily, face: .settings)) {
-                Image(systemName: "gearshape")
-                    .font(.system(size: 12, weight: .semibold))
-                    .frame(width: 26, height: 26)
-                    .contentShape(Circle())
-            }
-            .buttonStyle(.plain)
-            .foregroundStyle(.primary)
-            .background(Circle().fill(Color.primary.opacity(0.08)))
-            .overlay {
-                Circle().stroke(Color.primary.opacity(0.12), lineWidth: 0.5)
-            }
-            .accessibilityLabel(Text(verbatim: "Settings"))
-            .accessibilityHint(Text(verbatim: "Shows CodexSatellites settings in this widget."))
+        Button(intent: RefreshCachedQuotaIntent()) {
+            quotaContent
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .contentShape(Rectangle())
         }
+        .buttonStyle(.plain)
+        .accessibilityLabel(Text(verbatim: "Refresh Codex widget information"))
+        .accessibilityHint(Text(verbatim: "Reloads cached quota information and checks whether CodexSatellites is currently running."))
     }
 
     @ViewBuilder
@@ -66,55 +35,62 @@ struct CodexWidgetView: View {
             SmallCodexWidgetView(entry: entry)
         }
     }
-
-    private var presentationFamily: WidgetPresentationFamily {
-        family == .systemMedium ? .medium : .small
-    }
-
-    private var quotaTransition: AnyTransition {
-        if reduceMotion {
-            return .opacity
-        }
-        return .asymmetric(
-            insertion: .modifier(
-                active: WidgetFlipModifier(angle: 90),
-                identity: WidgetFlipModifier(angle: 0)
-            ),
-            removal: .modifier(
-                active: WidgetFlipModifier(angle: -90),
-                identity: WidgetFlipModifier(angle: 0)
-            )
-        )
-    }
-
-    private var settingsTransition: AnyTransition {
-        if reduceMotion {
-            return .opacity
-        }
-        return .asymmetric(
-            insertion: .modifier(
-                active: WidgetFlipModifier(angle: -90),
-                identity: WidgetFlipModifier(angle: 0)
-            ),
-            removal: .modifier(
-                active: WidgetFlipModifier(angle: 90),
-                identity: WidgetFlipModifier(angle: 0)
-            )
-        )
-    }
 }
 
-private struct WidgetFlipModifier: ViewModifier {
-    let angle: Double
+struct WidgetStatusRow: View {
+    let availableResetCount: Int?
+    let isAppRunning: Bool?
 
-    func body(content: Content) -> some View {
-        content
-            .rotation3DEffect(
-                .degrees(angle),
-                axis: (x: 0, y: 1, z: 0),
-                perspective: 0.7
-            )
-            .opacity(max(0, 1 - abs(angle) / 90))
+    var body: some View {
+        HStack(spacing: 8) {
+            HStack(spacing: 3) {
+                Text(verbatim: "Reset")
+                Text(verbatim: availableResetCount.map(String.init) ?? "—")
+                    .monospacedDigit()
+            }
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(Text(verbatim: "Available Reset Count"))
+            .accessibilityValue(Text(verbatim: availableResetCount.map(String.init) ?? "Unavailable"))
+
+            Spacer(minLength: 4)
+
+            HStack(spacing: 3) {
+                Image(systemName: appStatusSymbol)
+                    .imageScale(.small)
+                Text(verbatim: appStatusText)
+            }
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(Text(verbatim: "CodexSatellites App Status"))
+            .accessibilityValue(Text(verbatim: appStatusAccessibilityValue))
+        }
+        .font(.caption2)
+        .foregroundStyle(.tertiary)
+        .lineLimit(1)
+        .minimumScaleFactor(0.8)
+    }
+
+    private var appStatusSymbol: String {
+        switch isAppRunning {
+        case true: "circle.fill"
+        case false: "circle"
+        case nil: "questionmark.circle"
+        }
+    }
+
+    private var appStatusText: String {
+        switch isAppRunning {
+        case true: "Running"
+        case false: "Stopped"
+        case nil: "—"
+        }
+    }
+
+    private var appStatusAccessibilityValue: String {
+        switch isAppRunning {
+        case true: "Running"
+        case false: "Not Running"
+        case nil: "Unavailable"
+        }
     }
 }
 

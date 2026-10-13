@@ -1,5 +1,6 @@
 import SwiftUI
 import WidgetKit
+import AppIntents
 
 @main
 struct CodexSatellitesWidgetBundle: WidgetBundle {
@@ -10,14 +11,15 @@ struct CodexSatellitesWidgetBundle: WidgetBundle {
 
 struct CodexQuotaWidget: Widget {
     var body: some WidgetConfiguration {
-        StaticConfiguration(
+        AppIntentConfiguration(
             kind: WidgetSnapshotStore.widgetKind,
+            intent: CodexWidgetConfigurationIntent.self,
             provider: CodexWidgetProvider()
         ) { entry in
             CodexWidgetView(entry: entry)
         }
         .configurationDisplayName("Codex Usage")
-        .description("View your Codex 5-hour and weekly quota at a glance.")
+        .description("View Codex quota, reset count, and CodexSatellites app status at a glance.")
         .supportedFamilies([.systemSmall, .systemMedium])
     }
 }

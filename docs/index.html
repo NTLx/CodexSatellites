@@ -256,17 +256,16 @@
         <div class="widget-copy" data-reveal>
           <h2>At home on<br />your desktop, too.</h2>
           <p>
-            Keep both quotas on your desktop or in Notification Center. Choose
-            Small for a glance, Medium for reset times too. A gear flips either
-            size into the same four settings available beside the notch.
+            Keep both quotas, available reset count, and CodexSatellites running
+            status on your desktop or in Notification Center. Choose Small for a
+            glance, Medium for reset times too.
           </p>
           <p class="muted">
-            Click non-gear quota content to re-read the app’s latest cached
-            snapshot; that action never contacts OpenAI or launches the app.
-            The settings face provides Launch at Login, refresh frequency,
-            read-only reset count, and Quit. On a Mac without usable notch
-            satellites, those settings remain reachable through the widget;
-            there is still no conventional Settings window or menu bar item.
+            Click the widget content to re-read the app’s local cache and check
+            whether CodexSatellites is running now; that action never contacts
+            OpenAI or starts the app. macOS Edit Widget provides Launch at Login
+            and 1 / 5 / 15 minute frequency controls, including on Macs without
+            usable notch satellites.
           </p>
         </div>
         <figure class="widget-art" data-reveal>
@@ -283,7 +282,6 @@
           >
             <div class="widget-sample small">
               <strong>Codex</strong>
-              <span class="widget-gear" aria-hidden="true">⚙︎</span>
               <div class="metrics">
                 <div>
                   <span class="ring" style="--quota: 62%">62%</span
@@ -294,10 +292,10 @@
                   ><span>Weekly</span>
                 </div>
               </div>
+              <div class="widget-status"><span>Reset 2</span><span>● Running</span></div>
             </div>
             <div class="widget-sample medium">
               <strong>Codex</strong>
-              <span class="widget-gear" aria-hidden="true">⚙︎</span>
               <div class="metrics">
                 <div>
                   <span class="ring" style="--quota: 62%">62%</span
@@ -308,9 +306,10 @@
                   ><span>Weekly</span><small>Reset in 4 days</small>
                 </div>
               </div>
+              <div class="widget-status"><span>Reset 2</span><span>● Running</span></div>
             </div>
           </div>
-          <figcaption>Small + Medium · Quota face shown; gear opens settings</figcaption>
+          <figcaption>Small + Medium · Cached quota plus live app status</figcaption>
         </figure>
       </section>
       <section class="section wrap reliability" data-reveal>
@@ -372,7 +371,8 @@
             <p>
               macOS 15 or later and an existing local Codex sign-in. Satellites
               need a usable built-in MacBook notch; the widget also works on Macs
-              without one and provides its own settings face there.
+              without one, with Launch at Login and Frequency available through
+              macOS Edit Widget.
             </p>
           </div>
           <ol class="install-steps">

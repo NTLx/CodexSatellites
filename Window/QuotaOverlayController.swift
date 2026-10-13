@@ -463,26 +463,40 @@ final class QuotaOverlayController {
         }
     }
 
-    func handleWidgetSettingsAction(_ action: WidgetSettingsAction) {
-        logger.info("widget settings action=\(action.rawValue, privacy: .public)")
-        switch action {
-        case .toggleLaunchAtLogin:
-            setLaunchAtLogin(launchAtLoginService.state() != .enabled)
-        case .advanceRefreshInterval:
-            advanceRefreshInterval()
-        case .reviewLoginItems:
-            reviewLoginItems()
-        case .quit:
-            quit()
+    func applyWidgetConfigurationChange(
+        launchAtLogin: Bool?,
+        refreshInterval: QuotaRefreshInterval?
+    ) {
+        var changed = false
+
+        if let launchAtLogin {
+            updateLaunchAtLogin(launchAtLogin)
+            changed = true
         }
+
+        if let refreshInterval, refreshInterval != self.refreshInterval {
+            updateRefreshInterval(refreshInterval)
+            changed = true
+        }
+
+        guard changed else { return }
+        render()
+        publishWidgetSettingsSnapshot()
+        logger.info(
+            "widget configuration applied launchChanged=\(launchAtLogin != nil, privacy: .public) frequencyChanged=\(refreshInterval != nil, privacy: .public)"
+        )
     }
 
-    private func setLaunchAtLogin(_ enabled: Bool) {
+    private func updateLaunchAtLogin(_ enabled: Bool) {
         do {
             try launchAtLoginService.setEnabled(enabled)
         } catch {
             logger.error("login item update failed error=\(String(describing: error), privacy: .public)")
         }
+    }
+
+    private func setLaunchAtLogin(_ enabled: Bool) {
+        updateLaunchAtLogin(enabled)
         render()
         publishWidgetSettingsSnapshot()
         scheduleSettingsAutoHide()
@@ -494,11 +508,14 @@ final class QuotaOverlayController {
         publishWidgetSettingsSnapshot()
     }
 
-    private func advanceRefreshInterval() {
-        let nextInterval = refreshInterval.next
-        refreshPreference.interval = nextInterval
-        refreshInterval = nextInterval
+    private func updateRefreshInterval(_ interval: QuotaRefreshInterval) {
+        refreshPreference.interval = interval
+        refreshInterval = interval
         startRefreshLoop(immediately: false)
+    }
+
+    private func advanceRefreshInterval() {
+        updateRefreshInterval(refreshInterval.next)
         render()
         publishWidgetSettingsSnapshot()
         scheduleSettingsAutoHide()

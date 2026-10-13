@@ -20,24 +20,24 @@ CodexSatellites is an independent community utility and is not affiliated with o
 
 CodexSatellites ships a WidgetKit widget in two sizes:
 
-- **Small** → 5-hour and weekly remaining gauges.
-- **Medium** → both gauges plus reset times.
+- **Small** → 5-hour and weekly remaining gauges, available reset count, and current app status.
+- **Medium** → the same information with reset times for both quota windows.
 
 Add it from the desktop: right-click the desktop → **Edit Widgets…** → **CodexSatellites**. macOS does not allow an app to place a widget for you.
 
-The app remains the only component that reads Codex authentication and requests usage. It publishes separate quota and settings snapshots for the widget; the widget stores only its local quota/settings face selection. The `1m` / `5m` / `15m` setting controls quota polling by the app, not widget rendering. The widget performs no scheduled background refresh and its timeline policy remains `.never`.
+The app remains the only component that reads Codex authentication and requests usage. It publishes quota and settings snapshots for the widget; the widget only reads those caches and independently checks whether the main app is currently running. The `1m` / `5m` / `15m` setting controls quota polling by the app, not widget rendering. The widget performs no scheduled background refresh and its timeline policy remains `.never`.
 
-Each Small and Medium widget has a gear control that flips between the quota face and a compact settings face. The settings face exposes the same four controls as the notch Settings Bar: Launch at Login, quota check frequency, read-only available reset count, and Quit. Launch/frequency/Quit actions route back to the app's existing behavior instead of duplicating settings logic in the extension. Macs without a hardware notch can therefore manage these settings from the widget even though CodexSatellites still has no conventional Settings window or menu bar item.
+Use macOS **Edit Widget** to configure **Launch at Login** and **Frequency**. Those settings are global to CodexSatellites even though WidgetKit stores editor values per widget instance: the running app detects the field that changed and applies only that field globally, so an unchanged stale value from another widget does not overwrite newer app state. WidgetKit does not provide a public API for rewriting the stored editor values of every other widget instance. If a widget is edited while CodexSatellites is stopped, the edit does not wake the app; it is reconciled the next time the app launches. This native editor is also the settings path on Macs without a usable hardware notch.
 
-Clicking the non-gear quota content reloads the latest snapshot the app has cached — useful after the app has polled, before macOS asks for a new widget timeline. That reload never fetches from OpenAI, never starts or activates the app, and never writes the snapshot: it only asks WidgetKit for a fresh timeline, which re-reads the cache. The system content margin around the content (roughly the outer 24pt of a Small widget) is not part of that click area; tapping there uses the system's default widget tap, which opens CodexSatellites. If the app has never run and no snapshot exists, the widget keeps showing `—`.
+Clicking the normal widget content performs a local-only refresh. WidgetKit reloads the timeline, re-reads the latest quota/settings caches, and checks whether `CodexSatellites.app` is currently running. The click never fetches from OpenAI, reads Codex auth, starts or activates the app, or writes either snapshot. The system content margin around the content may still use WidgetKit's default tap behavior and open CodexSatellites. If the app has never run and no snapshot exists, the widget keeps showing `—`.
 
 ## Interaction
 
 - Hover → both satellites expand and show remaining percentages.
 - Click either satellite → a compact icon-only Settings Bar appears.
-- Click the widget's non-gear quota content → reloads the latest quota snapshot the app cached, with no network request and no app launch.
-- Click the widget gear → flips between quota and settings faces; Reduce Motion uses a non-3D fallback.
-- Widget settings face and notch Settings Bar → Launch at Login, refresh frequency, read-only available reset count, and Quit controls.
+- Click normal widget content → re-reads cached quota/settings information and refreshes the live app Running/Stopped state, with no network request and no app launch.
+- Edit Widget → Launch at Login and refresh frequency (`1m`, `5m`, `15m`).
+- Notch Settings Bar → Launch at Login, refresh frequency, read-only available reset count, and Quit.
 - Quota check interval → `1m`, `5m`, or `15m`.
 - Notifications → native macOS alerts when a quota window resets to 100%, crosses below 10%, or the available reset count changes.
 

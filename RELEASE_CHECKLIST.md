@@ -194,32 +194,30 @@ Widget refresh model:
 - [ ] Widget performs no Timer or background refresh.
 - [ ] When WidgetKit requests a new timeline, it reads the latest available snapshot.
 
-Widget quota-face reload:
+Widget local refresh (v0.4.0):
 
-- [ ] Clicking non-gear quota content — gauge, label, or empty content space — logs `intent operation=refresh result=noop` followed by a new `timeline build=<n>` line.
-- [ ] The reload shows a snapshot the app cached after the widget was last rendered; it never triggers a Codex usage request.
-- [ ] A quota-content reload does not launch or activate CodexSatellites.
-- [ ] The gear wins hit testing and does not also run `RefreshCachedQuotaIntent`.
+- [ ] Clicking normal widget content — gauge, label, status row, or empty content space inside the interactive content region — logs `intent operation=refresh result=reloadRequested` followed by a new `timeline build=<n>` line.
+- [ ] The reload re-reads quota/settings snapshots the app already cached and re-probes the main app's current Running/Stopped process state.
+- [ ] The reload never triggers a Codex usage request, reads Codex auth, launches/activates CodexSatellites, or writes either snapshot.
+- [ ] With the app running, click refresh and confirm the status row reports `Running`.
+- [ ] Quit the app, click refresh again, confirm the status row reports `Stopped`, and confirm the app remains stopped.
+- [ ] Reset count is read-only on the normal face; fresh `0` renders as `0`, stale/unavailable renders `—`.
 - [ ] A click in the system content margin may use WidgetKit's default app-launch behavior; no `widgetURL` or custom padding masks that platform behavior.
-- [ ] The reload action adds no refresh affordance: no icon, spinner, label, timestamp, toast, or pressed overlay.
+- [ ] The reload action adds no refresh affordance: no icon, spinner, timestamp, toast, or pressed overlay.
 - [ ] With no quota snapshot on disk the widget keeps showing `—` after a reload.
 
-Widget settings face (v0.4.0):
+Native Edit Widget configuration (v0.4.0):
 
-- [ ] Small and Medium each show a top-right gear and can switch `quota → settings → quota`.
-- [ ] The normal transition is the Y-axis flip and completes in about 0.35 seconds; Reduce Motion uses the non-3D fallback.
-- [ ] Small settings use a 2×2 control grid; Medium settings use one centered row; neither clips at 158×158 / 338×158 reference sizes.
-- [ ] Launch at Login matches `SMAppService.mainApp`: enabled/disabled toggle, `requiresApproval` opens Login Items, unavailable is noninteractive.
-- [ ] Frequency cycles exactly `1m → 5m → 15m → 1m`, persists through `QuotaRefreshPreference`, replaces the old loop once, and does not cause an immediate quota fetch solely because the interval changed.
-- [ ] Reset count is read-only; fresh `0` renders as `0`, stale/unavailable renders `—`.
-- [ ] Quit terminates the current app without unregistering Launch at Login.
-- [ ] Settings actions execute through the existing main-app `QuotaOverlayController` path; no duplicate widget-side settings logic exists.
-- [ ] Already-running app actions do not create a normal window or persistent Dock icon.
-- [ ] Cold-launch widget action reaches the queued main-app handler and the intent returns so WidgetKit reloads the timeline.
-- [ ] Small and Medium face state are independent; multiple instances of the same family may share that family's face state.
-- [ ] No settings action makes the widget read Codex auth or call the usage endpoint.
+- [ ] Small and Medium always render one information face; there is no custom gear, settings face, flip transition, Percentage option, reset action, or widget-side Quit.
+- [ ] **Edit Widget** exposes exactly Launch at Login and Frequency (`1m`, `5m`, `15m`).
+- [ ] Changing only Launch at Login applies that field through the main app's `SMAppService.mainApp` path and does not overwrite Frequency from a stale per-instance editor value.
+- [ ] Changing only Frequency persists through `QuotaRefreshPreference`, replaces the old refresh loop once, does not cause an immediate quota fetch solely because the interval changed, and does not overwrite Launch at Login from a stale per-instance editor value.
+- [ ] Adding, removing, or resizing a widget does not mutate either global setting.
+- [ ] An ambiguous multi-widget configuration change does not mutate global settings.
+- [ ] Editing native configuration while CodexSatellites is stopped does not launch/wake the app; after the next app launch the persisted configuration baseline is reconciled.
+- [ ] WidgetKit's per-instance editor values are not claimed to be rewritten across other installed instances; no private API or polling workaround is used.
 - [ ] Widget logs continue using `transport=widgetContainer` with no TCC App Group denial.
-- [ ] At least one usable-notch Mac and one no-notch Mac/VM-equivalent environment have been tested for settings reachability when such environments are available.
+- [ ] At least one usable-notch Mac and one no-notch Mac/VM-equivalent environment have been tested for native settings reachability when such environments are available.
 
 Observed 2026-09-10 (ad-hoc, built-in display, Small + Medium, builds 27 and 28):
 
@@ -248,15 +246,16 @@ Observed 2026-09-09 (ad-hoc, build 20 → 21):
 
 Known limitation (non-blocking): macOS does not guarantee hot replacement of an already-running WidgetKit extension process when the containing app is replaced in place, and no public WidgetKit API can force it. Developer ID upgrade behaviour remains `NOT TESTED`.
 
-Observed 2026-10-11 for v0.4.0 release preparation:
+Observed 2026-10-13 for the revised v0.4.0 widget design:
 
-- `PASS` — clean rebuild + full macOS test suite: 63/63 tests passed.
-- `PASS` — `./script/build_and_run.sh --verify`; app and embedded widget both reported `0.4.0` with matching HEAD-derived build numbers and passed ad-hoc `codesign --verify`.
-- `PASS` — `./script/release.sh preview` produced `CodexSatellites-0.4.0-preview-adhoc.dmg`; `hdiutil verify` and preview codesign validation passed; app/widget metadata inside the DMG matched `0.4.0` with the same HEAD-derived build number.
-- `NOT TESTED` — v0.4.0 live widget clicks and visual flip/Reduce Motion observation: macOS Accessibility automation was unavailable (`AXIsProcessTrusted=false`) and screen-capture preflight was denied; system privacy settings were intentionally not changed for testing.
-- `NOT TESTED` — no-notch Mac/VM-equivalent E2E; this Mac exposed only its built-in notched display and no no-notch environment was available.
-- `NOT TESTED` — the complete 158×158 / 338×158 offscreen layout matrix was not completed before the live-E2E run was stopped.
-- `BLOCKED` — formal Developer ID/notarized release artifact on this machine: release preflight reported Developer ID unavailable and `CodexSatellites-notary` unavailable. Preview capability remains ready.
+- `PASS` — `git diff --check` and the full macOS `xcodebuild test` workflow passed after the native Edit Widget / runtime-status implementation.
+- `PASS` — `BUILD_NUMBER=41 ./script/build_and_run.sh --verify`; app and embedded widget both reported `0.4.0 (41)` and the app bundle passed strict/deep code-signature verification.
+- `PASS` — compiled AppIntents metadata exposes Launch at Login + Frequency on `CodexWidgetConfigurationIntent`; Percentage and the superseded custom gear/settings-face intents are absent.
+- `PASS` — exact validated build 41 was installed rollback-safely to `/Applications`; installed app/widget versions and strict/deep signatures were re-verified, and the prior CodexSatellites widget-extension process was recycled without touching chronod or unrelated processes.
+- `PASS` — owner manually validated the installed build 41: Small/Medium no longer expose the custom gear; normal-content refresh reports `Running` while the app is active, reports `Stopped` after Quit without relaunching the app, and native **Edit Widget** exposes only Launch at Login + Frequency.
+- `NOT TESTED` — changing Launch at Login or Frequency in the native editor and observing end-to-end reconciliation into app-global settings remains a separate manual E2E check. System privacy settings were intentionally not changed for UI automation.
+- `NOT TESTED` — no-notch Mac/VM-equivalent E2E; this Mac exposes only its built-in notched display and no no-notch environment is currently available.
+- `BLOCKED` — formal Developer ID/notarized release artifact on this machine: Developer ID and `CodexSatellites-notary` remain unavailable. Preview capability remains separate from this manual build-41 validation.
 
 ## 14. Final install
 

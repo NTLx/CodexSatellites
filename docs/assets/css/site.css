@@ -568,20 +568,14 @@ body.demo-open .demo-bar {
   line-height: 1.2;
   color: #c5cbd4;
 }
-.widget-gear {
-  position: absolute;
-  top: 13px;
-  right: 13px;
-  width: 26px;
-  height: 26px;
-  display: grid;
-  place-items: center;
-  border: 1px solid #ffffff1f;
-  border-radius: 50%;
-  background: #ffffff14;
-  color: #eef0f3;
-  font-size: 13px;
-  line-height: 1;
+.widget-status {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 10px;
+  color: #aeb6c1;
+  font-size: 9px;
+  line-height: 1.2;
 }
 .small {
   width: 170px;

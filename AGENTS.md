@@ -10,14 +10,16 @@ It shows:
 - right satellite → Codex weekly remaining quota;
 - hover → remaining percentages;
 - click → compact icon-only Settings Bar;
-- WidgetKit widget (Small/Medium) → quota face plus an interactive settings face on the desktop and in Notification Center.
+- WidgetKit widget (Small/Medium) → remaining quotas, available reset count, and current app-running state on the desktop and in Notification Center.
 
-Current Settings Bar / widget settings controls:
+Current notch Settings Bar controls:
 
 1. Launch at Login;
 2. quota check frequency (`1m → 5m → 15m → 1m`);
 3. read-only available reset count;
 4. Quit.
+
+Native **Edit Widget** configuration exposes only Launch at Login and quota check frequency (`1m`, `5m`, `15m`).
 
 ## Source of truth
 
@@ -193,15 +195,18 @@ The app embeds one WidgetKit extension (`CodexSatellitesWidget`, bundle ID `io.g
 
 State flow is deliberately split:
 
-- the app is the only writer of quota and app-settings state; the widget only reads those two app-owned snapshots;
+- the app is the only writer of quota and app-settings snapshots; the widget only reads those two app-owned snapshots and probes transient main-app process state;
 - quota sharing is implemented in `Shared/WidgetQuotaSnapshot.swift`; settings sharing is implemented independently in `Shared/WidgetSettingsSnapshot.swift` as `settings-snapshot.json`;
 - both snapshot stores use the explicit `WidgetSnapshotTransport`; the current source fixes the active transport to `.widgetContainer` for every build — Developer ID signing does not switch it automatically;
 - on macOS 15+ App Group containers are protected and membership must be authorized by the code-signing/provisioning model; an ad-hoc build has neither a provisioning profile authorizing the registered `group.*` App Group nor a Developer Team ID for a team-prefixed macOS group, so a widget App Group read would be denied by TCC (`kTCCServiceSystemPolicyAppData`);
 - with the current `.widgetContainer` transport, the non-sandboxed app writes both snapshot files into the widget extension's Documents container and the sandboxed widget reads them there;
 - `activeTransport` is the single source of truth: `.widgetContainer` must never touch the App Group; the implemented `.appGroup` path may fall back to `.widgetContainer` for legacy migration only if source code explicitly selects `.appGroup` in the future;
 - quota/settings snapshot payloads are rolling-upgrade IPC contracts: new fields stay optional and existing fields are never removed, retyped, or repurposed without a schema-version change;
-- the app publishes settings state at controller start, after quota refresh success/failure, and after Launch/frequency/review-login-items actions; reset count is included only while quota state is fresh;
-- the widget may write only its own presentation state (`quota` or `settings`) through `WidgetPresentationStore`; Small and Medium are stored independently, so multiple instances of the same family share one face selection;
+- the app publishes settings state at controller start, after quota refresh success/failure, and after Launch/frequency changes; reset count is included only while quota state is fresh;
+- native WidgetKit configuration exposes only Launch at Login and refresh frequency. These are app-global settings even though WidgetKit stores configuration per widget instance;
+- each native widget configuration is a command surface rather than the source of truth. `WidgetConfigurationSyncService` persists a multiset baseline, re-reads `WidgetCenter.getCurrentConfigurations`, and applies only fields that actually changed on one same-family instance; unchanged stale fields must never overwrite a newer app-global value;
+- add/remove/resize or otherwise ambiguous configuration changes update the baseline only and do not mutate app-global settings. WidgetKit has no public API for rewriting another installed widget instance's stored configuration;
+- the provider posts a payload-free Darwin notification after a real timeline request. A running app uses it only as a wake-up signal to re-scan WidgetCenter; editing configuration while the app is stopped must not launch it, and reconciliation occurs on the next app launch;
 - macOS may keep an already-running widget extension process on the previous binary after the app is replaced in place; no public WidgetKit API can force a reload. Treat this as a known platform limitation — do not add `killall chronod`, `pluginkit`, or `lsregister` workarounds to product code;
 - snapshot reads/writes log operation/transport/result only — never quota values, tokens, or paths;
 - app polling frequency and WidgetKit rendering are deliberately decoupled;
@@ -212,20 +217,16 @@ State flow is deliberately split:
 
 Widget interactions:
 
-- the quota face keeps `RefreshCachedQuotaIntent` as a full-content background action and adds a sibling top-right gear button; never nest interactive buttons;
-- `RefreshCachedQuotaIntent.perform()` deliberately does nothing: no network request, Codex auth read, app launch, snapshot write, or `WidgetCenter.reloadTimelines`; WidgetKit's guaranteed post-interaction reload re-runs the provider and re-reads the app cache;
-- the gear uses `SetWidgetFaceIntent` to change only widget-local presentation state; it must not launch the app, access auth, or perform network work;
-- quota ↔ settings uses the Y-axis flip transition in `CodexWidgetView` (~0.35 s); Reduce Motion falls back to opacity;
-- the settings face exposes Launch at Login, refresh frequency, read-only available reset count, and Quit, plus the gear/back control;
-- `WidgetSettingsActionIntent` is non-discoverable and uses `openAppWhenRun = true` for the macOS 15 main-app execution path; it routes through `WidgetSettingsActionRouter.shared` into `QuotaOverlayController.handleWidgetSettingsAction(_:)` so Launch/frequency/review/Quit behavior has one implementation;
-- the router holds cold-launch actions until the app installs its controller-backed handler; do not replace this with polling, file watchers, or duplicate widget-side behavior;
-- Launch state mirrors `SMAppService.mainApp`: enabled/disabled toggle, `requiresApproval` opens Login Items, unavailable is noninteractive;
-- frequency cycles exactly `1m → 5m → 15m → 1m`; changing it replaces the existing refresh loop without an immediate quota fetch;
-- reset count has no button/action and shows `—` unless the app-published quota state is fresh; `0` remains valid;
-- Quit terminates the current app and must not unregister Launch at Login;
-- the quota reload surface is the content area, not the widget's full face: the system content-margin band may retain WidgetKit's default app-launch behavior; do not add `widgetURL` or hand-built padding to suppress it;
-- all widget strings remain English-only; every actionable control has an explicit English accessibility label/hint and reset count exposes label + value;
-- with no quota snapshot on disk, quota reload keeps rendering `—`; never create a fake snapshot or start the app to work around a missing cache.
+- Small and Medium always render one information face: 5-hour and weekly **remaining** quota, available reset count, and the main app's current Running/Stopped state;
+- `RefreshCachedQuotaIntent` covers the normal widget content and explicitly calls `WidgetCenter.reloadTimelines(ofKind:)`; the new timeline re-reads cached quota/settings snapshots and re-probes the main app with `NSRunningApplication.runningApplications(withBundleIdentifier:)`;
+- that click path is strictly local-only: no OpenAI/network request, Codex auth read, app launch/activation, or quota/settings snapshot write;
+- the main-app running state is transient provider state and must not be persisted in an app-owned snapshot; every real timeline request probes it again;
+- native **Edit Widget** configuration provides Launch at Login and frequency only. There is no custom gear, settings face, flip state, Percentage option, reset-count action, or widget-side Quit;
+- Launch at Login continues through the main app's `SMAppService.mainApp` path; frequency maps exactly to `1m`, `5m`, or `15m` and changing it replaces the refresh loop without an immediate quota fetch;
+- reset count is read-only on the information face and shows `—` unless the app-published quota state is fresh; fresh `0` remains valid;
+- the local refresh surface is the widget content area; the system content-margin band may retain WidgetKit's default app-launch behavior. Do not add `widgetURL` or hand-built padding to suppress platform behavior;
+- all widget strings remain English-only; the refresh action and displayed status values expose explicit English accessibility semantics;
+- with no quota snapshot on disk, local refresh keeps rendering `—`; never create a fake snapshot or start the app to work around a missing cache.
 
 Signing/entitlements:
 

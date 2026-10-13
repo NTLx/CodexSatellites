@@ -9,15 +9,16 @@ struct WidgetQuotaGauge: View {
     var body: some View {
         Group {
             if let remainingPercent {
+                let clampedPercent = min(max(remainingPercent, 0), 100)
                 Gauge(
-                    value: min(max(remainingPercent, 0), 100),
+                    value: clampedPercent,
                     in: 0...100
                 ) {
                     Text(verbatim: title)
                 } currentValueLabel: {
-                    Text("\(Int(remainingPercent.rounded()))%")
+                    Text("\(Int(clampedPercent.rounded()))%")
                         .monospacedDigit()
-                        .contentTransition(.numericText(value: remainingPercent))
+                        .contentTransition(.numericText(value: clampedPercent))
                 }
                 .gaugeStyle(.accessoryCircularCapacity)
                 .tint(.primary)
@@ -41,6 +42,7 @@ struct WidgetQuotaGauge: View {
         guard let remainingPercent else {
             return "Unavailable"
         }
-        return "\(Int(remainingPercent.rounded()))%"
+        let clampedPercent = min(max(remainingPercent, 0), 100)
+        return "\(Int(clampedPercent.rounded()))% remaining"
     }
 }

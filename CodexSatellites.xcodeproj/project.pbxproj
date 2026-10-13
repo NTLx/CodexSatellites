@@ -37,15 +37,12 @@
 		G00000000000000000000012 /* RefreshCachedQuotaIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = H00000000000000000000014 /* RefreshCachedQuotaIntent.swift */; };
 		G00000000000000000000013 /* WidgetSettingsSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = H00000000000000000000015 /* WidgetSettingsSnapshot.swift */; };
 		G00000000000000000000014 /* WidgetSettingsSnapshot.swift in Sources */ = {isa = PBXBuildFile; fileRef = H00000000000000000000015 /* WidgetSettingsSnapshot.swift */; };
-		G00000000000000000000015 /* WidgetPresentationStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = H00000000000000000000016 /* WidgetPresentationStore.swift */; };
-		G00000000000000000000016 /* WidgetPresentationStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = H00000000000000000000016 /* WidgetPresentationStore.swift */; };
-		G00000000000000000000017 /* WidgetSettingsAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = H00000000000000000000017 /* WidgetSettingsAction.swift */; };
-		G00000000000000000000018 /* WidgetSettingsAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = H00000000000000000000017 /* WidgetSettingsAction.swift */; };
-		G00000000000000000000019 /* WidgetSettingsActionIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = H00000000000000000000018 /* WidgetSettingsActionIntent.swift */; };
-		G00000000000000000000020 /* WidgetSettingsActionIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = H00000000000000000000018 /* WidgetSettingsActionIntent.swift */; };
-		G00000000000000000000021 /* SetWidgetFaceIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = H00000000000000000000019 /* SetWidgetFaceIntent.swift */; };
-		G00000000000000000000022 /* WidgetSettingsFaceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = H00000000000000000000020 /* WidgetSettingsFaceView.swift */; };
 		G00000000000000000000023 /* WidgetSettingsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = H00000000000000000000021 /* WidgetSettingsTests.swift */; };
+		G00000000000000000000024 /* CodexWidgetConfigurationIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = H00000000000000000000022 /* CodexWidgetConfigurationIntent.swift */; };
+		G00000000000000000000025 /* CodexWidgetConfigurationIntent.swift in Sources */ = {isa = PBXBuildFile; fileRef = H00000000000000000000022 /* CodexWidgetConfigurationIntent.swift */; };
+		G00000000000000000000026 /* WidgetConfigurationSignal.swift in Sources */ = {isa = PBXBuildFile; fileRef = H00000000000000000000023 /* WidgetConfigurationSignal.swift */; };
+		G00000000000000000000027 /* WidgetConfigurationSignal.swift in Sources */ = {isa = PBXBuildFile; fileRef = H00000000000000000000023 /* WidgetConfigurationSignal.swift */; };
+		G00000000000000000000028 /* WidgetConfigurationSyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = H00000000000000000000024 /* WidgetConfigurationSyncService.swift */; };
 		G00000000000000000000010 /* CodexSatellitesWidget.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = H00000000000000000000012 /* CodexSatellitesWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		G00000000000000000000011 /* WidgetSnapshotStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = H00000000000000000000013 /* WidgetSnapshotStoreTests.swift */; };
 /* End PBXBuildFile section */
@@ -95,12 +92,10 @@
 		H00000000000000000000013 /* WidgetSnapshotStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetSnapshotStoreTests.swift; sourceTree = "<group>"; };
 		H00000000000000000000014 /* RefreshCachedQuotaIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefreshCachedQuotaIntent.swift; sourceTree = "<group>"; };
 		H00000000000000000000015 /* WidgetSettingsSnapshot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetSettingsSnapshot.swift; sourceTree = "<group>"; };
-		H00000000000000000000016 /* WidgetPresentationStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetPresentationStore.swift; sourceTree = "<group>"; };
-		H00000000000000000000017 /* WidgetSettingsAction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetSettingsAction.swift; sourceTree = "<group>"; };
-		H00000000000000000000018 /* WidgetSettingsActionIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetSettingsActionIntent.swift; sourceTree = "<group>"; };
-		H00000000000000000000019 /* SetWidgetFaceIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetWidgetFaceIntent.swift; sourceTree = "<group>"; };
-		H00000000000000000000020 /* WidgetSettingsFaceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetSettingsFaceView.swift; sourceTree = "<group>"; };
 		H00000000000000000000021 /* WidgetSettingsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetSettingsTests.swift; sourceTree = "<group>"; };
+		H00000000000000000000022 /* CodexWidgetConfigurationIntent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodexWidgetConfigurationIntent.swift; sourceTree = "<group>"; };
+		H00000000000000000000023 /* WidgetConfigurationSignal.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetConfigurationSignal.swift; sourceTree = "<group>"; };
+		H00000000000000000000024 /* WidgetConfigurationSyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WidgetConfigurationSyncService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -113,13 +108,13 @@
 		D00000000000000000000001 = {isa = PBXGroup; children = (D00000000000000000000002, D00000000000000000000003, D00000000000000000000004, D00000000000000000000005, D00000000000000000000006, I00000000000000000000001, I00000000000000000000002, D00000000000000000000007, D00000000000000000000008, B00000000000000000000015, H00000000000000000000011, ); sourceTree = "<group>"; };
 		D00000000000000000000002 /* App */ = {isa = PBXGroup; children = (B00000000000000000000001, ); path = App; sourceTree = "<group>"; };
 		D00000000000000000000003 /* Models */ = {isa = PBXGroup; children = (B00000000000000000000002, B00000000000000000000016, B00000000000000000000019, ); path = Models; sourceTree = "<group>"; };
-		D00000000000000000000004 /* Services */ = {isa = PBXGroup; children = (B00000000000000000000003, B00000000000000000000004, B00000000000000000000011, B00000000000000000000017, B00000000000000000000020, ); path = Services; sourceTree = "<group>"; };
+		D00000000000000000000004 /* Services */ = {isa = PBXGroup; children = (B00000000000000000000003, B00000000000000000000004, B00000000000000000000011, B00000000000000000000017, B00000000000000000000020, H00000000000000000000024, ); path = Services; sourceTree = "<group>"; };
 		D00000000000000000000005 /* Views */ = {isa = PBXGroup; children = (B00000000000000000000005, B00000000000000000000012, ); path = Views; sourceTree = "<group>"; };
 		D00000000000000000000006 /* Window */ = {isa = PBXGroup; children = (B00000000000000000000006, ); path = Window; sourceTree = "<group>"; };
 		D00000000000000000000007 /* Tests */ = {isa = PBXGroup; children = (B00000000000000000000007, B00000000000000000000008, B00000000000000000000013, B00000000000000000000018, B00000000000000000000021, H00000000000000000000013, H00000000000000000000021, ); path = Tests; sourceTree = "<group>"; };
 		D00000000000000000000008 /* Products */ = {isa = PBXGroup; children = (B00000000000000000000009, B00000000000000000000010, H00000000000000000000012, ); name = Products; sourceTree = "<group>"; };
-		I00000000000000000000001 /* Shared */ = {isa = PBXGroup; children = (H00000000000000000000001, H00000000000000000000015, H00000000000000000000016, H00000000000000000000017, H00000000000000000000018, ); path = Shared; sourceTree = "<group>"; };
-		I00000000000000000000002 /* CodexSatellitesWidget */ = {isa = PBXGroup; children = (H00000000000000000000002, H00000000000000000000003, H00000000000000000000004, H00000000000000000000005, H00000000000000000000006, H00000000000000000000007, H00000000000000000000014, H00000000000000000000019, H00000000000000000000020, H00000000000000000000009, H00000000000000000000010, ); path = CodexSatellitesWidget; sourceTree = "<group>"; };
+		I00000000000000000000001 /* Shared */ = {isa = PBXGroup; children = (H00000000000000000000001, H00000000000000000000015, H00000000000000000000023, ); path = Shared; sourceTree = "<group>"; };
+		I00000000000000000000002 /* CodexSatellitesWidget */ = {isa = PBXGroup; children = (H00000000000000000000002, H00000000000000000000003, H00000000000000000000004, H00000000000000000000005, H00000000000000000000006, H00000000000000000000007, H00000000000000000000014, H00000000000000000000022, H00000000000000000000009, H00000000000000000000010, ); path = CodexSatellitesWidget; sourceTree = "<group>"; };
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -139,9 +134,9 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		C00000000000000000000003 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (A00000000000000000000001, A00000000000000000000002, A00000000000000000000003, A00000000000000000000004, A00000000000000000000005, A00000000000000000000006, A00000000000000000000009, A00000000000000000000010, A00000000000000000000014, A00000000000000000000015, A00000000000000000000017, A00000000000000000000018, G00000000000000000000001, G00000000000000000000013, G00000000000000000000015, G00000000000000000000017, G00000000000000000000019, ); runOnlyForDeploymentPostprocessing = 0; };
+		C00000000000000000000003 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (A00000000000000000000001, A00000000000000000000002, A00000000000000000000003, A00000000000000000000004, A00000000000000000000005, A00000000000000000000006, A00000000000000000000009, A00000000000000000000010, A00000000000000000000014, A00000000000000000000015, A00000000000000000000017, A00000000000000000000018, G00000000000000000000001, G00000000000000000000013, G00000000000000000000025, G00000000000000000000026, G00000000000000000000028, ); runOnlyForDeploymentPostprocessing = 0; };
 		C00000000000000000000005 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (A00000000000000000000007, A00000000000000000000008, A00000000000000000000011, A00000000000000000000016, A00000000000000000000019, G00000000000000000000011, G00000000000000000000023, ); runOnlyForDeploymentPostprocessing = 0; };
-		J00000000000000000000001 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (G00000000000000000000002, G00000000000000000000003, G00000000000000000000004, G00000000000000000000005, G00000000000000000000006, G00000000000000000000007, G00000000000000000000008, G00000000000000000000012, G00000000000000000000014, G00000000000000000000016, G00000000000000000000018, G00000000000000000000020, G00000000000000000000021, G00000000000000000000022, ); runOnlyForDeploymentPostprocessing = 0; };
+		J00000000000000000000001 /* Sources */ = {isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = (G00000000000000000000002, G00000000000000000000003, G00000000000000000000004, G00000000000000000000005, G00000000000000000000006, G00000000000000000000007, G00000000000000000000008, G00000000000000000000012, G00000000000000000000014, G00000000000000000000024, G00000000000000000000027, ); runOnlyForDeploymentPostprocessing = 0; };
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
