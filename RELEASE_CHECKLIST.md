@@ -146,24 +146,22 @@ Use a stable installed app path such as `/Applications/CodexSatellites.app`.
 - [ ] Logs contain no Authorization header.
 - [ ] App creates/modifies no files under `~/.codex`.
 
-## 12. Formal Developer ID release
+## 12. v0.4.0 ad-hoc public release
 
-- [ ] Developer ID Application identity available.
-- [ ] `./script/release.sh preflight` reports public release capability READY.
-- [ ] `./script/release.sh all` succeeds.
-- [ ] Exported app passes `codesign --verify`.
-- [ ] Hardened Runtime present.
-- [ ] App Sandbox absent.
-- [ ] App notarization `Accepted`.
-- [ ] App staple validation passes.
-- [ ] App Gatekeeper passes.
-- [ ] Final DMG passes `hdiutil verify`.
-- [ ] DMG signature verifies.
-- [ ] DMG notarization `Accepted`.
-- [ ] DMG staple validation passes.
-- [ ] DMG Gatekeeper passes.
-- [ ] `SHA256SUMS` verifies.
-- [ ] `SHA256SUMS` contains only DMG basename.
+Developer ID signing and Apple notarization are intentionally outside the v0.4.0 release gate. The owner does not currently use an Apple Developer identity; the public trust model must be disclosed as ad-hoc signed and unnotarized.
+
+- [ ] `./script/release.sh preflight` reports `Ad-hoc public release capability: READY`.
+- [ ] `./script/release.sh adhoc` succeeds from a clean exact HEAD.
+- [ ] App and widget versions are `0.4.0` and share the exact HEAD-derived `CFBundleVersion`.
+- [ ] App passes `codesign --verify --deep --strict` with its ad-hoc signature.
+- [ ] Widget extension passes strict signature verification and remains sandboxed.
+- [ ] App remains non-sandboxed.
+- [ ] Final `CodexSatellites-0.4.0.dmg` passes `hdiutil verify`.
+- [ ] Mounted DMG contains `CodexSatellites.app`, `Applications`, `LICENSE.txt`, and the widget extension.
+- [ ] `SHA256SUMS` verifies and contains only the final DMG basename.
+- [ ] README, release notes, website, and GitHub Release explicitly state that the public artifact is ad-hoc signed and not notarized.
+
+Optional future Developer ID/notarized distribution remains available through `./script/release.sh all` when credentials exist, but it is not required for v0.4.0.
 
 ## 13. Widget
 
@@ -244,7 +242,7 @@ Observed 2026-09-09 (ad-hoc, build 20 → 21):
 - `FAIL` — after launching build 21, chronod kept the pre-upgrade widget extension process; the timeline still ran the build 20 binary, and re-adding the widgets did not recycle it.
 - `PASS` — after the old extension process was terminated, chronod launched a new process reporting `timeline build=21`.
 
-Known limitation (non-blocking): macOS does not guarantee hot replacement of an already-running WidgetKit extension process when the containing app is replaced in place, and no public WidgetKit API can force it. Developer ID upgrade behaviour remains `NOT TESTED`.
+Known limitation (non-blocking): macOS does not guarantee hot replacement of an already-running WidgetKit extension process when the containing app is replaced in place, and no public WidgetKit API can force process recycling.
 
 Observed 2026-10-13 for the revised v0.4.0 widget design:
 
@@ -253,14 +251,16 @@ Observed 2026-10-13 for the revised v0.4.0 widget design:
 - `PASS` — compiled AppIntents metadata exposes Launch at Login + Frequency on `CodexWidgetConfigurationIntent`; Percentage and the superseded custom gear/settings-face intents are absent.
 - `PASS` — exact validated build 41 was installed rollback-safely to `/Applications`; installed app/widget versions and strict/deep signatures were re-verified, and the prior CodexSatellites widget-extension process was recycled without touching chronod or unrelated processes.
 - `PASS` — owner manually validated the installed build 41: Small/Medium no longer expose the custom gear; normal-content refresh reports `Running` while the app is active, reports `Stopped` after Quit without relaunching the app, and native **Edit Widget** exposes only Launch at Login + Frequency.
-- `PASS` — revised implementation is committed as `0899ccc2f062c98ce60ef261699c6e4326b24cec`. Because release builds derive `CFBundleVersion` from the HEAD commit count and the manual E2E used build 41, the final release-evidence commit advances HEAD to build 41; final exact-HEAD validation must run without a `BUILD_NUMBER` override.
+- `PASS` — owner subsequently installed the final exact-HEAD preview from `dist/` and confirmed the tested behavior is good enough to approve v0.4.0 publication.
+- `PASS` — revised implementation is committed as `0899ccc2f062c98ce60ef261699c6e4326b24cec`. Release builds derive `CFBundleVersion` from the final release commit count; final exact-HEAD validation must run without a `BUILD_NUMBER` override.
 - `NOT TESTED` — changing Launch at Login or Frequency in the native editor and observing end-to-end reconciliation into app-global settings remains a separate manual E2E check. System privacy settings were intentionally not changed for UI automation.
 - `NOT TESTED` — no-notch Mac/VM-equivalent E2E; this Mac exposes only its built-in notched display and no no-notch environment is currently available.
-- `BLOCKED` — formal Developer ID/notarized release artifact on this machine: Developer ID and `CodexSatellites-notary` remain unavailable. Preview capability remains separate from this manual build-41 validation.
+- `PASS` — owner explicitly chose ad-hoc signed, unnotarized distribution for v0.4.0 because no Apple Developer account is currently used or planned in the short term. Developer ID/notary availability is therefore not a v0.4.0 blocker; the release must disclose the resulting Gatekeeper trust model.
 
 ## 14. Final install
 
-- [ ] Install from final signed/notarized DMG.
+- [ ] Install from final ad-hoc signed, unnotarized DMG.
+- [ ] Complete any explicit macOS first-launch approval required by Gatekeeper.
 - [ ] Launch from `/Applications`.
 - [ ] Quota display works.
 - [ ] Settings Bar works.
@@ -275,10 +275,11 @@ Observed 2026-10-13 for the revised v0.4.0 widget design:
 - [ ] `ReleaseNotes/v0.4.0.md` accurate.
 - [ ] README and website describe the runtime transport exactly as implemented; they do not claim Developer ID signing automatically activates App Group transport.
 - [ ] README and website keep Full-screen Space behavior marked unvalidated unless it was actually tested.
-- [ ] Preview artifacts from `./script/release.sh preview` are treated as local-validation artifacts; formal publication uses the signed/notarized `./script/release.sh all` output.
+- [ ] Preview artifacts from `./script/release.sh preview` remain local-validation artifacts; v0.4.0 publication uses the clean-HEAD `./script/release.sh adhoc` output.
+- [ ] Public release copy clearly states that v0.4.0 is ad-hoc signed and unnotarized; it does not claim Developer ID, notarization, stapling, or Gatekeeper acceptance.
 - [ ] MIT License present.
-- [ ] Final DMG + `SHA256SUMS` ready.
-- [ ] Owner approves publication.
+- [ ] Final `CodexSatellites-0.4.0.dmg` + `SHA256SUMS` ready.
+- [x] Owner approves publication.
 - [ ] Tag `v0.4.0`.
 - [ ] Publish GitHub Release.
 

@@ -31,10 +31,10 @@ RW_DMG="$WORK_DIR/$APP_NAME-$VERSION-rw.dmg"
 MOUNT_POINT="/Volumes/$APP_NAME"
 DMG_PATH="$DIST_DIR/$APP_NAME-$VERSION.dmg"
 CHECKSUMS_PATH="$DIST_DIR/SHA256SUMS"
-PREVIEW_DERIVED="$WORK_DIR/preview-derived"
-PREVIEW_APP="$PREVIEW_DERIVED/Build/Products/Release/$APP_NAME.app"
+ADHOC_DERIVED="$WORK_DIR/adhoc-derived"
+ADHOC_APP="$ADHOC_DERIVED/Build/Products/Release/$APP_NAME.app"
 PREVIEW_RW_DMG="$WORK_DIR/$APP_NAME-$VERSION-preview-rw.dmg"
-PREVIEW_MOUNT_POINT="$WORK_DIR/preview-dmg-mount"
+ADHOC_MOUNT_POINT="$WORK_DIR/adhoc-dmg-mount"
 PREVIEW_DMG_PATH="$DIST_DIR/$APP_NAME-$VERSION-preview-adhoc.dmg"
 DMG_BACKGROUND="$ROOT_DIR/Artwork/Release/DMG/dmg-background.png"
 
@@ -56,7 +56,7 @@ die() {
 
 require_clean_tree() {
     [[ -z "$(git -C "$ROOT_DIR" status --porcelain --untracked-files=no)" ]] \
-        || die "working tree has uncommitted changes; commit before a formal release"
+        || die "working tree has uncommitted changes; commit before a release"
 }
 
 warn_if_dirty_tree() {
@@ -139,7 +139,9 @@ require_notary() {
 }
 
 preflight() {
-    local blocked=0
+    local adhoc_blocked=0
+    local developer_id_available=0
+    local notary_available=0
     ensure_tools
     mkdir -p "$WORK_DIR" "$LOG_DIR"
     log "project: $PROJECT_NAME"
@@ -150,33 +152,38 @@ preflight() {
         log "Artwork: AVAILABLE"
     else
         log "Artwork: BLOCKED"
-        blocked=1
+        adhoc_blocked=1
     fi
+
     if check_signing_prerequisites; then
-        log "Developer ID: AVAILABLE"
+        developer_id_available=1
+        log "Developer ID: AVAILABLE (optional)"
         log "Team ID: $TEAM_ID"
     else
-        log "Developer ID: BLOCKED"
-        blocked=1
+        log "Developer ID: UNAVAILABLE (optional; not required for ad-hoc release)"
     fi
     if check_notary_prerequisites; then
-        log "Notary profile: AVAILABLE"
+        notary_available=1
+        log "Notary profile: AVAILABLE (optional)"
     else
-        log "Notary profile: BLOCKED ($NOTARY_PROFILE)"
-        blocked=1
+        log "Notary profile: UNAVAILABLE (optional; not required for ad-hoc release)"
     fi
-    if check_artwork; then
+
+    if [[ "$adhoc_blocked" -eq 0 ]]; then
         log "Preview DMG capability: READY"
+        log "Ad-hoc public release capability: READY"
     else
         log "Preview DMG capability: BLOCKED"
+        log "Ad-hoc public release capability: BLOCKED"
     fi
-    if [[ "$blocked" -eq 0 ]]; then
-        log "Public release capability: READY"
+
+    if [[ "$developer_id_available" -eq 1 && "$notary_available" -eq 1 ]]; then
+        log "Developer ID/notarized release capability: READY"
     else
-        log "Public release capability: BLOCKED"
-        log "Preview remains available with: $0 preview"
+        log "Developer ID/notarized release capability: UNAVAILABLE (optional)"
     fi
-    [[ "$blocked" -eq 0 ]]
+
+    [[ "$adhoc_blocked" -eq 0 ]]
 }
 
 write_export_options() {
@@ -453,7 +460,7 @@ write_checksum() {
     )
 }
 
-ad_hoc_sign_preview_app() {
+ad_hoc_sign_app() {
     local app="$1"
     local appex="$app/Contents/PlugIns/$WIDGET_EXTENSION_NAME.appex"
 
@@ -466,34 +473,72 @@ ad_hoc_sign_preview_app() {
     codesign --force --sign - \
         --identifier "$BUNDLE_ID" \
         --entitlements "$ROOT_DIR/CodexSatellites.entitlements" \
-        "$app" || die "failed to ad-hoc sign preview app"
-    log "preview app and widget extension ad-hoc signed"
+        "$app" || die "failed to ad-hoc sign app"
+    log "app and widget extension ad-hoc signed"
 }
 
-preview_structure_test() {
+verify_adhoc_app() {
+    local app="$1"
+    local appex="$app/Contents/PlugIns/$WIDGET_EXTENSION_NAME.appex"
+    mkdir -p "$LOG_DIR"
+    [[ -d "$appex" ]] || die "widget extension missing: $appex"
+    codesign --verify --deep --strict --verbose=4 "$app"
+    codesign --verify --strict --verbose=4 "$appex"
+    codesign -d --entitlements :- "$app" >"$LOG_DIR/adhoc-app-entitlements.plist" 2>&1
+    codesign -d --entitlements :- "$appex" >"$LOG_DIR/adhoc-appex-entitlements.plist" 2>&1
+    if grep -q 'com.apple.security.app-sandbox' "$LOG_DIR/adhoc-app-entitlements.plist"; then
+        die "App Sandbox entitlement is present"
+    fi
+    grep -q 'com.apple.security.app-sandbox' "$LOG_DIR/adhoc-appex-entitlements.plist" || die "widget extension is not sandboxed"
+    grep -q "$APP_GROUP_ID" "$LOG_DIR/adhoc-appex-entitlements.plist" || die "widget extension lacks the App Group entitlement"
+    [[ "$(lipo -archs "$app/Contents/MacOS/$APP_NAME")" == *arm64* ]] || die "app binary does not contain arm64"
+    verify_versions "$app"
+    log "ad-hoc app verification passed"
+}
+
+adhoc_structure_test() {
+    local dmg="$1"
+    local label="$2"
     local mount_active=0
-    rm -rf "$PREVIEW_MOUNT_POINT"
-    mkdir -p "$PREVIEW_MOUNT_POINT"
-    cleanup_preview_mount() {
+    rm -rf "$ADHOC_MOUNT_POINT"
+    mkdir -p "$ADHOC_MOUNT_POINT"
+    cleanup_adhoc_mount() {
         if [[ "$mount_active" -eq 1 ]]; then
-            detach_mount "$PREVIEW_MOUNT_POINT" || true
+            detach_mount "$ADHOC_MOUNT_POINT" || true
         fi
     }
-    trap cleanup_preview_mount EXIT
-    hdiutil attach -readonly -noverify -noautoopen -mountpoint "$PREVIEW_MOUNT_POINT" "$PREVIEW_DMG_PATH" >/dev/null
+    trap cleanup_adhoc_mount EXIT
+    hdiutil attach -readonly -noverify -noautoopen -mountpoint "$ADHOC_MOUNT_POINT" "$dmg" >/dev/null
     mount_active=1
-    local app="$PREVIEW_MOUNT_POINT/$APP_NAME.app"
-    [[ -d "$app" ]] || die "preview DMG is missing the app"
-    [[ -L "$PREVIEW_MOUNT_POINT/Applications" ]] || die "preview DMG is missing Applications alias"
-    [[ -f "$PREVIEW_MOUNT_POINT/LICENSE.txt" ]] || die "preview DMG is missing LICENSE.txt"
-    [[ -d "$app/Contents/PlugIns/$WIDGET_EXTENSION_NAME.appex" ]] || die "preview app is missing the widget extension"
+    local app="$ADHOC_MOUNT_POINT/$APP_NAME.app"
+    [[ -d "$app" ]] || die "$label DMG is missing the app"
+    [[ -L "$ADHOC_MOUNT_POINT/Applications" ]] || die "$label DMG is missing Applications alias"
+    [[ -f "$ADHOC_MOUNT_POINT/LICENSE.txt" ]] || die "$label DMG is missing LICENSE.txt"
+    [[ -d "$app/Contents/PlugIns/$WIDGET_EXTENSION_NAME.appex" ]] || die "$label app is missing the widget extension"
     codesign --verify --deep --strict --verbose=2 "$app"
-    detach_mount "$PREVIEW_MOUNT_POINT" || die "could not detach preview DMG volume cleanly"
+    verify_versions "$app"
+    detach_mount "$ADHOC_MOUNT_POINT" || die "could not detach $label DMG volume cleanly"
     mount_active=0
     trap - EXIT
     # Never launch the app from the mounted image: that registers a widget
     # extension path which disappears on detach. Install to /Applications first.
-    log "preview DMG structure verified (not launched from the mount)"
+    log "$label DMG structure verified (not launched from the mount)"
+}
+
+build_adhoc_app() {
+    rm -rf "$ADHOC_DERIVED"
+    log "building Release app for ad-hoc packaging"
+    xcodebuild \
+        -project "$ROOT_DIR/$PROJECT_NAME" \
+        -scheme "$SCHEME" \
+        -configuration Release \
+        -derivedDataPath "$ADHOC_DERIVED" \
+        CODE_SIGNING_ALLOWED=NO \
+        CURRENT_PROJECT_VERSION="$BUILD_NUMBER" \
+        build
+    [[ -d "$ADHOC_APP" ]] || die "ad-hoc build did not produce $ADHOC_APP"
+    ad_hoc_sign_app "$ADHOC_APP"
+    verify_adhoc_app "$ADHOC_APP"
 }
 
 preview() {
@@ -501,26 +546,30 @@ preview() {
     warn_if_dirty_tree
     check_artwork || die "artwork is incomplete; preview cannot be built"
     mkdir -p "$DIST_DIR" "$WORK_DIR" "$LOG_DIR"
-    rm -rf "$PREVIEW_DERIVED"
-    log "building Release preview app"
-    xcodebuild \
-        -project "$ROOT_DIR/$PROJECT_NAME" \
-        -scheme "$SCHEME" \
-        -configuration Release \
-        -derivedDataPath "$PREVIEW_DERIVED" \
-        CODE_SIGNING_ALLOWED=NO \
-        CURRENT_PROJECT_VERSION="$BUILD_NUMBER" \
-        build
-    [[ -d "$PREVIEW_APP" ]] || die "preview build did not produce $PREVIEW_APP"
-    ad_hoc_sign_preview_app "$PREVIEW_APP"
-    verify_versions "$PREVIEW_APP"
-    create_styled_dmg "$PREVIEW_APP" "$PREVIEW_DMG_PATH" "$PREVIEW_RW_DMG" "$MOUNT_POINT"
+    build_adhoc_app
+    create_styled_dmg "$ADHOC_APP" "$PREVIEW_DMG_PATH" "$PREVIEW_RW_DMG" "$MOUNT_POINT"
     hdiutil verify "$PREVIEW_DMG_PATH"
-    preview_structure_test
+    adhoc_structure_test "$PREVIEW_DMG_PATH" "preview"
     log "preview DMG: $PREVIEW_DMG_PATH"
     printf '%s\n' 'WARNING: This is an ad-hoc signed, unnotarized preview DMG.'
     printf '%s\n' 'It is for local packaging/artwork/widget validation only.'
     printf '%s\n' 'Do not publish it.'
+}
+
+adhoc() {
+    require_clean_tree
+    ensure_tools
+    check_artwork || die "artwork is incomplete; ad-hoc release cannot be built"
+    mkdir -p "$DIST_DIR" "$WORK_DIR" "$LOG_DIR"
+    build_adhoc_app
+    create_styled_dmg "$ADHOC_APP" "$DMG_PATH" "$RW_DMG" "$MOUNT_POINT"
+    hdiutil verify "$DMG_PATH"
+    adhoc_structure_test "$DMG_PATH" "ad-hoc release"
+    write_checksum
+    log "ad-hoc public DMG: $DMG_PATH"
+    log "checksum verified: $CHECKSUMS_PATH"
+    printf '%s\n' 'NOTICE: This public release is ad-hoc signed and not notarized.'
+    printf '%s\n' 'macOS may require explicit user approval on first launch.'
 }
 
 verify() {
@@ -531,7 +580,7 @@ verify() {
 }
 
 usage() {
-    printf 'usage: %s {preflight|preview|build|notarize|package|verify|all}\n' "$0" >&2
+    printf 'usage: %s {preflight|preview|adhoc|build|notarize|package|verify|all}\n' "$0" >&2
 }
 
 main() {
@@ -539,6 +588,7 @@ main() {
     case "$mode" in
         preflight) preflight ;;
         preview) preview ;;
+        adhoc) adhoc ;;
         build) build; verify_signed_app ;;
         notarize) notarize_app ;;
         package) package_dmg ;;

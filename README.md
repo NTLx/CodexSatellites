@@ -6,6 +6,8 @@ Minimal Codex quota satellites for the MacBook notch.
 
 Website: [ntlx.github.io/CodexSatellites](https://ntlx.github.io/CodexSatellites/)
 
+Latest release: [v0.4.0](https://github.com/NTLx/CodexSatellites/releases/tag/v0.4.0)
+
 ## What it does
 
 CodexSatellites is a native macOS ambient HUD for the built-in display of a notched MacBook. It keeps the hardware notch untouched and shows two small quota orbs beside it:
@@ -14,7 +16,7 @@ CodexSatellites is an independent community utility and is not affiliated with o
 
 - Left satellite → Codex 5h remaining
 - Right satellite → Codex weekly remaining
-- Desktop / Notification Center widget → the same two quotas at a glance
+- Desktop / Notification Center widget → quotas, available reset count, and live app Running/Stopped status
 
 ## Widget
 
@@ -72,15 +74,16 @@ Use `./script/build_and_run.sh --verify` to build, launch, and verify the proces
 
 ## Release engineering
 
-The outside-Mac-App-Store release workflow uses Developer ID signing, Hardened Runtime, notarization, stapling, and a DMG:
+v0.4.0 is the current GitHub release. Its public DMG contains an ad-hoc signed app and widget extension and is **not notarized**. This is the project's current distribution policy because no Apple Developer identity is used for the release.
 
 ```bash
 ./script/release.sh preflight
-./script/release.sh preview
-./script/release.sh all
+./script/release.sh adhoc
 ```
 
-The release script reads signing and notarization identity from the local environment and Keychain. It never stores credentials in the repository. Generated artifacts and release evidence live under the ignored `dist/` directory. `./script/release.sh preview` produces an ad-hoc signed, unnotarized artifact for local validation only; the formal distribution path is `./script/release.sh all`.
+`./script/release.sh adhoc` requires a clean tree, builds the exact HEAD revision, verifies the app/widget signatures and versions, creates `dist/CodexSatellites-0.4.0.dmg`, and writes `dist/SHA256SUMS`. `./script/release.sh preview` remains a local-only packaging check. The optional `./script/release.sh all` path is retained for a future Developer ID signed and notarized release if those credentials become available.
+
+Because the public DMG is not notarized, macOS may require explicit approval the first time you open the app. The release notes and GitHub Release identify this trust model rather than implying Apple notarization.
 
 ## Known limitations
 
@@ -89,10 +92,10 @@ The release script reads signing and notarization identity from the local enviro
 - The app assumes an existing local Codex login and does not manage authentication.
 - Notifications require a signed build and the app to be running.
 - Notifications are English-only and have no in-app toggle — use macOS System Settings → Notifications.
-- The widget requires a code-signed build to be registered by macOS; both `./script/build_and_run.sh` and `./script/release.sh preview` ad-hoc sign locally, so the widget can be tested without a Developer ID.
-- The widget extension is sandboxed (a macOS requirement) and never reads Codex auth or calls the usage endpoint. App-owned quota/settings snapshots stay separate from widget-local presentation state.
-- Widget face state is stored per family, so multiple Small widgets share one face selection and multiple Medium widgets share one face selection.
-- On macOS, an already-running widget extension may keep using the previous widget code after CodexSatellites is updated, even though the installed app and widget extension report a newer build number. This was observed during local ad-hoc upgrade testing: widget data kept refreshing, but presentation changes did not appear until macOS recycled the widget extension process. There is no public API that guarantees recycling; restarting the WidgetKit host or logging out may create a fresh process. Developer ID upgrade behaviour remains to be verified.
+- The widget requires a code-signed build to be registered by macOS. The v0.4.0 public release ad-hoc signs both the app and widget extension; it is not Developer ID signed or notarized.
+- The widget extension is sandboxed (a macOS requirement) and never reads Codex auth or calls the usage endpoint. App-owned quota/settings snapshots stay separate from transient app-process state.
+- WidgetKit stores **Edit Widget** configuration per widget instance, while Launch at Login and Frequency are app-global settings. CodexSatellites reconciles the field that changed, but WidgetKit provides no public API to rewrite the stored editor values in every other widget instance.
+- On macOS, an already-running WidgetKit extension can temporarily keep the previous widget binary after an in-place app update. CodexSatellites requests a timeline reload after an app build change, but WidgetKit process recycling remains controlled by macOS and has no public force-recycle API.
 
 ## License
 

@@ -6,7 +6,7 @@
     <title>CodexSatellites: Codex quota beside the MacBook notch</title>
     <meta
       name="description"
-      content="A native macOS ambient HUD for Codex quota, with notch satellites and an interactive WidgetKit widget that includes Launch at Login, refresh frequency, reset count, and Quit controls."
+      content="CodexSatellites v0.4.0 is a native macOS ambient HUD for Codex quota, with notch satellites and a WidgetKit widget for quota, reset count, live app status, Launch at Login, and refresh frequency."
     />
     <link rel="canonical" href="https://ntlx.github.io/CodexSatellites/" />
     <meta name="theme-color" content="#f4f5f7" />
@@ -20,7 +20,7 @@
     />
     <meta
       property="og:description"
-      content="Codex quota beside the MacBook notch, plus an interactive WidgetKit widget with built-in settings. Free and open source."
+      content="CodexSatellites v0.4.0: Codex quota beside the MacBook notch, plus a WidgetKit widget with live app status and native settings. Free and open source."
     />
     <meta property="og:url" content="https://ntlx.github.io/CodexSatellites/" />
     <meta
@@ -36,7 +36,7 @@
     />
     <meta
       name="twitter:description"
-      content="Codex quota beside the MacBook notch, plus an interactive WidgetKit widget with built-in settings."
+      content="CodexSatellites v0.4.0: Codex quota beside the MacBook notch, plus a WidgetKit widget with live app status and native settings."
     />
     <meta
       name="twitter:image"
@@ -60,10 +60,11 @@
         "name": "CodexSatellites",
         "applicationCategory": "UtilitiesApplication",
         "operatingSystem": "macOS 15 or later",
-        "description": "A native macOS ambient HUD that shows Codex quota beside the MacBook notch and in an interactive WidgetKit widget with built-in settings.",
+        "description": "A native macOS ambient HUD that shows Codex quota beside the MacBook notch and in a WidgetKit widget with reset count, live app status, and native configuration.",
         "softwareVersion": "0.4.0",
+        "datePublished": "2026-10-13",
         "url": "https://ntlx.github.io/CodexSatellites/",
-        "downloadUrl": "https://github.com/NTLx/CodexSatellites/releases",
+        "downloadUrl": "https://github.com/NTLx/CodexSatellites/releases/tag/v0.4.0",
         "license": "https://github.com/NTLx/CodexSatellites/blob/main/LICENSE",
         "isAccessibleForFree": true,
         "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
@@ -91,8 +92,8 @@
           >
           <a
             class="btn btn-primary btn-sm"
-            href="https://github.com/NTLx/CodexSatellites/releases"
-            >Releases</a
+            href="https://github.com/NTLx/CodexSatellites/releases/tag/v0.4.0"
+            >v0.4.0</a
           >
         </nav>
       </div>
@@ -110,8 +111,8 @@
           <div class="hero-cta">
             <a
               class="btn btn-primary"
-              href="https://github.com/NTLx/CodexSatellites/releases"
-              >Releases</a
+              href="https://github.com/NTLx/CodexSatellites/releases/tag/v0.4.0"
+              >Download v0.4.0</a
             ><a class="text-link" href="#satellites"
               >Try the satellites <span aria-hidden="true">↗</span></a
             >
@@ -361,8 +362,8 @@
           <h2>Make room for<br />one small utility.</h2>
           <a
             class="btn btn-primary"
-            href="https://github.com/NTLx/CodexSatellites/releases"
-            >Releases</a
+            href="https://github.com/NTLx/CodexSatellites/releases/tag/v0.4.0"
+            >Download v0.4.0</a
           >
         </div>
         <div class="install-content" data-reveal>
@@ -377,17 +378,23 @@
           </div>
           <ol class="install-steps">
             <li>Download the v0.4.0 DMG from GitHub Releases.</li>
-            <li>Drag CodexSatellites into Applications, then launch it.</li>
+            <li>Drag CodexSatellites into Applications.</li>
+            <li>
+              Launch it. Because v0.4.0 is not notarized, macOS may require you
+              to explicitly approve the app on first open.
+            </li>
             <li>
               Add the widget from the macOS widget gallery if you want it.
             </li>
           </ol>
           <aside>
-            <strong>Preview builds</strong>
+            <strong>Current release · v0.4.0</strong>
             <p>
-              The preview artifact produced by the release script is ad-hoc
-              signed, not notarized, and intended for local validation only.
-              Formal distribution uses Developer ID signing and notarization.
+              The app and widget extension are ad-hoc signed; the DMG is not
+              Developer ID signed or Apple-notarized. Verify the download against
+              the published SHA256SUMS file. If macOS blocks the first launch,
+              use Finder’s Open action or review the app in System Settings →
+              Privacy &amp; Security.
             </p>
           </aside>
           <p class="license-note">Free and open source. MIT licensed.</p>
@@ -402,8 +409,8 @@
           <a href="https://github.com/NTLx/CodexSatellites" rel="noopener"
             >GitHub</a
           >
-          <a href="https://github.com/NTLx/CodexSatellites/releases"
-            >Releases</a
+          <a href="https://github.com/NTLx/CodexSatellites/releases/tag/v0.4.0"
+            >v0.4.0</a
           >
           <a
             href="https://github.com/NTLx/CodexSatellites/tree/main/ReleaseNotes"

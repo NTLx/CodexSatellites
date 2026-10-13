@@ -301,7 +301,8 @@ Current release identity:
 - license: MIT
 - minimum macOS: 15+
 - App Sandbox: OFF (the widget extension is sandboxed — WidgetKit requires it)
-- Hardened Runtime: ON
+- Hardened Runtime: ON in the Xcode project; the optional Developer ID path verifies it on the exported artifact
+- current public distribution: ad-hoc signed app/widget in an unnotarized DMG
 - widget extension bundle ID: `io.github.ntlx.codexsatellites.widget`
 - App Group: `group.io.github.ntlx.codexsatellites`
 - GitHub Release titles use the version tag directly, such as `v0.4.0`; do not prefix the product name.
@@ -347,16 +348,22 @@ The widget extension is a separate process; the widget gallery is not scriptable
 - if PlugInKit rejects the appex, `log show --predicate 'process == "pkd"'` reports `plug-ins must be sandboxed`;
 - placing the widget on the desktop/gallery is a manual user action; report `NOT TESTED` unless actually observed.
 
-Preview DMG:
+Local preview DMG:
 
 ```bash
 ./script/release.sh preview
 ```
 
-Formal release:
+Current public release path:
 
 ```bash
 ./script/release.sh preflight
+./script/release.sh adhoc
+```
+
+Optional Developer ID/notarized path:
+
+```bash
 ./script/release.sh all
 ```
 
@@ -366,7 +373,18 @@ Never claim manual/signing/notarization checks passed unless actually executed.
 
 Do not modify `script/release.sh` as incidental cleanup.
 
-Formal distribution uses:
+The current public distribution path is intentionally:
+
+clean HEAD
+→ Release build
+→ ad-hoc sign app + widget extension with their required entitlements
+→ strict signature/version verification
+→ DMG
+→ SHA256SUMS.
+
+The public artifact must be described as **ad-hoc signed and unnotarized**. Developer ID, Apple notarization, stapling, and Gatekeeper acceptance are not v0.4.0 release gates.
+
+The optional future Developer ID path remains:
 
 Developer ID
 → Hardened Runtime
@@ -427,5 +445,5 @@ Rules:
 - scroll-linked effects are decoration only and must be wrapped in `@supports` so an unsupported engine drops them instead of losing content. The same applies to `@property`-driven ring fills;
 - anything presented as a screenshot, reading, or demo must be labelled as what it is. The notch replica and the widget layouts are simulations with invented values, and those numbers must never be presented as the owner's real usage;
 - the site is a presentation surface and must not contradict this file — quota-window semantics, widget click behaviour, privacy, authentication, and supported macOS versions all stay as documented here;
-- it must not claim a notarized, formal, or "latest stable" release while only pre-releases exist; the download entry points at the Releases page and states the ad-hoc / not-notarized status;
+- release/download language must reflect the actual GitHub release state and trust model. Before a stable release exists, never present a preview artifact as public distribution. For v0.4.0, primary download links target the current version tag and clearly disclose that the public DMG contains an ad-hoc signed app/widget and is not notarized; preview artifacts remain developer-only validation outputs;
 - the site is English-only, matching the widget and notification strings.
