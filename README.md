@@ -1,102 +1,239 @@
+<div align="center">
+
 # CodexSatellites
 
-Minimal Codex quota satellites for the MacBook notch.
+**Codex quota, quietly at home around your MacBook notch — and on your desktop.**
 
-![CodexSatellites](Artwork/README/README-hero-1600x900.png)
+[![Release](https://img.shields.io/github/v/release/NTLx/CodexSatellites?display_name=tag&style=flat-square)](https://github.com/NTLx/CodexSatellites/releases/latest)
+![macOS](https://img.shields.io/badge/macOS-15%2B-000000?style=flat-square&logo=apple&logoColor=white)
+![Swift](https://img.shields.io/badge/Swift-5.10-F05138?style=flat-square&logo=swift&logoColor=white)
+[![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
 
-Website: [ntlx.github.io/CodexSatellites](https://ntlx.github.io/CodexSatellites/)
+[Website](https://ntlx.github.io/CodexSatellites/) · [Download](https://github.com/NTLx/CodexSatellites/releases/latest) · [Release notes](ReleaseNotes/v0.4.0.md)
 
-Latest release: [v0.4.0](https://github.com/NTLx/CodexSatellites/releases/tag/v0.4.0)
+</div>
 
-## What it does
+![CodexSatellites running around the MacBook notch](Artwork/README/README-hero-1600x900.png)
 
-CodexSatellites is a native macOS ambient HUD for the built-in display of a notched MacBook. It keeps the hardware notch untouched and shows two small quota orbs beside it:
+CodexSatellites is a small native macOS utility that turns the space beside a MacBook notch into an ambient Codex quota display. The left satellite tracks the **5-hour** window, the right satellite tracks the **weekly** window, and both stay out of the way until you need more detail.
 
-CodexSatellites is an independent community utility and is not affiliated with or endorsed by OpenAI.
+A WidgetKit companion brings the same information to the desktop and Notification Center, including reset credits and the current app status.
 
-- Left satellite → Codex 5h remaining
-- Right satellite → Codex weekly remaining
-- Desktop / Notification Center widget → quotas, available reset count, and live app Running/Stopped status
+> CodexSatellites is an independent community project. It is not affiliated with or endorsed by OpenAI.
 
-## Widget
+## Why CodexSatellites?
 
-CodexSatellites ships a WidgetKit widget in two sizes:
+- **Ambient by design** — quota is visible where your eyes already are, without another floating window.
+- **Native macOS behavior** — SwiftUI, WidgetKit, native notifications, Launch at Login, and system widget editing.
+- **No conventional settings window** — controls live where the product lives: beside the notch and in the widget editor.
+- **Read-only authentication** — reuses your existing local Codex sign-in without implementing another login flow.
+- **Widget without the notch** — the desktop widget works on Macs without a usable hardware notch.
+- **No analytics or cloud sync** — CodexSatellites does not add its own telemetry service or account system.
 
-- **Small** → 5-hour and weekly remaining gauges, available reset count, and current app status.
-- **Medium** → the same information with reset times for both quota windows.
+## Install
 
-Add it from the desktop: right-click the desktop → **Edit Widgets…** → **CodexSatellites**. macOS does not allow an app to place a widget for you.
+### Requirements
 
-The app remains the only component that reads Codex authentication and requests usage. It publishes quota and settings snapshots for the widget; the widget only reads those caches and independently checks whether the main app is currently running. The `1m` / `5m` / `15m` setting controls quota polling by the app, not widget rendering. The widget performs no scheduled background refresh and its timeline policy remains `.never`.
+- **macOS 15 or later**
+- an existing **Codex CLI sign-in** on the Mac
+- a MacBook with a hardware notch for notch satellites
 
-Use macOS **Edit Widget** to configure **Launch at Login** and **Frequency**. Those settings are global to CodexSatellites even though WidgetKit stores editor values per widget instance: the running app detects the field that changed and applies only that field globally, so an unchanged stale value from another widget does not overwrite newer app state. WidgetKit does not provide a public API for rewriting the stored editor values of every other widget instance. If a widget is edited while CodexSatellites is stopped, the edit does not wake the app; it is reconciled the next time the app launches. This native editor is also the settings path on Macs without a usable hardware notch.
+The WidgetKit widget does **not** require a notch.
 
-Clicking the normal widget content performs a local-only refresh. WidgetKit reloads the timeline, re-reads the latest quota/settings caches, and checks whether `CodexSatellites.app` is currently running. The click never fetches from OpenAI, reads Codex auth, starts or activates the app, or writes either snapshot. The system content margin around the content may still use WidgetKit's default tap behavior and open CodexSatellites. If the app has never run and no snapshot exists, the widget keeps showing `—`.
+### Download and install
 
-## Interaction
+1. Download the latest DMG from [GitHub Releases](https://github.com/NTLx/CodexSatellites/releases/latest).
+2. Open the DMG and drag **CodexSatellites** into **Applications**.
+3. Launch the app.
+4. Optionally add the WidgetKit widget from the macOS widget gallery.
 
-- Hover → both satellites expand and show remaining percentages.
-- Click either satellite → a compact icon-only Settings Bar appears.
-- Click normal widget content → re-reads cached quota/settings information and refreshes the live app Running/Stopped state, with no network request and no app launch.
-- Edit Widget → Launch at Login and refresh frequency (`1m`, `5m`, `15m`).
-- Notch Settings Bar → Launch at Login, refresh frequency, read-only available reset count, and Quit.
-- Quota check interval → `1m`, `5m`, or `15m`.
-- Notifications → native macOS alerts when a quota window resets to 100%, crosses below 10%, or the available reset count changes.
+> **Why might macOS block the first launch?**
+>
+> The current public release is ad-hoc signed and not Apple-notarized. If macOS blocks it, use Finder → right-click **CodexSatellites** → **Open**, or approve it in **System Settings → Privacy & Security**. Each release also includes `SHA256SUMS` for independent download verification.
 
-## Requirements
+## At a glance
 
-- macOS 15+
-- MacBook with a hardware notch (notch satellites only; the widget works on any Mac)
-- Existing local Codex CLI authentication
+### Notch satellites
+
+| Interaction | Behavior |
+| --- | --- |
+| Idle | Two compact satellites sit beside the hardware notch. |
+| Hover | Both expand to reveal the remaining quota percentages. |
+| Click | Opens the compact Settings Bar. |
+| Settings Bar | Launch at Login, `1m` / `5m` / `15m` checks, available reset count, and Quit. |
+
+The panels are non-activating and follow the built-in display's camera-housing geometry instead of covering the notch itself.
+
+### Desktop widget
+
+<p align="center">
+  <img src="docs/assets/img/widget-small.svg" width="240" alt="CodexSatellites Small widget" />
+  &nbsp;&nbsp;&nbsp;
+  <img src="docs/assets/img/widget-medium.svg" width="480" alt="CodexSatellites Medium widget" />
+</p>
+
+| Small | Medium |
+| --- | --- |
+| 5-hour + weekly remaining quota | 5-hour + weekly remaining quota |
+| Available reset count | Available reset count |
+| App Running / Stopped status | App Running / Stopped status |
+| — | Reset time for each quota window |
+
+Right-click the desktop → **Edit Widgets…** → **CodexSatellites** to add it.
+
+The native **Edit Widget** panel exposes two app-wide settings:
+
+- **Launch at Login**
+- **Frequency** — `1m`, `5m`, or `15m`
+
+Clicking the normal widget content performs a **local-only refresh**: it re-reads the app's cached quota/settings data and checks whether CodexSatellites is currently running. It does **not** contact OpenAI, read Codex authentication, or start the app.
+
+## Notifications
+
+CodexSatellites can post native macOS notifications when:
+
+- a quota window returns to **100%**;
+- remaining quota falls below **10%**;
+- the available reset-credit count changes.
+
+Notification permissions are managed in **System Settings → Notifications**.
 
 ## How it works
 
-The app reads the existing local Codex authentication state and requests the current quota windows. It classifies the 5-hour and weekly windows by their server-provided duration, then positions two non-activating panels using the display's camera-housing geometry.
+```text
+Existing Codex sign-in
+        │
+        ▼
+ CodexSatellites app ─────► usage endpoint
+        │
+        ├────► notch satellites
+        ├────► native notifications
+        │
+        └────► local quota/settings snapshots
+                         │
+                         ▼
+                   WidgetKit widget
+```
 
-## Privacy & authentication
+The main app is the only component that reads the existing local Codex authentication state and requests quota data. It classifies the 5-hour and weekly windows from the server-provided durations and publishes widget-safe snapshots locally.
 
-CodexSatellites does not perform login or OAuth. It reads the existing local Codex authentication state. It does not refresh tokens or write Codex auth files.
+The WidgetKit extension is sandboxed. It never reads Codex authentication and never calls the usage endpoint itself.
 
-## Development
+## Privacy & security
 
-Build and run the app with:
+CodexSatellites is intentionally narrow in what it touches:
+
+- **No separate login or OAuth flow.**
+- **No credential storage of its own.**
+- **No writes to Codex auth files.**
+- **No token refresh performed by CodexSatellites.**
+- **No analytics, remote telemetry, or cloud sync added by the project.**
+- **Widget access is cache-only.** The sandboxed extension never receives Codex credentials.
+
+The app currently depends on an undocumented ChatGPT usage endpoint, so upstream behavior may change without notice.
+
+## Build from source
+
+Clone the repository, then build and run:
 
 ```bash
+git clone https://github.com/NTLx/CodexSatellites.git
+cd CodexSatellites
 ./script/build_and_run.sh
 ```
 
-Use `./script/build_and_run.sh --verify` to build, launch, and verify the process.
+Build, launch, and verify the running process:
 
-## Documentation
+```bash
+./script/build_and_run.sh --verify
+```
 
-- [Agent Engineering Contract](AGENTS.md)
-- [Release Checklist](RELEASE_CHECKLIST.md)
+The project targets **macOS 15+** and is written in **Swift / SwiftUI** with a WidgetKit extension.
 
-## Release engineering
+### Packaging
 
-v0.4.0 is the current GitHub release. Its public DMG contains an ad-hoc signed app and widget extension and is **not notarized**. This is the project's current distribution policy because no Apple Developer identity is used for the release.
+The current public distribution path does not require an Apple Developer identity:
 
 ```bash
 ./script/release.sh preflight
 ./script/release.sh adhoc
 ```
 
-`./script/release.sh adhoc` requires a clean tree, builds the exact HEAD revision, verifies the app/widget signatures and versions, creates `dist/CodexSatellites-0.4.0.dmg`, and writes `dist/SHA256SUMS`. `./script/release.sh preview` remains a local-only packaging check. The optional `./script/release.sh all` path is retained for a future Developer ID signed and notarized release if those credentials become available.
+`release.sh adhoc` requires a clean tracked worktree, builds the exact `HEAD`, verifies app/widget versions and ad-hoc signatures, and produces:
 
-Because the public DMG is not notarized, macOS may require explicit approval the first time you open the app. The release notes and GitHub Release identify this trust model rather than implying Apple notarization.
+```text
+dist/CodexSatellites-<version>.dmg
+dist/SHA256SUMS
+```
+
+`release.sh preview` is a local packaging check. `release.sh all` is retained for a future Developer ID signed + notarized distribution path.
+
+## Project documentation
+
+- [`AGENTS.md`](AGENTS.md) — architecture, invariants, and engineering contract
+- [`RELEASE_CHECKLIST.md`](RELEASE_CHECKLIST.md) — release gates and manual verification
+- [`ReleaseNotes/`](ReleaseNotes/) — versioned release notes
+- [Project website](https://ntlx.github.io/CodexSatellites/) — product overview and install guide
+
+## Contributing
+
+Issues and pull requests are welcome. For substantial changes, review [`AGENTS.md`](AGENTS.md) first: it documents the project's architectural boundaries, WidgetKit constraints, release rules, and source-of-truth conventions.
+
+When changing user-visible behavior, keep the implementation, README, release notes, and website consistent with the actual shipped product.
+
+## FAQ
+
+<details>
+<summary><strong>Can I use CodexSatellites on a Mac without a notch?</strong></summary>
+
+Yes — the **WidgetKit widget** works independently of the notch. Only the two notch satellites require a MacBook display with a hardware camera housing.
+
+</details>
+
+<details>
+<summary><strong>Does the widget contact OpenAI?</strong></summary>
+
+No. The widget reads only local snapshots written by the main app and checks whether the app is currently running. It never receives Codex credentials and never calls the usage endpoint.
+
+</details>
+
+<details>
+<summary><strong>Why does macOS warn about the downloaded app?</strong></summary>
+
+The current public build is ad-hoc signed rather than Developer ID signed and notarized. See [Install](#install) for the first-launch steps, and verify the DMG against the `SHA256SUMS` file attached to the release if desired.
+
+</details>
+
+<details>
+<summary><strong>Does CodexSatellites modify my Codex login?</strong></summary>
+
+No. It reads the existing local authentication state, does not perform OAuth itself, does not refresh tokens, and does not write the Codex auth files.
+
+</details>
 
 ## Known limitations
 
-- Codex usage currently depends on an undocumented ChatGPT usage endpoint.
-- Full-screen Space behavior has not been explicitly validated and should be treated as a known limitation.
-- The app assumes an existing local Codex login and does not manage authentication.
-- Notifications require a signed build and the app to be running.
-- Notifications are English-only and have no in-app toggle — use macOS System Settings → Notifications.
-- The widget requires a code-signed build to be registered by macOS. The v0.4.0 public release ad-hoc signs both the app and widget extension; it is not Developer ID signed or notarized.
-- The widget extension is sandboxed (a macOS requirement) and never reads Codex auth or calls the usage endpoint. App-owned quota/settings snapshots stay separate from transient app-process state.
-- WidgetKit stores **Edit Widget** configuration per widget instance, while Launch at Login and Frequency are app-global settings. CodexSatellites reconciles the field that changed, but WidgetKit provides no public API to rewrite the stored editor values in every other widget instance.
-- On macOS, an already-running WidgetKit extension can temporarily keep the previous widget binary after an in-place app update. CodexSatellites requests a timeline reload after an app build change, but WidgetKit process recycling remains controlled by macOS and has no public force-recycle API.
+<details>
+<summary>Current platform and upstream limitations</summary>
+
+- Codex usage depends on an undocumented ChatGPT usage endpoint.
+- Full-screen Space behavior has not been explicitly validated.
+- CodexSatellites assumes an existing local Codex sign-in and does not manage authentication.
+- Notifications require the app to be running and currently use English copy only.
+- The public v0.4.0 build is ad-hoc signed, not Developer ID signed, and not notarized.
+- WidgetKit stores **Edit Widget** configuration per widget instance while Launch at Login and Frequency are app-global. CodexSatellites reconciles the setting that changed, but WidgetKit has no public API to rewrite the stored editor values in every other widget instance.
+- macOS can temporarily keep an older WidgetKit extension process alive after an in-place app update. Timeline reloads are requested, but process recycling remains controlled by the system.
+
+</details>
 
 ## License
 
-CodexSatellites is released under the [MIT License](LICENSE).
+CodexSatellites is open source under the [MIT License](LICENSE).
+
+---
+
+<div align="center">
+
+**[Website](https://ntlx.github.io/CodexSatellites/) · [Latest release](https://github.com/NTLx/CodexSatellites/releases/latest) · [Source](https://github.com/NTLx/CodexSatellites)**
+
+</div>
